@@ -1,0 +1,234 @@
+/* Add this to your CSS file */
+.gmail-editor-container {
+    max-width: 800px;
+    margin: 20px auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Roboto', Arial, sans-serif;
+  }
+  
+  .email-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .subject-input {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    font-size: 16px;
+    outline: none;
+  }
+  
+  .toolbar {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  
+  .toolbar-group {
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #e0e0e0;
+    padding-right: 10px;
+    margin-right: 10px;
+  }
+  
+  .toolbar-item {
+    position: relative;
+    margin-right: 5px;
+  }
+  
+  .toolbar-button {
+    background: none;
+    border: none;
+    padding: 5px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5f6368;
+  }
+  
+  .toolbar-button:hover {
+    background-color: #f1f3f4;
+  }
+  
+  .toolbar-button.active {
+    color: #1a73e8;
+    background-color: #e8f0fe;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    padding: 8px 0;
+    min-width: 150px;
+  }
+  
+  .font-options {
+    min-width: 180px;
+  }
+  
+  .dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #202124;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f1f3f4;
+  }
+  
+  .dropdown-item.active {
+    color: #1a73e8;
+    background-color: #e8f0fe;
+  }
+  
+  .color-options {
+    width: 200px;
+    padding: 10px;
+  }
+  
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  
+  .color-option {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 2px;
+  }
+  
+  .color-option:hover {
+    border-color: #5f6368;
+  }
+  
+  .color-reset {
+    width: 100%;
+    padding: 6px;
+    background: none;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #5f6368;
+  }
+  
+  .color-reset:hover {
+    background-color: #f1f3f4;
+  }
+  
+  .editor-content {
+    padding: 15px;
+    min-height: 300px;
+  }
+  
+  .ProseMirror {
+    outline: none;
+    min-height: 200px;
+  }
+  
+  .ProseMirror p {
+    margin: 0 0 16px 0;
+  }
+  
+  .bubble-menu {
+    display: flex;
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 4px;
+  }
+  
+  .bubble-menu-button {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #5f6368;
+  }
+  
+  .bubble-menu-button:hover {
+    background-color: #f1f3f4;
+    border-radius: 2px;
+  }
+  
+  .bubble-menu-button.active {
+    color: #1a73e8;
+  }
+  
+  .editor-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .send-button {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .send-button:hover {
+    background-color: #1765cc;
+  }
+  
+  .more-options {
+    background: none;
+    border: none;
+    color: #5f6368;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+  }
+  
+  .more-options:hover {
+    background-color: #f1f3f4;
+  }
+  
+  .material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+  }
