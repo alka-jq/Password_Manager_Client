@@ -214,11 +214,11 @@ const CardModalUIOnly = () => {
                 {isEdit ? "Update your saved card" : "Securely store your card information"}
               </p>
             </div>
-          </div>
           <VaultDropdown
             selectedTab={selectedTab}
             setSelectedTab={setSelectedTab}
           />
+          </div>
           <button
             onClick={() => dispatch(closeCardModal())}
             className="h-8 w-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors duration-200"
@@ -228,7 +228,7 @@ const CardModalUIOnly = () => {
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div className="overflow-y-auto max-h-[calc(90vh-80px)] thin-scrollbar">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Title Section */}
             <div className="space-y-2">
@@ -509,7 +509,7 @@ const CardModalUIOnly = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
+            <div className="flex justify-end flex-col-reverse sm:flex-row gap-3 pt-6 pb-6 border-t border-gray-200/50 dark:border-gray-700/50">
               <button
                 type="button"
                 onClick={() => dispatch(closeCardModal())}

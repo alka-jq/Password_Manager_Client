@@ -85,7 +85,7 @@ export default function ViewIdentityModal({ selectedTab, setSelectedTab, isOpen,
   }, [isOpen])
 
   if (!isOpen || !identity) return null
-
+console.log(identity,"task")
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 transition-all">
       <div

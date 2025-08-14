@@ -116,38 +116,38 @@ const IdentityModalUIOnly = () => {
     setIsSubmitting(false)
   }
 
-  useEffect(() => {
-    if (isEdit && identity) {
-      setTitle(identity.title || "")
-      setNote(identity.note || "")
-      setFullName(identity.personalDetails.fullName || "")
-      setEmail(identity.personalDetails.email || "")
-      setPhoneNumber(identity.personalDetails.phoneNumber || "")
-      setDateOfBirth(identity.personalDetails.dateOfBirth || "")
-      setGender(identity.personalDetails.gender || "")
-      setNationality(identity.personalDetails.nationality || "")
-      setOrganization(identity.addressDetails.organization || "")
-      setStreetAddress(identity.addressDetails.streetAddress || "")
-      setZipCode(identity.addressDetails.zipCode || "")
-      setCity(identity.addressDetails.city || "")
-      setState(identity.addressDetails.state || "")
-      setCountry(identity.addressDetails.country || "")
-      setHomePhone(identity.contactDetails.homePhone || "")
-      setWorkPhone(identity.contactDetails.workPhone || "")
-      setMobilePhone(identity.contactDetails.mobilePhone || "")
-      setAlternateEmail(identity.contactDetails.alternateEmail || "")
-      setWebsite(identity.contactDetails.website || "")
-      setCompany(identity.workDetails.company || "")
-      setJobTitle(identity.workDetails.jobTitle || "")
-      setDepartment(identity.workDetails.department || "")
-      setWorkAddress(identity.workDetails.workAddress || "")
-      setWorkEmail(identity.workDetails.workEmail || "")
-      setWorkPhoneNumber(identity.workDetails.workPhone || "")
-      setDynamicFields(identity.dynamicFields || [])
-    } else {
-      resetForm()
-    }
-  }, [isEdit, identity])
+  // useEffect(() => {
+  //   if (isEdit && identity) {
+  //     setTitle(identity.title || "")
+  //     setNote(identity.note || "")
+  //     setFullName(identity.personalDetails.fullName || "")
+  //     setEmail(identity.personalDetails.email || "")
+  //     setPhoneNumber(identity.personalDetails.phoneNumber || "")
+  //     setDateOfBirth(identity.personalDetails.dateOfBirth || "")
+  //     setGender(identity.personalDetails.gender || "")
+  //     setNationality(identity.personalDetails.nationality || "")
+  //     setOrganization(identity.addressDetails.organization || "")
+  //     setStreetAddress(identity.addressDetails.streetAddress || "")
+  //     setZipCode(identity.addressDetails.zipCode || "")
+  //     setCity(identity.addressDetails.city || "")
+  //     setState(identity.addressDetails.state || "")
+  //     setCountry(identity.addressDetails.country || "")
+  //     setHomePhone(identity.contactDetails.homePhone || "")
+  //     setWorkPhone(identity.contactDetails.workPhone || "")
+  //     setMobilePhone(identity.contactDetails.mobilePhone || "")
+  //     setAlternateEmail(identity.contactDetails.alternateEmail || "")
+  //     setWebsite(identity.contactDetails.website || "")
+  //     setCompany(identity.workDetails.company || "")
+  //     setJobTitle(identity.workDetails.jobTitle || "")
+  //     setDepartment(identity.workDetails.department || "")
+  //     setWorkAddress(identity.workDetails.workAddress || "")
+  //     setWorkEmail(identity.workDetails.workEmail || "")
+  //     setWorkPhoneNumber(identity.workDetails.workPhone || "")
+  //     setDynamicFields(identity.dynamicFields || [])
+  //   } else {
+  //     resetForm()
+  //   }
+  // }, [isEdit, identity])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -277,11 +277,11 @@ const IdentityModalUIOnly = () => {
                 {isEdit ? "Update identity information" : "Store personal and professional details"}
               </p>
             </div>
-          </div>
           <VaultDropdown
             selectedTab={selectedTab}
             setSelectedTab={setSelectedTab}
           />
+          </div>
           <button
             onClick={() => dispatch(closeIdentityModal())}
             className="h-8 w-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors duration-200"
@@ -291,7 +291,7 @@ const IdentityModalUIOnly = () => {
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div className="overflow-y-auto max-h-[calc(90vh-80px)] thin-scrollbar">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Title Section */}
             <div className="space-y-2">
@@ -751,7 +751,7 @@ const IdentityModalUIOnly = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
+            <div className="flex justify-end flex-col-reverse sm:flex-row gap-3 pt-6 pb-6 border-t border-gray-200/50 dark:border-gray-700/50">
               <button
                 type="button"
                 onClick={() => dispatch(closeIdentityModal())}

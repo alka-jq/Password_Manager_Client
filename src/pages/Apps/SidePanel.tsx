@@ -110,6 +110,7 @@ const SidePanel = () => {
 
     const openDrawer = () => {
         setIsDrawerOpen(true);
+        //  setIsDrawerOpen();
     };
 
     const handleUpdateVault = (vaultId: string, name: string, icon: string, color: string) => {
@@ -250,7 +251,7 @@ const SidePanel = () => {
             <div className="lg:flex lg:relative h-full text-[#fff] lightmint:bg-[#629e7c]">
                 <div className={`overlay bg-black/60 z-[5] w-full h-full fixed inset-0 xl:!hidden ${menuBarOpen ? 'block' : 'hidden'}`} onClick={() => setMenuBarOpen(false)}></div>
                 <div
-                    className={` overflow-y-scroll thin-scrollbar lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtl:right-0' : ''}`}
+                    className={`  lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtl:right-0' : ''}`}
 
                 >
                     <div className="lightmint:bg-[#629e7c]">
@@ -260,12 +261,12 @@ const SidePanel = () => {
                                     <img className="w-[33px] logo_shadow rounded-md inline" src={logo} alt="logo" />
                                 </div>
                                 <span className="font_woff text-2xl font-medium align-middle hidden md:inline blue:text-black classic:text-gray-900 dark:text-white-light transition-all duration-300 text-[#fff]">
-                                    UB Password
+                                    JQ Password
                                 </span>
                             </Link>
                         </div>
                         <div className="flex flex-col h-full blue:bg-[#64b5f6] pb-8">
-                            <div className="flex justify-center relative mt-4" ref={dropdownRef}>
+                            <div className="flex justify-center relative" ref={dropdownRef}>
                                 <div className="w-full max-w-xs px-4 ">
                                     <button
                                         className="btn hover:shadow-md mb-1 blue:bg-[#e3f2fd] blue:text-black salmonpink:bg-gray-100 salmonpink:text-black bg-[#2565C7] classic:bg-[#a8c7fa] classic:text-black cornflower:bg-gray-200 cornflower:text-black peach:bg-gray-200 peach:text-black dark:bg-[#2F2F2F] lightmint:bg-green-50 lightmint:text-black border-none shadow-md py-3 font-medium rounded-lg w-full relative text-white softazure:bg-[#363852]"
@@ -296,7 +297,7 @@ const SidePanel = () => {
                                 </div>
                             </div>
 
-                            <div className="space-y-0 pl-3 w-full   -mr-3  flex flex-col classic:text-gray-900">
+                            <div className="space-y-0 pl-3 w-full mt-1  -mr-3  flex flex-col classic:text-gray-900">
                                 <div>
                                     {tabs.map((tab) => (
                                         <Tippy content={tab.label} placement="right" key={tab.path}>
@@ -329,9 +330,9 @@ const SidePanel = () => {
                                             <Tag className="h-4 cursor-pointer" />
                                             My Cells
                                         </div>
-                                        <div className='flex gap-1'>
+                                        <div className='flex gap-1 '>
                                             <PlusIcon
-                                                className="h-4 cursor-pointer "
+                                                className="h-4 cursor-pointer rounded-full hover:bg-white/20 transition duration-150 "
                                                 onClick={openDrawer}
                                             />
                                             <Link to="/setting">
@@ -359,76 +360,87 @@ const SidePanel = () => {
                                             {vaults.map((vault) => (
                                                 <div key={vault.id} className="relative group">
                                                     <Tippy content={vault.name} placement="right">
-                                                        <Link to={vault.path}>
-                                                            <button
-                                                                type="button"
-                                                                className={`${baseClasses} ${!isEdit && selectedTab === vault.key ? activeClasses : ''} w-full pr-10`}
-                                                                onClick={() => setSelectedTab(vault.key)}
+                                                        <div className="flex items-center justify-between px-2 py-2 rounded-lg  dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer">
+                                                            {/* Left Icon and Name */}
+                                                            <div
+                                                                onClick={() => {
+                                                                    setSelectedTab(vault.key);
+                                                                }}
+                                                                className="flex items-center gap-2 w-full"
                                                             >
-                                                                <div className="flex items-center ml-4">
-                                                                    <Box sx={{ color: vault.color, display: 'flex', mr: 1 }}>
-                                                                        {iconComponents[vault.icon]}
-                                                                    </Box>
-                                                                    <div className="ltr:ml-2 rtl:mr-3">{vault.name}</div>
+                                                                <Box sx={{ color: vault.color, display: 'flex', mr: 1 }}>
+                                                                    {iconComponents[vault.icon]}
+                                                                </Box>
+                                                                <span className="text-white font-medium text-sm truncate">{vault.name}</span>
+                                                            </div>
+
+                                                            {/* Dots Dropdown (shown only on hover) */}
+                                                            <div className="relative">
+                                                                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                                                    <Menu as="div" className="relative inline-block text-left z-50">
+                                                                        <Menu.Button className="p-1 rounded-full hover:bg-white/20 transition duration-150">
+                                                                            <HiDotsVertical className="w-4 h-4 text-white" />
+                                                                        </Menu.Button>
+
+
+
+                                                                        <Menu.Items className="absolute right-0 mt-2 w-44 origin-top-right rounded-md bg-white dark:bg-gray-900 shadow-xl ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 dark:divide-gray-700 focus:outline-none">
+                                                                            <div className="py-1 text-gray-900 dark:text-gray-100">
+                                                                                <Menu.Item>
+                                                                                    {({ active }) => (
+                                                                                        <button
+                                                                                            onClick={() => handleEditVault(vault)}
+                                                                                            className={`${active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                                                                                } flex items-center w-full px-4 py-2 text-sm font-medium`}
+                                                                                        >
+                                                                                            <GoPencil className="mr-2 w-4 h-4" />
+                                                                                            Edit Cell
+                                                                                        </button>
+                                                                                    )}
+                                                                                </Menu.Item>
+
+                                                                                <Menu.Item>
+                                                                                    {({ active }) => (
+                                                                                        <button
+                                                                                            onClick={() => handleShareVault(vault)}
+                                                                                            className={`${active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                                                                                } flex items-center w-full px-4 py-2 text-sm font-medium`}
+                                                                                        >
+                                                                                            <FiUserPlus className="mr-2 w-4 h-4" />
+                                                                                            Share Cell
+                                                                                        </button>
+                                                                                    )}
+                                                                                </Menu.Item>
+
+                                                                                <Menu.Item>
+                                                                                    {({ active }) => (
+                                                                                        <button
+                                                                                            onClick={() => handleDeleteClick(vault)}
+                                                                                            className={`${active ? "bg-red-100 dark:bg-red-900/30" : ""
+                                                                                                } flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`}
+                                                                                        >
+                                                                                            <FaRegTrashAlt className="mr-2 w-4 h-4" />
+                                                                                            Delete Cell
+                                                                                        </button>
+                                                                                    )}
+                                                                                </Menu.Item>
+                                                                            </div>
+                                                                        </Menu.Items>
+
+                                                                        {/* Delete Confirmation Modal */}
+                                                                        <DeleteConfirmationModal
+                                                                            open={deleteModalOpen}
+                                                                            onClose={handleCancelDelete}
+                                                                            onConfirm={handleConfirmDelete}
+                                                                            vaultName={vaultToDelete?.name || ""}
+                                                                        />
+                                                                    </Menu>
                                                                 </div>
-                                                            </button>
-                                                        </Link>
+                                                            </div>
+                                                        </div>
                                                     </Tippy>
-<div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition duration-200">
-  <Menu as="div" className="relative inline-block text-left z-50">
-    <MenuButton className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-      <HiDotsVertical className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-    </MenuButton>
-
-    <MenuItems className="absolute right-0 mt-2 w-44 origin-top-right rounded-md bg-white dark:bg-gray-900 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 divide-y divide-gray-200 dark:divide-gray-700">
-      <div className="py-1 text-gray-900 dark:text-gray-100">
-        <MenuItem as="button"
-          onClick={() => handleEditVault(vault)}
-          className={({ active }) =>
-            `${active ? 'bg-gray-100 dark:bg-gray-700' : ''
-            } group flex items-center w-full px-4 py-2 text-sm font-medium`
-          }
-        >
-          <GoPencil className="mr-2 w-4 h-4" />
-          Edit Vault
-        </MenuItem>
-
-        <MenuItem as="button"
-          onClick={() => handleShareVault(vault)}
-          className={({ active }) =>
-            `${active ? 'bg-gray-100 dark:bg-gray-700' : ''
-            } group flex items-center w-full px-4 py-2 text-sm font-medium`
-          }
-        >
-          <FiUserPlus className="mr-2 w-4 h-4" />
-          Share Vault
-        </MenuItem>
-
-        <MenuItem as="button"
-          onClick={() => handleDeleteClick(vault)}
-          className={({ active }) =>
-            `${active ? 'bg-red-100 dark:bg-red-900/30' : ''
-            } group flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`
-          }
-        >
-          <FaRegTrashAlt className="mr-2 w-4 h-4" />
-          Delete Vault
-        </MenuItem>
-      </div>
-    </MenuItems>
-
-    <DeleteConfirmationModal
-      open={deleteModalOpen}
-      onClose={handleCancelDelete}
-      onConfirm={handleConfirmDelete}
-      vaultName={vaultToDelete?.name || ''}
-    />
-  </Menu>
-</div>
-
-
-
                                                 </div>
+
                                             ))}
                                         </div>
                                     )}

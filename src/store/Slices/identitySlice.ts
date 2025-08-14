@@ -405,15 +405,15 @@ export interface Identity {
   note: string
   created_at: string
   date: string
-  assigneeColor: string
+  // assigneeColor: string
   // Optional fields
-  description?: string
-  descriptionText?: string
-  assignee?: string
-  tag?: string
-  priority?: "low" | "medium" | "high"
+  // description?: string
+  // descriptionText?: string
+  // assignee?: string
+  // tag?: string
+  // priority?: "low" | "medium" | "high"
   status?: "" | "complete" | "important" | "trash"
-  path?: string
+  // path?: string
 }
 
 interface IdentityState {
@@ -484,13 +484,13 @@ const identitySlice = createSlice({
         id: newId,
         created_at: now.toISOString(),
         date: getDate(),
-        assigneeColor,
+        // assigneeColor,
         // Default values for optional fields
-        description: "",
-        descriptionText: "",
-        assignee: "",
-        tag: "",
-        priority: "medium",
+        // description: "",
+        // descriptionText: "",
+        // assignee: "",
+        // tag: "",
+        // priority: "medium",
         status: "",
       }
 

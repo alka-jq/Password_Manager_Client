@@ -82,7 +82,7 @@ export default function ViewCardModal({ selectedTab, setSelectedTab, isOpen, onC
   }, [isOpen])
 
   if (!isOpen || !card) return null
-
+console.log(card,"task")
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 transition-all">
       <div

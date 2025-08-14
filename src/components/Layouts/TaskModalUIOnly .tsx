@@ -273,7 +273,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { addTask, editTask, closeModal } from "@/store/Slices/taskSlice";
@@ -289,6 +289,8 @@ import {
   Shield,
   Trash2,
   AlertCircle,
+  Paperclip,
+  Upload,
 } from "lucide-react";
 import VaultDropdown from "./VaultDropdown";
 import { useVaults } from "@/useContext/VaultContext";
@@ -312,6 +314,28 @@ const TaskModalUIOnly = () => {
   const [errors, setErrors] = useState({ title: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedTab, setSelectedTab] = useState(vaults[0]?.key || "");
+const [attachments, setAttachments] = useState<File[]>([]);
+const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+
+const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const files = Array.from(e.target.files || []);
+  setAttachments((prev) => [...prev, ...files]);
+};
+
+const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+  const files = Array.from(e.dataTransfer.files || []);
+  setAttachments((prev) => [...prev, ...files]);
+};
+
+const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+};
+
+const removeAttachment = (index: number) => {
+  setAttachments((prev) => prev.filter((_, i) => i !== index));
+};
 
   const resetForm = () => {
     setTitle("");
@@ -360,6 +384,7 @@ const TaskModalUIOnly = () => {
       totp,
       websites: websites.filter((website) => website.trim() !== ""),
       note,
+       attachments, 
       vaultKey: selectedTab,
       vaultName: selectedVault?.name || "",
       // Optional extras:
@@ -414,12 +439,12 @@ const TaskModalUIOnly = () => {
                   : "Securely store your login information"}
               </p>
             </div>
-          </div>
-
           <VaultDropdown
             selectedTab={selectedTab}
             setSelectedTab={setSelectedTab}
           />
+          </div>
+
 
           <button
             onClick={() => dispatch(closeModal())}
@@ -430,7 +455,7 @@ const TaskModalUIOnly = () => {
         </div>
 
         {/* Form */}
-        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div className="overflow-y-auto max-h-[calc(90vh-80px)] thin-scrollbar">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Title */}
             <div className="space-y-2">
@@ -579,8 +604,49 @@ const TaskModalUIOnly = () => {
               />
             </div>
 
+              {/* Attachments Section */}
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <Paperclip className="h-4 w-4 text-gray-500" />
+                            Attachments
+                          </div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Upload files from your device.</p>
+            
+                          <div
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                            onClick={() => fileInputRef.current?.click()}
+                            className="border-2 border-dashed border-green-300 dark:border-green-600 rounded-lg p-8 text-center bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200 cursor-pointer"
+                          >
+                            <Upload className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                            <p className="text-green-700 dark:text-green-300 font-medium">Choose a file or drag it here</p>
+                          </div>
+            
+                          <input ref={fileInputRef} type="file" multiple onChange={handleFileUpload} className="hidden" />
+            
+                          {attachments.length > 0 && (
+                            <div className="space-y-2">
+                              {attachments.map((file, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                                >
+                                  <span className="text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => removeAttachment(index)}
+                                    className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
             {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-end gap-3 pt-6 pb-6 border-t border-gray-200 dark:border-gray-700">
               <button
                 type="button"
                 onClick={() => dispatch(closeModal())}
