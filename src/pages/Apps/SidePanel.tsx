@@ -94,20 +94,33 @@ const SidePanel = () => {
         FileText: <FileText size={16} />,
     };
 
-    const handleCreateVault = (vaultName: string, iconName: string, color: string) => {
-        const path = `/Cell/${vaultName.toLowerCase().replace(/\s+/g, '-')}`;
-        const newVault: Vault = {
-            id: Date.now().toString(),
-            name: vaultName,
-            path,
-            key: `vault-${Date.now()}`,
-            icon: iconName,
-            color: color,
-        };
-        setVaults([...vaults, newVault]);
-        navigate(path);
-    };
+ const handleCreateVault = (vaultName: string, iconName: string, color: string) => {
+  const path = `/Cell/${vaultName.toLowerCase().replace(/\s+/g, '-')}`;
+  const newVault: Vault = {
+    id: Date.now().toString(),
+    name: vaultName,
+    path,
+    key: `vault-${Date.now()}`,
+    icon: iconName,
+    color: color,
+  };
 
+  // Completely safe update with multiple fallbacks
+  setVaults(prevVaults => {
+    const currentVaults = Array.isArray(prevVaults) ? prevVaults : [];
+    const updatedVaults = [...currentVaults, newVault];
+    
+    try {
+      localStorage.setItem("VAULTS_STORAGE_KEY", JSON.stringify(updatedVaults));
+    } catch (error) {
+      console.error("Failed to save vaults to localStorage", error);
+    }
+    
+    return updatedVaults;
+  });
+
+  navigate(path);
+};
     const openDrawer = () => {
         setIsDrawerOpen(true);
         //  setIsDrawerOpen();
@@ -354,7 +367,7 @@ const SidePanel = () => {
                                 />
 
                                 <div className=" h-[50vh] thin-scrollbar  overflow-auto">
-                                    {vaults.length > 0 && (
+                                    {vaults && vaults.length > 0 && (
                                         <div className=" ">
 
                                             {vaults.map((vault) => (

@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "@/store"
@@ -27,19 +26,22 @@ import { useVaults } from "@/useContext/VaultContext"
 
 const IdentityModalUIOnly = () => {
   const dispatch = useDispatch()
-     const { vaults } = useVaults();
+  const { vaults = [] } = useVaults() // Default to empty array if undefined
   const {
     isModalOpen,
     modalMode,
     editIdentity: identity,
     expandedSections,
   } = useSelector((state: RootState) => state.identity)
-  const identities = useSelector((state: RootState) => state.identity.identities);
-  console.log(identities, "identities");
-  const [selectedTab, setSelectedTab] = useState(vaults[0]?.key || "");
-  useEffect(() => {
-    console.log(identities, "identities");
-  }, [identities])
+  const identities = useSelector((state: RootState) => state.identity.identities)
+
+  // Initialize selectedTab safely
+  const [selectedTab, setSelectedTab] = useState("")
+  // useEffect(() => {
+  //   if (vaults.length > 0) {
+  //     setSelectedTab(vaults[0].key)
+  //   }
+  // }, [vaults])
 
   const isEdit = modalMode === "edit"
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -116,38 +118,42 @@ const IdentityModalUIOnly = () => {
     setIsSubmitting(false)
   }
 
-  // useEffect(() => {
-  //   if (isEdit && identity) {
-  //     setTitle(identity.title || "")
-  //     setNote(identity.note || "")
-  //     setFullName(identity.personalDetails.fullName || "")
-  //     setEmail(identity.personalDetails.email || "")
-  //     setPhoneNumber(identity.personalDetails.phoneNumber || "")
-  //     setDateOfBirth(identity.personalDetails.dateOfBirth || "")
-  //     setGender(identity.personalDetails.gender || "")
-  //     setNationality(identity.personalDetails.nationality || "")
-  //     setOrganization(identity.addressDetails.organization || "")
-  //     setStreetAddress(identity.addressDetails.streetAddress || "")
-  //     setZipCode(identity.addressDetails.zipCode || "")
-  //     setCity(identity.addressDetails.city || "")
-  //     setState(identity.addressDetails.state || "")
-  //     setCountry(identity.addressDetails.country || "")
-  //     setHomePhone(identity.contactDetails.homePhone || "")
-  //     setWorkPhone(identity.contactDetails.workPhone || "")
-  //     setMobilePhone(identity.contactDetails.mobilePhone || "")
-  //     setAlternateEmail(identity.contactDetails.alternateEmail || "")
-  //     setWebsite(identity.contactDetails.website || "")
-  //     setCompany(identity.workDetails.company || "")
-  //     setJobTitle(identity.workDetails.jobTitle || "")
-  //     setDepartment(identity.workDetails.department || "")
-  //     setWorkAddress(identity.workDetails.workAddress || "")
-  //     setWorkEmail(identity.workDetails.workEmail || "")
-  //     setWorkPhoneNumber(identity.workDetails.workPhone || "")
-  //     setDynamicFields(identity.dynamicFields || [])
-  //   } else {
-  //     resetForm()
-  //   }
-  // }, [isEdit, identity])
+  useEffect(() => {
+    if (isEdit && identity) {
+      setTitle(identity.title || "")
+      setNote(identity.note || "")
+      setFullName(identity.personalDetails?.fullName || "")
+      setEmail(identity.personalDetails?.email || "")
+      setPhoneNumber(identity.personalDetails?.phoneNumber || "")
+      setDateOfBirth(identity.personalDetails?.dateOfBirth || "")
+      setGender(identity.personalDetails?.gender || "")
+      setNationality(identity.personalDetails?.nationality || "")
+      setOrganization(identity.addressDetails?.organization || "")
+      setStreetAddress(identity.addressDetails?.streetAddress || "")
+      setZipCode(identity.addressDetails?.zipCode || "")
+      setCity(identity.addressDetails?.city || "")
+      setState(identity.addressDetails?.state || "")
+      setCountry(identity.addressDetails?.country || "")
+      setHomePhone(identity.contactDetails?.homePhone || "")
+      setWorkPhone(identity.contactDetails?.workPhone || "")
+      setMobilePhone(identity.contactDetails?.mobilePhone || "")
+      setAlternateEmail(identity.contactDetails?.alternateEmail || "")
+      setWebsite(identity.contactDetails?.website || "")
+      setCompany(identity.workDetails?.company || "")
+      setJobTitle(identity.workDetails?.jobTitle || "")
+      setDepartment(identity.workDetails?.department || "")
+      setWorkAddress(identity.workDetails?.workAddress || "")
+      setWorkEmail(identity.workDetails?.workEmail || "")
+      setWorkPhoneNumber(identity.workDetails?.workPhone || "")
+      setDynamicFields(identity.dynamicFields || [])
+      
+      if (identity.vaultKey && vaults.some(v => v.key === identity.vaultKey)) {
+       setSelectedTab(identity.vaultKey || (vaults[0]?.key ?? ""))
+      }
+    } else {
+      resetForm()
+    }
+  }, [isEdit, identity, vaults])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -159,10 +165,9 @@ const IdentityModalUIOnly = () => {
 
     setIsSubmitting(true)
 
-    // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 500))
 
- const selectedVault = vaults.find((v) => v.key === selectedTab);
+    const selectedVault = vaults.find((v) => v.key === selectedTab) || vaults[0] || { key: "", name: "" }
 
     const payload = {
       title: title.trim(),
@@ -200,9 +205,8 @@ const IdentityModalUIOnly = () => {
       dynamicFields,
       attachments: attachments.map((file) => file.name),
       note,
-      vaultKey: selectedTab,
+      vaultKey: selectedTab || selectedVault.key,
       vaultName: selectedVault?.name || "",
-      // Optional extras:
       vaultIcon: selectedVault?.icon || "",
       vaultColor: selectedVault?.color || "",
     }
@@ -237,7 +241,7 @@ const IdentityModalUIOnly = () => {
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
+    const files = e.target.files ? Array.from(e.target.files) : []
     setAttachments((prev) => [...prev, ...files])
   }
 
@@ -251,7 +255,7 @@ const IdentityModalUIOnly = () => {
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
-    const files = Array.from(e.dataTransfer.files)
+    const files = e.dataTransfer.files ? Array.from(e.dataTransfer.files) : []
     setAttachments((prev) => [...prev, ...files])
   }
 
@@ -266,7 +270,6 @@ const IdentityModalUIOnly = () => {
       <div className="fixed inset-0" onClick={() => dispatch(closeIdentityModal())} />
 
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl border border-white/20 bg-white dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl animate-in zoom-in-95 duration-300">
-        {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
           <div className="flex items-center gap-3">
             <div>
@@ -277,10 +280,13 @@ const IdentityModalUIOnly = () => {
                 {isEdit ? "Update identity information" : "Store personal and professional details"}
               </p>
             </div>
-          <VaultDropdown
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-          />
+           
+              <VaultDropdown
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+                vaults={vaults}
+              />
+           
           </div>
           <button
             onClick={() => dispatch(closeIdentityModal())}
@@ -290,10 +296,8 @@ const IdentityModalUIOnly = () => {
           </button>
         </div>
 
-        {/* Content */}
         <div className="overflow-y-auto max-h-[calc(90vh-80px)] thin-scrollbar">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* Title Section */}
             <div className="space-y-2">
               <label
                 htmlFor="title"
@@ -310,10 +314,11 @@ const IdentityModalUIOnly = () => {
                   setErrors({ ...errors, title: false })
                 }}
                 placeholder="Untitled"
-                className={`w-full h-11 px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${errors.title
+                className={`w-full h-11 px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  errors.title
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
-                  }`}
+                }`}
               />
               {errors.title && (
                 <div className="flex items-center gap-2 text-sm text-red-600">
@@ -344,6 +349,7 @@ const IdentityModalUIOnly = () => {
               {expandedSections.personal && (
                 <div className="p-4 pt-0 space-y-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Personal details fields */}
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
                       <input

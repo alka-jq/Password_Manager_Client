@@ -273,7 +273,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { addTask, editTask, closeModal } from "@/store/Slices/taskSlice";
@@ -291,12 +291,91 @@ import {
   AlertCircle,
   Paperclip,
   Upload,
+  ChevronDown,
 } from "lucide-react";
-import VaultDropdown from "./VaultDropdown";
 import { useVaults } from "@/useContext/VaultContext";
+import VaultDropdown from "./VaultDropdown";
+
+interface VaultDropdownProps {
+  selectedTab: string;
+  setSelectedTab: (key: string) => void;
+  vaults: Array<{ key: string; name: string; icon?: string; color?: string }>;
+}
+
+// const VaultDropdown = ({ selectedTab, setSelectedTab, vaults }: VaultDropdownProps) => {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const dropdownRef = useRef<HTMLDivElement>(null);
+//   const selectedVault = vaults.find(v => v.key === selectedTab);
+
+//   const handleClickOutside = useCallback((event: MouseEvent) => {
+//     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+//       setIsOpen(false);
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     document.addEventListener('mousedown', handleClickOutside);
+//     return () => {
+//       document.removeEventListener('mousedown', handleClickOutside);
+//     };
+//   }, [handleClickOutside]);
+
+//   return (
+//     <div className="relative" ref={dropdownRef}>
+//       <button
+//         type="button"
+//         onClick={() => setIsOpen(!isOpen)}
+//         className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+//       >
+//         {selectedVault ? (
+//           <>
+//             {selectedVault.icon && (
+//               <span className={`w-5 h-5 rounded-full flex items-center justify-center ${selectedVault.color || 'bg-gray-200'}`}>
+//                 {selectedVault.icon}
+//               </span>
+//             )}
+//             <span>{selectedVault.name}</span>
+//           </>
+//         ) : (
+//           <span>Select Vault</span>
+//         )}
+//         <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+//       </button>
+
+//       {isOpen && (
+//         <div className="absolute z-10 mt-1 w-full min-w-[200px] rounded-md bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+//           <div className="py-1 max-h-60 overflow-auto">
+//             {vaults.map((vault) => (
+//               <button
+//                 key={vault.key}
+//                 type="button"
+//                 onClick={() => {
+//                   setSelectedTab(vault.key);
+//                   setIsOpen(false);
+//                 }}
+//                 className={`flex items-center gap-2 w-full px-4 py-2 text-left text-sm ${selectedTab === vault.key
+//                   ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+//                   : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+//                   }`}
+//               >
+//                 {vault.icon && (
+//                   <span className={`w-5 h-5 rounded-full flex items-center justify-center ${vault.color || 'bg-gray-200'}`}>
+//                     {vault.icon}
+//                   </span>
+//                 )}
+//                 <span>{vault.name}</span>
+//               </button>
+//             ))}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
 
 const TaskModalUIOnly = () => {
-  const { vaults } = useVaults();
+  const { vaults: rawVaults } = useVaults();
+  const vaults = rawVaults ?? [];
   const dispatch = useDispatch();
   const { isModalOpen, modalMode, editTask: task } = useSelector(
     (state: RootState) => state.task
@@ -304,6 +383,7 @@ const TaskModalUIOnly = () => {
 
   const isEdit = modalMode === "edit";
 
+  // Form state
   const [title, setTitle] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -313,41 +393,16 @@ const TaskModalUIOnly = () => {
   const [note, setNote] = useState("");
   const [errors, setErrors] = useState({ title: false });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedTab, setSelectedTab] = useState(vaults[0]?.key || "");
-const [attachments, setAttachments] = useState<File[]>([]);
-const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Initialize selectedTab with proper default value
+  const [selectedTab, setSelectedTab] = useState<string>(() => {
+    if (isEdit && task?.vaultKey) return task.vaultKey;
+    return vaults[0]?.key || "";
+  });
 
-const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const files = Array.from(e.target.files || []);
-  setAttachments((prev) => [...prev, ...files]);
-};
-
-const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-  e.preventDefault();
-  const files = Array.from(e.dataTransfer.files || []);
-  setAttachments((prev) => [...prev, ...files]);
-};
-
-const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-  e.preventDefault();
-};
-
-const removeAttachment = (index: number) => {
-  setAttachments((prev) => prev.filter((_, i) => i !== index));
-};
-
-  const resetForm = () => {
-    setTitle("");
-    setEmail("");
-    setPassword("");
-    setTotp("");
-    setWebsites([""]);
-    setNote("");
-    setErrors({ title: false });
-    setIsSubmitting(false);
-  };
-
+  // Initialize form state when modal opens or task changes
   useEffect(() => {
     if (isEdit && task) {
       setTitle(task.title || "");
@@ -358,10 +413,49 @@ const removeAttachment = (index: number) => {
       setNote(task.note || "");
       setSelectedTab(task.vaultKey || vaults[0]?.key || "");
     } else {
-      resetForm();
+      setTitle("");
+      setEmail("");
+      setPassword("");
+      setTotp("");
+      setWebsites([""]);
+      setNote("");
+      setErrors({ title: false });
+      setAttachments([]);
       setSelectedTab(vaults[0]?.key || "");
     }
-  }, [isEdit, task, vaults]);
+  }, [isModalOpen, task, isEdit, vaults]);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setAttachments((prev) => [...prev, ...files]);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files || []);
+    setAttachments((prev) => [...prev, ...files]);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const resetForm = () => {
+    setTitle("");
+    setEmail("");
+    setPassword("");
+    setTotp("");
+    setWebsites([""]);
+    setNote("");
+    setErrors({ title: false });
+    setIsSubmitting(false);
+    setAttachments([]);
+    setSelectedTab(vaults[0]?.key || "");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -373,33 +467,34 @@ const removeAttachment = (index: number) => {
 
     setIsSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const selectedVault = vaults.find((v) => v.key === selectedTab);
 
-    const selectedVault = vaults.find((v) => v.key === selectedTab);
+      const payload = {
+        title: title.trim(),
+        email,
+        password,
+        totp,
+        websites: websites.filter((website) => website.trim() !== ""),
+        note,
+        attachments,
+        vaultKey: selectedTab,
+        vaultName: selectedVault?.name || "",
+        vaultIcon: selectedVault?.icon || "",
+        vaultColor: selectedVault?.color || "",
+      };
 
-    const payload = {
-      title: title.trim(),
-      email,
-      password,
-      totp,
-      websites: websites.filter((website) => website.trim() !== ""),
-      note,
-       attachments, 
-      vaultKey: selectedTab,
-      vaultName: selectedVault?.name || "",
-      // Optional extras:
-      vaultIcon: selectedVault?.icon || "",
-      vaultColor: selectedVault?.color || "",
-    };
+      if (isEdit && task) {
+        dispatch(editTask({ id: task.id, updates: payload }));
+      } else {
+        dispatch(addTask(payload));
+      }
 
-    if (isEdit && task) {
-      dispatch(editTask({ id: task.id, updates: payload }));
-    } else {
-      dispatch(addTask(payload));
+      dispatch(closeModal());
+      resetForm();
+    } finally {
+      setIsSubmitting(false);
     }
-
-    dispatch(closeModal());
-    resetForm();
   };
 
   const handleWebsiteChange = (index: number, value: string) => {
@@ -428,23 +523,21 @@ const removeAttachment = (index: number) => {
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl border border-white/20 bg-white dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl animate-in zoom-in-95 duration-300">
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
-          <div className="flex items-center gap-3">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {isEdit ? "Edit Credential" : "Add New Credential"}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {isEdit
-                  ? "Update your saved credential"
-                  : "Securely store your login information"}
-              </p>
-            </div>
-          <VaultDropdown
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-          />
-          </div>
-
+      
+<div className="flex items-center gap-3">
+  <div>
+    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+      {isEdit ? "Edit Credential" : "Add New Credential"}
+    </h2>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      {isEdit ? "Update your saved credential" : "Securely store your login information"}
+    </p>
+  </div>
+  <VaultDropdown
+    selectedTab={selectedTab}
+    setSelectedTab={setSelectedTab}
+  />
+</div>
 
           <button
             onClick={() => dispatch(closeModal())}
@@ -604,46 +697,46 @@ const removeAttachment = (index: number) => {
               />
             </div>
 
-              {/* Attachments Section */}
-                        <div className="space-y-4">
-                          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                            <Paperclip className="h-4 w-4 text-gray-500" />
-                            Attachments
-                          </div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Upload files from your device.</p>
-            
-                          <div
-                            onDragOver={handleDragOver}
-                            onDrop={handleDrop}
-                            onClick={() => fileInputRef.current?.click()}
-                            className="border-2 border-dashed border-green-300 dark:border-green-600 rounded-lg p-8 text-center bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200 cursor-pointer"
-                          >
-                            <Upload className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                            <p className="text-green-700 dark:text-green-300 font-medium">Choose a file or drag it here</p>
-                          </div>
-            
-                          <input ref={fileInputRef} type="file" multiple onChange={handleFileUpload} className="hidden" />
-            
-                          {attachments.length > 0 && (
-                            <div className="space-y-2">
-                              {attachments.map((file, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg"
-                                >
-                                  <span className="text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => removeAttachment(index)}
-                                    className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+            {/* Attachments Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <Paperclip className="h-4 w-4 text-gray-500" />
+                Attachments
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Upload files from your device.</p>
+
+              <div
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-green-300 dark:border-green-600 rounded-lg p-8 text-center bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200 cursor-pointer"
+              >
+                <Upload className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                <p className="text-green-700 dark:text-green-300 font-medium">Choose a file or drag it here</p>
+              </div>
+
+              <input ref={fileInputRef} type="file" multiple onChange={handleFileUpload} className="hidden" />
+
+              {attachments.length > 0 && (
+                <div className="space-y-2">
+                  {attachments.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                    >
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(index)}
+                        className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Action Buttons */}
             <div className="flex justify-end gap-3 pt-6 pb-6 border-t border-gray-200 dark:border-gray-700">

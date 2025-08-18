@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "@/store"
 import { addCard, editCard, closeCardModal } from "@/store/Slices/cardSlice"
@@ -17,7 +16,6 @@ import {
   FileText,
   Paperclip,
   Upload,
-  ChevronDown,
   Eye,
   EyeOff,
   AlertCircle,
@@ -35,10 +33,15 @@ interface DynamicField {
 
 const CardModalUIOnly = () => {
   const dispatch = useDispatch()
-    const { vaults } = useVaults();
-  const { isModalOpen, modalMode, editCard: card } = useSelector((state: RootState) => state.card)
+  const { vaults: rawVaults } = useVaults()
+  const vaults = rawVaults ?? []
+  const { isModalOpen, modalMode, editCard: card } = useSelector(
+    (state: RootState) => state.card
+  )
   const isEdit = modalMode === "edit"
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Form state
   const [title, setTitle] = useState("")
   const [nameOnCard, setNameOnCard] = useState("")
   const [cardNumber, setCardNumber] = useState("")
@@ -53,26 +56,18 @@ const CardModalUIOnly = () => {
   const [showDropdown, setShowDropdown] = useState(false)
   const [showPin, setShowPin] = useState(false)
   const [showSecurityCode, setShowSecurityCode] = useState(false)
-    const [selectedTab, setSelectedTab] = useState(vaults[0]?.key || "");
-  const cards = useSelector((state: RootState) => state.card.cards);
-  console.log(cards, "cards");
 
-  useEffect(() => {
-    console.log('Current Cards:', cards);
-  }, [cards]);
+  // Initialize selectedTab with first vault's key or card's vaultKey
+  const [selectedTab, setSelectedTab] = useState<string>("")
 
- const selectedVault = vaults.find((v) => v.key === selectedTab);
+  // Get initial tab value
+  const getInitialTab = useCallback(() => {
+    if (isEdit && card?.vaultKey) return card.vaultKey
+    return vaults[0]?.key || ""
+  }, [isEdit, card, vaults])
 
-
-  const fieldTypes = [
-    { type: "text" as const, label: "Text", icon: FileText },
-    { type: "2fa" as const, label: "2FA secret key (TOTP)", icon: Shield },
-    { type: "hidden" as const, label: "Hidden", icon: Eye },
-    { type: "date" as const, label: "Date", icon: Calendar },
-    { type: "note" as const, label: "Note", icon: FileText },
-  ]
-
-  const resetForm = () => {
+  // Reset form completely
+  const resetForm = useCallback(() => {
     setTitle("")
     setNameOnCard("")
     setCardNumber("")
@@ -84,9 +79,13 @@ const CardModalUIOnly = () => {
     setAttachments([])
     setErrors({ title: false })
     setIsSubmitting(false)
-  }
+    setSelectedTab(getInitialTab())
+  }, [getInitialTab])
 
+  // Initialize form when modal opens or edit mode changes
   useEffect(() => {
+    if (!isModalOpen) return
+
     if (isEdit && card) {
       setTitle(card.title || "")
       setNameOnCard(card.nameOnCard || "")
@@ -96,12 +95,59 @@ const CardModalUIOnly = () => {
       setPin(card.pin || "")
       setNote(card.note || "")
       setDynamicFields(card.dynamicFields || [])
-         setSelectedTab(card.vaultKey || vaults[0]?.key || "");
+      setSelectedTab(card.vaultKey || getInitialTab())
     } else {
       resetForm()
-       setSelectedTab(vaults[0]?.key || "");
     }
-  }, [isEdit, card, vaults])
+  }, [isModalOpen, isEdit]) // Only depend on modal state and edit mode
+
+  // Update selectedTab when vaults change (only if empty)
+  useEffect(() => {
+    if (vaults.length > 0 && !selectedTab) {
+      setSelectedTab(vaults[0].key)
+    }
+  }, [vaults]) // Only run when vaults change
+
+  const selectedVault = vaults.find((v) => v.key === selectedTab)
+
+  const fieldTypes = [
+    { type: "text" as const, label: "Text", icon: FileText },
+    { type: "2fa" as const, label: "2FA secret key (TOTP)", icon: Shield },
+    { type: "hidden" as const, label: "Hidden", icon: Eye },
+    { type: "date" as const, label: "Date", icon: Calendar },
+    { type: "note" as const, label: "Note", icon: FileText },
+  ]
+
+  // const resetForm = () => {
+  //   setTitle("")
+  //   setNameOnCard("")
+  //   setCardNumber("")
+  //   setExpirationDate("")
+  //   setSecurityCode("")
+  //   setPin("")
+  //   setNote("")
+  //   setDynamicFields([])
+  //   setAttachments([])
+  //   setErrors({ title: false })
+  //   setIsSubmitting(false)
+  // }
+
+  // useEffect(() => {
+  //   if (isEdit && card) {
+  //     setTitle(card.title || "")
+  //     setNameOnCard(card.nameOnCard || "")
+  //     setCardNumber(card.cardNumber || "")
+  //     setExpirationDate(card.expirationDate || "")
+  //     setSecurityCode(card.securityCode || "")
+  //     setPin(card.pin || "")
+  //     setNote(card.note || "")
+  //     setDynamicFields(card.dynamicFields || [])
+  //     setSelectedTab(card.vaultKey || (vaults[0]?.key ?? ""))
+  //   } else {
+  //     resetForm()
+  //     setSelectedTab(vaults[0]?.key ?? "")
+  //   }
+  // }, [isEdit, card, vaults])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -111,6 +157,7 @@ const CardModalUIOnly = () => {
     }
     setIsSubmitting(true)
     await new Promise((resolve) => setTimeout(resolve, 500))
+
     const payload = {
       title: title.trim(),
       nameOnCard,
@@ -121,9 +168,8 @@ const CardModalUIOnly = () => {
       note,
       dynamicFields,
       attachments: attachments.map((file) => file.name),
-       vaultKey: selectedTab,
+      vaultKey: selectedTab,
       vaultName: selectedVault?.name || "",
-      // Optional extras:
       vaultIcon: selectedVault?.icon || "",
       vaultColor: selectedVault?.color || "",
     }
@@ -146,16 +192,11 @@ const CardModalUIOnly = () => {
     for (let i = 0, len = match.length; i < len; i += 4) {
       parts.push(match.substring(i, i + 4))
     }
-    if (parts.length) {
-      return parts.join(" ")
-    } else {
-      return v
-    }
+    return parts.length ? parts.join(" ") : v
   }
 
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatCardNumber(e.target.value)
-    setCardNumber(formatted)
+    setCardNumber(formatCardNumber(e.target.value))
   }
 
   const addDynamicField = (type: DynamicField["type"]) => {
@@ -170,7 +211,9 @@ const CardModalUIOnly = () => {
   }
 
   const updateDynamicField = (id: string, value: string) => {
-    setDynamicFields((fields) => fields.map((field) => (field.id === id ? { ...field, value } : field)))
+    setDynamicFields((fields) =>
+      fields.map((field) => (field.id === id ? { ...field, value } : field))
+    )
   }
 
   const removeDynamicField = (id: string) => {
@@ -200,8 +243,12 @@ const CardModalUIOnly = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20">
-      <div className="fixed inset-0" onClick={() => dispatch(closeCardModal())} />
+      <div
+        className="fixed inset-0"
+        onClick={() => dispatch(closeCardModal())}
+      />
 
+      {/* Modal */}
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl border border-white/20 bg-white dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl animate-in zoom-in-95 duration-300">
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
@@ -211,13 +258,17 @@ const CardModalUIOnly = () => {
                 {isEdit ? "Edit Card" : "Add New Card"}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {isEdit ? "Update your saved card" : "Securely store your card information"}
+                {isEdit
+                  ? "Update your saved card"
+                  : "Securely store your card information"}
               </p>
             </div>
-          <VaultDropdown
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-          />
+           
+              <VaultDropdown
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+              />
+          
           </div>
           <button
             onClick={() => dispatch(closeCardModal())}
