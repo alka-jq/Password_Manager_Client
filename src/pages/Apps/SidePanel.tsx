@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Tippy from '@tippyjs/react';
 import { MdMoveToInbox, MdOutlineCircle } from 'react-icons/md';
 import 'react-quill/dist/quill.snow.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import 'tippy.js/dist/tippy.css';
 import logo from '../../assets/images/ubs icons/2-removebg-preview.png';
 import { useAuth } from '../../useContext/AppState';
@@ -36,7 +36,6 @@ import { openPasswordGenerator } from "@/store/Slices/passwordSlice"
 import PasswordGenerator from "./passwordgenerator"
 import { useVaults } from '@/useContext/VaultContext';
 
-
 interface Vault {
     id: string;
     name: string;
@@ -48,6 +47,7 @@ interface Vault {
 const VAULTS_STORAGE_KEY = 'userVaults';
 const SidePanel = () => {
     const navigate = useNavigate();
+    const location = useLocation(); // Get current location
     const dispatch = useDispatch();
     const { menuBarOpen, setMenuBarOpen } = useAuth();
     const [isEdit, setIsEdit] = useState(false);
@@ -94,36 +94,64 @@ const SidePanel = () => {
         FileText: <FileText size={16} />,
     };
 
- const handleCreateVault = (vaultName: string, iconName: string, color: string) => {
-  const path = `/Cell/${vaultName.toLowerCase().replace(/\s+/g, '-')}`;
-  const newVault: Vault = {
-    id: Date.now().toString(),
-    name: vaultName,
-    path,
-    key: `vault-${Date.now()}`,
-    icon: iconName,
-    color: color,
-  };
+    // Update selectedTab based on current path
+    useEffect(() => {
+        const currentPath = location.pathname;
+        
+        // Check if current path matches any tab
+        const matchedTab = tabs.find(tab => tab.path === currentPath);
+        if (matchedTab) {
+            setSelectedTab(matchedTab.key);
+            localStorage.setItem('selectedTab', matchedTab.key);
+            return;
+        }
+        
+        // Check if current path matches any vault
+        const matchedVault = vaults.find(vault => vault.path === currentPath);
+        if (matchedVault) {
+            setSelectedTab(matchedVault.key);
+            localStorage.setItem('selectedTab', matchedVault.key);
+            return;
+        }
+        
+        // Default to 'inbox' if no match found
+        setSelectedTab('inbox');
+        localStorage.setItem('selectedTab', 'inbox');
+    }, [location.pathname, vaults]);
 
-  // Completely safe update with multiple fallbacks
-  setVaults(prevVaults => {
-    const currentVaults = Array.isArray(prevVaults) ? prevVaults : [];
-    const updatedVaults = [...currentVaults, newVault];
-    
-    try {
-      localStorage.setItem("VAULTS_STORAGE_KEY", JSON.stringify(updatedVaults));
-    } catch (error) {
-      console.error("Failed to save vaults to localStorage", error);
-    }
-    
-    return updatedVaults;
-  });
+    const handleCreateVault = (vaultName: string, iconName: string, color: string) => {
+        const path = `/Cell/${vaultName.toLowerCase().replace(/\s+/g, '-')}`;
+        const newVault: Vault = {
+            id: Date.now().toString(),
+            name: vaultName,
+            path,
+            key: `vault-${Date.now()}`,
+            icon: iconName,
+            color: color,
+        };
 
-  navigate(path);
-};
+        // Completely safe update with multiple fallbacks
+        setVaults(prevVaults => {
+            const currentVaults = Array.isArray(prevVaults) ? prevVaults : [];
+            const updatedVaults = [...currentVaults, newVault];
+            
+            try {
+                localStorage.setItem("VAULTS_STORAGE_KEY", JSON.stringify(updatedVaults));
+            } catch (error) {
+                console.error("Failed to save vaults to localStorage", error);
+            }
+            
+            return updatedVaults;
+        });
+
+        // Set the new vault as selected
+        setSelectedTab(newVault.key);
+        localStorage.setItem('selectedTab', newVault.key);
+        navigate(path);
+    };
+
     const openDrawer = () => {
         setIsDrawerOpen(true);
-        //  setIsDrawerOpen();
     };
 
     const handleUpdateVault = (vaultId: string, name: string, icon: string, color: string) => {
@@ -163,6 +191,13 @@ const SidePanel = () => {
             setVaults(vaults.filter(v => v.id !== vaultToDelete.id));
             setDeleteModalOpen(false);
             setVaultToDelete(null);
+            
+            // If the deleted vault was selected, reset to inbox
+            if (selectedTab === vaultToDelete.key) {
+                setSelectedTab('inbox');
+                localStorage.setItem('selectedTab', 'inbox');
+                navigate('/all_items');
+            }
         }
     };
 
@@ -170,24 +205,12 @@ const SidePanel = () => {
         localStorage.setItem(VAULTS_STORAGE_KEY, JSON.stringify(vaults));
     }, [vaults]);
 
-
     const tabs = [
         { label: 'All Items', path: '/all_items', icon: MdMoveToInbox, key: 'inbox', count: counts.inbox },
         { label: 'Personal', path: '/personal', icon: CircleUserRound, key: 'done', count: counts.done },
         { label: 'Pin', path: '/pin', icon: Pin, key: 'important', count: counts.important },
         { label: 'Trash', path: '/trash', icon: RiDeleteBinLine, key: 'trash', count: counts.trash },
     ];
-
-    // const disclosureTabs = [
-    //     { label: 'Team', path: '/team', icon: AiOutlineTeam, key: 'team', count: counts.team },
-    //     { label: 'Update', path: '/update', icon: RxUpdate, key: 'update', count: counts.update },
-    // ];
-
-    // const priorityTabs = [
-    //     { label: 'High', path: '/high', icon: IoAlertCircleOutline, key: 'high', count: counts.high },
-    //     { label: 'Medium', path: '/medium', icon: MdOutlineCircle, key: 'medium', count: counts.medium },
-    //     { label: 'Low', path: '/low', icon: MdOutlineCircle, key: 'low', count: counts.low },
-    // ];
 
     const baseClasses =
         'mb-0.5 w-full flex justify-between blue:hover:text-white blue:text-black blue:hover:bg-[#4e96ca59] items-center px-3 py-2 rounded-md font-medium ' +
@@ -209,7 +232,6 @@ const SidePanel = () => {
         'salmonpink:bg-[#34878e7a] salmonpink:text-white ' +
         'softazure:bg-[#4a4e69]';
 
-
     const dropdownItems = [
         {
             id: 'login',
@@ -221,8 +243,7 @@ const SidePanel = () => {
             id: 'card',
             label: 'Card',
             icon: <FiCreditCard size={18} className="mr-2" />,
-            action: () => dispatch(openCardAddModal()),// Add your action here
-
+            action: () => dispatch(openCardAddModal()),
         },
         {
             id: 'identity',
@@ -230,16 +251,14 @@ const SidePanel = () => {
             icon: <FiUser size={18} className="mr-2" />,
             action: () => dispatch(openIdentityAddModal()),
         },
-
         {
             id: 'password',
             label: 'Password Generator',
             icon: <FiKey size={18} className="mr-2" />,
-            action: () => dispatch(openPasswordGenerator()),// Add your action here
+            action: () => dispatch(openPasswordGenerator()),
         }
     ];
 
-    //  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
 
     // Click outside detection
@@ -259,13 +278,26 @@ const SidePanel = () => {
         }
     }, [])
 
+    // Function to handle tab click
+    const handleTabClick = (tabKey: string, tabPath: string) => {
+        setSelectedTab(tabKey);
+        localStorage.setItem('selectedTab', tabKey);
+        navigate(tabPath);
+    };
+
+    // Function to handle vault click
+    const handleVaultClick = (vault: Vault) => {
+        setSelectedTab(vault.key);
+        localStorage.setItem('selectedTab', vault.key);
+        navigate(vault.path);
+    };
+
     return (
         <>
             <div className="lg:flex lg:relative h-full text-[#fff] lightmint:bg-[#629e7c]">
                 <div className={`overlay bg-black/60 z-[5] w-full h-full fixed inset-0 xl:!hidden ${menuBarOpen ? 'block' : 'hidden'}`} onClick={() => setMenuBarOpen(false)}></div>
                 <div
-                    className={`  lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtl:right-0' : ''}`}
-
+                    className={`  lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtr:right-0' : ''}`}
                 >
                     <div className="lightmint:bg-[#629e7c]">
                         <div className="py-3 px-5 blue:bg-[#64b5f6]">
@@ -310,26 +342,25 @@ const SidePanel = () => {
                                 </div>
                             </div>
 
-                            <div className="space-y-0 pl-3 w-full mt-1  -mr-3  flex flex-col classic:text-gray-900">
+                            <div className="space-y-0 pl-3 pr-3 w-full mt-1  -mr-3  flex flex-col classic:text-gray-900">
                                 <div>
                                     {tabs.map((tab) => (
                                         <Tippy content={tab.label} placement="right" key={tab.path}>
-                                            <Link to={tab.path}>
-                                                <button
-                                                    type="button"
-                                                    className={`${baseClasses} ${!isEdit && selectedTab === tab.key ? activeClasses : ''}`}
-                                                >
-                                                    <div className="flex items-center">
-                                                        <tab.icon className="shrink-0 w-4 h-4" />
-                                                        <div className="ltr:ml-2 rtl:mr-3">{tab.label}</div>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleTabClick(tab.key, tab.path)}
+                                                className={`${baseClasses} ${selectedTab === tab.key ? activeClasses : ''}`}
+                                            >
+                                                <div className="flex items-center">
+                                                    <tab.icon className="shrink-0 w-4 h-4" />
+                                                    <div className="ltr:ml-2 rtl:mr-3 text-white font-medium text-sm truncate">{tab.label}</div>
+                                                </div>
+                                                {tab.count !== undefined && (
+                                                    <div className="text-white text-xs font-semibold ml-auto">
+                                                        {tab.count}
                                                     </div>
-                                                    {tab.count !== undefined && (
-                                                        <div className="text-white text-xs font-semibold ml-auto">
-                                                            {tab.count}
-                                                        </div>
-                                                    )}
-                                                </button>
-                                            </Link>
+                                                )}
+                                            </button>
                                         </Tippy>
                                     ))}
                                 </div>
@@ -369,16 +400,15 @@ const SidePanel = () => {
                                 <div className=" h-[50vh] thin-scrollbar  overflow-auto">
                                     {vaults && vaults.length > 0 && (
                                         <div className=" ">
-
                                             {vaults.map((vault) => (
                                                 <div key={vault.id} className="relative group">
                                                     <Tippy content={vault.name} placement="right">
-                                                        <div className="flex items-center justify-between px-2 py-2 rounded-lg  dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer">
+                                                        <div 
+                                                            className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''}`}
+                                                            onClick={() => handleVaultClick(vault)}
+                                                        >
                                                             {/* Left Icon and Name */}
                                                             <div
-                                                                onClick={() => {
-                                                                    setSelectedTab(vault.key);
-                                                                }}
                                                                 className="flex items-center gap-2 w-full"
                                                             >
                                                                 <Box sx={{ color: vault.color, display: 'flex', mr: 1 }}>
@@ -391,18 +421,22 @@ const SidePanel = () => {
                                                             <div className="relative">
                                                                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
                                                                     <Menu as="div" className="relative inline-block text-left z-50">
-                                                                        <Menu.Button className="p-1 rounded-full hover:bg-white/20 transition duration-150">
+                                                                        <Menu.Button 
+                                                                            className="p-1 rounded-full hover:bg-white/20 transition duration-150"
+                                                                            onClick={(e) => e.stopPropagation()} // Prevent triggering vault selection
+                                                                        >
                                                                             <HiDotsVertical className="w-4 h-4 text-white" />
                                                                         </Menu.Button>
-
-
 
                                                                         <Menu.Items className="absolute right-0 mt-2 w-44 origin-top-right rounded-md bg-white dark:bg-gray-900 shadow-xl ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 dark:divide-gray-700 focus:outline-none">
                                                                             <div className="py-1 text-gray-900 dark:text-gray-100">
                                                                                 <Menu.Item>
                                                                                     {({ active }) => (
                                                                                         <button
-                                                                                            onClick={() => handleEditVault(vault)}
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                handleEditVault(vault);
+                                                                                            }}
                                                                                             className={`${active ? "bg-gray-100 dark:bg-gray-700" : ""
                                                                                                 } flex items-center w-full px-4 py-2 text-sm font-medium`}
                                                                                         >
@@ -415,7 +449,10 @@ const SidePanel = () => {
                                                                                 <Menu.Item>
                                                                                     {({ active }) => (
                                                                                         <button
-                                                                                            onClick={() => handleShareVault(vault)}
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                handleShareVault(vault);
+                                                                                            }}
                                                                                             className={`${active ? "bg-gray-100 dark:bg-gray-700" : ""
                                                                                                 } flex items-center w-full px-4 py-2 text-sm font-medium`}
                                                                                         >
@@ -428,7 +465,10 @@ const SidePanel = () => {
                                                                                 <Menu.Item>
                                                                                     {({ active }) => (
                                                                                         <button
-                                                                                            onClick={() => handleDeleteClick(vault)}
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                handleDeleteClick(vault);
+                                                                                            }}
                                                                                             className={`${active ? "bg-red-100 dark:bg-red-900/30" : ""
                                                                                                 } flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`}
                                                                                         >
@@ -453,7 +493,6 @@ const SidePanel = () => {
                                                         </div>
                                                     </Tippy>
                                                 </div>
-
                                             ))}
                                         </div>
                                     )}

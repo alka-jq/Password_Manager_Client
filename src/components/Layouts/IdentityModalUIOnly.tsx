@@ -347,7 +347,7 @@ const IdentityModalUIOnly = () => {
               </button>
 
               {expandedSections.personal && (
-                <div className="p-4 pt-0 space-y-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="p-4 pt-2 space-y-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Personal details fields */}
                     <div className="space-y-2">
@@ -427,7 +427,7 @@ const IdentityModalUIOnly = () => {
               </button>
 
               {expandedSections.address && (
-                <div className="p-4 pt-0 space-y-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="p-4 pt-2 space-y-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2 md:col-span-2">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Organization</label>
@@ -520,7 +520,7 @@ const IdentityModalUIOnly = () => {
               </button>
 
               {expandedSections.contact && (
-                <div className="p-4 pt-0 space-y-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="p-4 pt-2 space-y-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Home Phone</label>
@@ -600,7 +600,7 @@ const IdentityModalUIOnly = () => {
               </button>
 
               {expandedSections.work && (
-                <div className="p-4 pt-0 space-y-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="p-4 pt-2 space-y-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Company</label>
