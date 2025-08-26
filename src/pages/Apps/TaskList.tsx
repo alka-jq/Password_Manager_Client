@@ -316,7 +316,7 @@ const TaskList = () => {
             ))}
           </div>
         ) : (
-          <div className="flex justify-center items-center h-96  text-center text-gray-500 dark:text-gray-400">
+          <div className="flex justify-center items-center h-full  text-center text-gray-500 dark:text-gray-400">
             <div>
               {/* <div className="text-6xl mb-2">🔐</div>
               <div className="font-medium">No items found</div> */}
