@@ -33,7 +33,7 @@ import ViewCardModal from "./ViewCardModal"
 import ViewIdentityModal from "./ViewIdentityModal"
 import { selectCombinedItems } from "@/store/selectors/combinedSelector"
 import type { RootState } from "@/store"
-import { MoreHorizontal, Edit, Trash2, RotateCcw, Pin, Eye, AlertTriangle, Move } from "lucide-react"
+import { MoreHorizontal, Edit, Trash2, RotateCcw, Pin, Eye, AlertTriangle, Move, PinOff } from "lucide-react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { CiShare1 } from "react-icons/ci";
 import { FiUserPlus } from "react-icons/fi"
@@ -139,67 +139,7 @@ const PermanentDeleteConfirmationModal = ({ isOpen, onClose, onConfirm, itemCoun
   )
 }
 
-const MoveToModal = ({ isOpen, onClose, onMove, selectedTab }) => {
-  const [destination, setDestination] = useState("")
-  
-  if (!isOpen) return null
 
-  const options = [
-    { value: "personal", label: "Personal", disabled: selectedTab === "personal" },
-    { value: "pin", label: "Pin", disabled: selectedTab === "pin" },
-    { value: "card", label: "Card", disabled: selectedTab === "card" },
-    { value: "task", label: "Task", disabled: selectedTab === "task" },
-    { value: "identity", label: "Identity", disabled: selectedTab === "identity" },
-  ]
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-md">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Move selected items
-        </h3>
-        
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Select destination
-          </label>
-          <select
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            className="w-full p-2.5 border border-gray-300 rounded-md bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          >
-            <option value="">Choose a destination</option>
-            {options.map(option => (
-              <option 
-                key={option.value} 
-                value={option.value}
-                disabled={option.disabled}
-              >
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="flex justify-end space-x-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => onMove(destination)}
-            disabled={!destination}
-            className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Move
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 const TaskList = () => {
   const dispatch = useDispatch()
@@ -256,7 +196,7 @@ const TaskList = () => {
         case "card": return item.type === "card" && item.status !== "trash"
         case "task": return item.type === "task" && item.status !== "trash"
         case "identity": return item.type === "identity" && item.status !== "trash"
-        default: return item.status !== "trash"
+        default: return item.status !== "trash" && item.status !== "important" // Don't show pinned items in "All items"
       }
     })()
 
@@ -444,7 +384,7 @@ const TaskList = () => {
           <>
             <div className="col-span-8 flex items-center">
               <span className="text-sm font-normal text-gray-700 dark:text-gray-300">
-                Select all {paginatedItems.length} items
+                Select {paginatedItems.length} items
               </span>
             </div>
             <div className="col-span-3 flex justify-end items-center space-x-3">
@@ -458,15 +398,7 @@ const TaskList = () => {
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
-                  
-                  <button
-                    onClick={() => setMoveToModal({ isOpen: true, items: getSelectedItemsData() })}
-                    className="p-1.5 text-gray-500 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                    title="Move to folder"
-                  >
-                    <Move className="w-4 h-4" />
-                  </button>
-                  
+
                   {selectedTab !== "pin" ? (
                     <button
                       onClick={handleBulkToggleImportant}
@@ -481,7 +413,7 @@ const TaskList = () => {
                       className="p-1.5 text-gray-500 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
                       title="Unpin items"
                     >
-                      <Pin className="w-4 h-4" />
+                      <PinOff className="w-4 h-4" />
                     </button>
                   )}
                 </>
@@ -504,18 +436,13 @@ const TaskList = () => {
                   </button>
                 </>
               )}
-              
-              <button
-                onClick={() => setSelectedItems(new Set())}
-                className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-              >
-                Clear
-              </button>
+                            
             </div>
           </>
         ) : (
           <>
-            <div className="col-span-7">TITLE</div>
+            <div className="col-span-1">PIN</div>
+            <div className="col-span-6">TITLE</div>
             <div className="col-span-2">TYPE</div>
             <div className="col-span-2 text-right">ACTIONS</div>
           </>
@@ -529,6 +456,7 @@ const TaskList = () => {
             {paginatedItems.map((item) => {
               const itemId = `${item.type}-${item.id}`
               const isSelected = selectedItems.has(itemId)
+              const isPinned = item.status === "important"
               
               return (
                 <div
@@ -546,8 +474,19 @@ const TaskList = () => {
                       />
                     </div>
 
+                    {/* Pin button */}
+                    <div className="col-span-1 flex items-center">
+                      <button
+                        onClick={() => handleToggleImportant(item)}
+                        className={`p-1.5 rounded-full ${isPinned ? 'text-yellow-500 hover:text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600'}`}
+                        title={isPinned ? "Unpin item" : "Pin item"}
+                      >
+                        {isPinned ? <Pin className="w-4 h-4 fill-current" /> : <Pin className="w-4 h-4" />}
+                      </button>
+                    </div>
+
                     {/* Title */}
-                    <div className="col-span-7">
+                    <div className="col-span-6">
                       <div
                         className="cursor-pointer group"
                         onClick={() => {
@@ -692,14 +631,6 @@ const TaskList = () => {
         onClose={() => setPermanentDeleteModal({ isOpen: false, items: [] })}
         onConfirm={() => handleDelete(permanentDeleteModal.items, true)}
         itemCount={permanentDeleteModal.items.length}
-      />
-
-      {/* Move To Modal */}
-      <MoveToModal
-        isOpen={moveToModal.isOpen}
-        onClose={() => setMoveToModal({ isOpen: false, items: [] })}
-        onMove={handleBulkMove}
-        selectedTab={selectedTab}
       />
 
       {/* View Modals */}
