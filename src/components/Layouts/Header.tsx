@@ -151,17 +151,17 @@ const Header = () => {
 
 
     const apps = [
-        { src: mail, link: '/', title: 'ubMail', with: "w-10" },
-        { src: drive, link: '/', title: 'ubDrive', with: "w-10" },
-        { src: meeting, link: '/', title: 'ubMeeting', with: "w-12" },
-        { src: docs, link: '/', title: 'ubDocument', with: "w-10" },
-        { src: pad, link: '/', title: 'ubPad', with: "w-12" },
-        { src: sheet, link: '/', title: 'ubSheet', with: "w-12" },
-        { src: calendar, link: '/', title: 'ubCalendar', with: "w-14" },
-        { src: ppt, link: '/', title: 'ubPpt', with: "w-12" },
-        { src: contact, link: '/', title: 'ubContact', with: "w-14" },
-        { src: pdf, link: '/', title: 'ubPDF', with: "w-12" },
-        { src: form, link: '/', title: 'ubForm', with: "w-12" },
+        { src: mail, link: '/', title: 'JQ Mail', with: "w-10" },
+        { src: drive, link: '/', title: 'JQ Drive', with: "w-10" },
+        { src: meeting, link: '/', title: 'JQ Meeting', with: "w-12" },
+        { src: docs, link: '/', title: 'JQ Document', with: "w-10" },
+        { src: pad, link: '/', title: 'JQ Pad', with: "w-12" },
+        { src: sheet, link: '/', title: 'JQ Sheet', with: "w-12" },
+        { src: calendar, link: '/', title: 'JQ Calendar', with: "w-14" },
+        { src: ppt, link: '/', title: 'JQ Ppt', with: "w-12" },
+        { src: contact, link: '/', title: 'JQ Contact', with: "w-14" },
+        { src: pdf, link: '/', title: 'JQ PDF', with: "w-12" },
+        { src: form, link: '/', title: 'JQ Form', with: "w-12" },
         // { src: esign, link: '/', title: 'ubE-Sign' , with : "w-22" },
     ];
 
@@ -241,7 +241,7 @@ const Header = () => {
     const [lunrIndex, setLunrIndex] = useState<lunr.Index | null>(null);
 
     useEffect(() => {
-        console.log('📦 Setting up Lunr index header', emails);
+        console.log(' Setting up Lunr index header', emails);
 
         if (!emails.length) return;
 
@@ -249,7 +249,7 @@ const Header = () => {
             this.ref('id');
             this.field('subject');
             this.field('plain_text');
-            this.field('from_email'); // ✅ Searchable field
+            this.field('from_email'); 
 
             emails.forEach((email) => {
                 this.add({
@@ -272,7 +272,7 @@ const Header = () => {
     const [lunrAdvIndex, setLunrAdvIndex] = useState<lunr.Index | null>(null);
 
     useEffect(() => {
-        console.log('📦 Setting up Lunr index header', emails);
+        console.log('Setting up Lunr index header', emails);
 
         if (!emails.length) return;
 
@@ -360,85 +360,7 @@ const Header = () => {
                                         <IoIosSearch size={20} className="mx-auto" />
                                     </button>
                                     
-                                    {/* <button type="button" onClick={() => setSearch(false)} className="absolute lg:hidden dark:text-white w-8 h-8 mt-1 right-10">
-                                        <IoClose size={20} />
-                                    </button> */}
-
-                                    {/* {searchingData && (
-                                        <div ref={popupRef} className="absolute top-full w-[540px] dark:border-gray-500 peach:bg-gray-100 dark:bg-[#1F1F1F] blue:bg-blue-50 lightmint:bg-gray-50 max-h-[60vh] thin-scrollbar  overflow-y-auto border rounded bg-white ">
-                                            {filteredEmails.length > 0 ? (
-                                                <table className="min-w-full divide-y divide-gray-200 ">
-                                                    <tbody className="divide-y divide-gray-200 ">
-                                                        {filteredEmails.map((email) => (
-                                                            <tr
-                                                                key={email.id}
-                                                                onClick={() => {
-                                                                    setSearchingData(false);
-                                                                    navigate(`/mail_thread/${email.thread_id}`, {
-                                                                        state: {
-                                                                            id: email.id,
-                                                                            mail: email,
-                                                                            type: email.folder_info?.type || '',
-                                                                        },
-                                                                    });
-                                                                }}
-                                                                className="hover:bg-gray-50 dark:hover:bg-[#2F2F2F] transition-colors duration-150 cursor-pointer"
-                                                            >
-                                                                <td onClick={() => setSearchingData(false)} className="px-6 py-3 whitespace-nowrap w-10">
-                                                                    <div className="flex justify-center">
-                                                                        <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                strokeWidth={2}
-                                                                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                                                            />
-                                                                        </svg>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-0 py-3">
-                                                                    <div className="space-y-1">
-                                                                        <p className="font-medium text-gray-900 dark:text-white truncate max-w-[300px]">{email.subject}</p>
-                                                                        <div className="flex flex-wrap items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                                                                            <span className="font-medium">{email.from_email || email.from}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="px-6 py-3 whitespace-nowrap text-right">
-                                                                    <div className="flex flex-col items-end">
-                                                                        {email.created_at ? (
-                                                                            <>
-                                                                                <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                                                    {new Date(email.created_at).toLocaleDateString(undefined, {
-                                                                                        year: 'numeric',
-                                                                                        month: 'short',
-                                                                                        day: 'numeric',
-                                                                                    })}
-                                                                                </span>
-                                                                                <span className="text-xs text-gray-400 dark:text-gray-500">
-                                                                                    {new Date(email.created_at).toLocaleTimeString(undefined, {
-                                                                                        hour: '2-digit',
-                                                                                        minute: '2-digit',
-                                                                                    })}
-                                                                                </span>
-                                                                            </>
-                                                                        ) : (
-                                                                            <>
-                                                                                <span className="text-sm text-gray-500 dark:text-gray-400">—</span>
-                                                                                <span className="text-xs text-gray-400 dark:text-gray-500"></span>
-                                                                            </>
-                                                                        )}
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            ) : (
-                                                <div className="text-gray-500 text-center py-4">No matching emails found.</div>
-                                            )}
-                                        </div>
-                                    )} */}
+                          
                                 </div>
 
                                 {openSearch && (
@@ -488,6 +410,7 @@ const Header = () => {
                                 </Tippy>
                             </div>
                         )}
+                        {/* JQ App */}
                         <div className="">
                             <Dropdown
                                 offset={[20, 15]}
@@ -500,7 +423,7 @@ const Header = () => {
                                         {apps.map((app, index) => (
                                             <li>
                                                 <Link to={app.link}>
-                                                    <div className=" transition relative w-[80px] h-[80px] rounded-lg  flex flex-col items-center px-2">
+                                                    <div className=" transition relative w-[86px]  h-[80px] rounded-lg  flex flex-col items-center ">
                                                         <img src={app.src} alt="account" className={app.with} />
                                                         <p className="absolute bottom-0 font-medium text-slate-700 dark:text-white">{app.title}</p>
                                                     </div>
@@ -513,7 +436,6 @@ const Header = () => {
                         </div>
 
                         {/* profile */}
-
                         <div className="dropdown shrink-0 flex">
                             <Dropdown
                                 offset={[-32, 8]}
@@ -585,29 +507,6 @@ const Header = () => {
                                                         <h6 className='leading-4'>{userId?.first_name} <span className='block text-gray-500'>{userId?.email}</span></h6>
                                                         <h2 className='text-green-950 bg-green-100 text-[12px] h-5 px-2 rounded-md'>Default</h2>
                                                     </div>
-
-
-
-                                                </div>
-                                            </div>
-                                            <div className='flex   items-center transition py-1 px-1 hover:bg-gray-200 bg-white shadow  rounded-lg'>
-                                                <div className='mr-2'>
-                                                    {profile?.avatar ? (
-                                                        <img src={`data:image/*;base64,${profile.avatar}`} alt="avatar" className="w-7 h-7 rounded-full object-cover" />
-                                                    ) : (
-                                                        <div style={{ backgroundColor: bgColor }} className="rounded-full text-white text-xl w-7 h-7 flex items-center justify-center">
-                                                            {initial}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className='w-full '>
-                                                    <div className=" flex justify-between items-center w-full">
-                                                        <h6 className='leading-4'>{userId?.first_name} <span className='block text-gray-500'>{userId?.email}</span></h6>
-                                                        <h2 className='text-green-950 bg-green-100 text-[12px] h-5 px-2 rounded-md'>Default</h2>
-                                                    </div>
-
-
-
                                                 </div>
                                             </div>
                                         </div>

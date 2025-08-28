@@ -15,10 +15,10 @@ import path from 'path';
 
 
 const unProtectedRoutes: RouteObject[] = [
-  // {
-  //   path: '/auth/boxed-signin',
-  //   element: <LoginBoxed />,
-  // },
+  {
+    path: '/auth/boxed-signin',
+    element: <LoginBoxed />,
+  },
 
   {
     path: '/auth/boxed-signup',

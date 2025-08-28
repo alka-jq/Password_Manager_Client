@@ -10,7 +10,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import countries from 'world-countries';
 import email from '../../assets/images/icons_bg_remove/15-removebg-preview.png';
 import { useAuth } from '../../useContext/AppState';
-// import { ChevronDown } from 'lucide-react';
 import PageLoader from '@/components/Layouts/PageLoader';
 import { Check, ChevronDown, Globe } from 'lucide-react';
 import { FiUser } from 'react-icons/fi';
@@ -19,8 +18,7 @@ import { TiArrowSortedDown } from 'react-icons/ti';
 import { fetchUserKeys, initializeCrypto } from '@/utils/cryptoUtils';
 import { createMessage, encrypt, readKey } from 'openpgp';
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL; // ✅ Works with Vite
-// console.log('API base URL:', baseUrl);
+const baseUrl = import.meta.env.VITE_API_BASE_URL; 
 
 interface UserLogin {
     email: string;
@@ -334,43 +332,17 @@ export default function LoginBoxed() {
                 withCredentials: true, // needed in both modes
             });
 
-            console.log('🟢 Login response:', loginResponse.data);
+            console.log(' Login response:', loginResponse.data);
 
-            // if (isProd) {
-            //     // ✅ Production: session-based check
-            //     await axios
-            //         .get(`${baseUrl}/debug/cookie`, { withCredentials: true })
-            //         .then(() => console.log('✅ Cookie was sent'))
-            //         .catch(() => console.warn('❌ Cookie not sent'));
-
-            //     const sessionCheck = await axios.get(`${baseUrl}/users/session`, {
-            //         withCredentials: true,
-            //     });
-
-            //     console.log('🟢 Session check result:', sessionCheck.data);
-
-            //     if (sessionCheck.data?.authenticated) {
-            //         console.log('✅ Session validated. Navigating to /');
-            //         const token = loginResponse.data?.token;
-            //         if (token) {
-            //             setAuthToken(token); // 🔐 Save to localStorage or context
-            //             console.log('✅ JWT stored. Navigating to /');
-            //             navigate('/');
-            //         } else {
-            //             toast.error('No token received from server');
-            //         }
-            //     }
-            // }
-            // else {
-            // Handle non-production case if needed
+       
             const token = loginResponse.data?.token;
             if (token) {
                 setAuthToken(token);
-                console.log('✅ JWT stored (dev mode). Navigating to /');
+                console.log(' JWT stored (dev mode). Navigating to /');
                 await initializeCrypto(token); // Initialize crypto with the token
                 const encryptionKeys = await fetchUserKeys();
                 const publicKey = await readKey({ armoredKey: encryptionKeys.publicKey });
-                console.log(publicKey, "🔑 Public key fetched before cred2storage");
+                console.log(publicKey, " Public key fetched before cred2storage");
                 const encryptedCred = await encrypt({
                     message: await createMessage({ text: JSON.stringify(inputData) }),
                     encryptionKeys: [publicKey],
@@ -439,10 +411,10 @@ export default function LoginBoxed() {
                                 <div className="">
                                     <div className="mb-4 md:mb-0 flex items-center  rounded-lg ">
                                         <img src={email} alt="Logo" className="w-10" />
-                                        <h1 className=" text-2xl text-primary pr-4 ml-2 font-semibold"> UB Mail</h1>
+                                        <h1 className=" text-2xl text-primary pr-4 ml-2 font-semibold"> JQ Mail</h1>
                                     </div>
                                     <h2 className="text-4xl md:text-5xl lg:mt-16 text-black mb-4 leading-relaxed ">
-                                        Sign in <span className="block pt-3 text-[16px] font-medium">to continue to UB Mail</span>
+                                        Sign in <span className="block pt-3 text-[16px] font-medium">to continue to JQ Mail</span>
                                     </h2>
                                 </div>
                             </div>
@@ -549,7 +521,7 @@ export default function LoginBoxed() {
                                             </button>
                                         </div>
                                         <div className="flex items-center text-[15px] mt-4">
-                                            <p className="text-black">New to UB Mail?</p>{' '}
+                                            <p className="text-black">New to JQ Mail?</p>{' '}
                                             <Link to="/auth/boxed-signup" className="text-[#4361EE] ml-1 underline underline-offset-2">
                                                 Create an account
                                             </Link>
