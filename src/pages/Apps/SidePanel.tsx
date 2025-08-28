@@ -7,7 +7,7 @@ import 'tippy.js/dist/tippy.css';
 import logo from '../../assets/images/ubs icons/2-removebg-preview.png';
 import { useAuth } from '../../useContext/AppState';
 import { RiDeleteBinLine, RiDraftLine, RiSpam2Line } from 'react-icons/ri';
-import { FiCreditCard, FiKey, FiPlus, FiUser } from 'react-icons/fi';
+import { FiCreditCard, FiKey, FiPlus, FiUser, FiX } from 'react-icons/fi';
 import { FaRegStar, FaRegTrashAlt } from 'react-icons/fa';
 import { RxUpdate } from 'react-icons/rx';
 import { IoAlertCircleOutline } from 'react-icons/io5';
@@ -45,9 +45,79 @@ interface Vault {
     color: string;
 }
 const VAULTS_STORAGE_KEY = 'userVaults';
+
+// Create Modal Component
+const CreateModal = ({ isOpen, onClose, items }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      
+      {/* Modal */}
+      <div className="relative bg-white dark:bg-[#2a2f3b] rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden transform transition-all duration-300 scale-95 animate-in fade-in-90 zoom-in-90">
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+            Create New Item
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            <FiX className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+          </button>
+        </div>
+        
+        {/* Content */}
+        <div className="p-5">
+          <div className="grid grid-cols-1 gap-3">
+            {items.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  item.action();
+                  onClose();
+                }}
+                className="flex items-center w-full p-4 rounded-lg text-left transition-all duration-200 
+                  bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 
+                  border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700
+                  hover:shadow-md group"
+              >
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 mr-4">
+                  {item.icon}
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-800 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300">
+                    {item.label}
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {item.description || `Create a new ${item.label.toLowerCase()}`}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl">
+          <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+            Select an item type to create
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SidePanel = () => {
     const navigate = useNavigate();
-    const location = useLocation(); // Get current location
+    const location = useLocation();
     const dispatch = useDispatch();
     const { menuBarOpen, setMenuBarOpen } = useAuth();
     const [isEdit, setIsEdit] = useState(false);
@@ -61,7 +131,7 @@ const SidePanel = () => {
     const [isShareOpen, setIsShareOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [vaultToDelete, setVaultToDelete] = useState<Vault | null>(null);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false); // Changed from isDropdownOpen
 
     const iconComponents: Record<string, JSX.Element> = {
         Home: <Home size={16} />,
@@ -232,51 +302,36 @@ const SidePanel = () => {
         'salmonpink:bg-[#34878e7a] salmonpink:text-white ' +
         'softazure:bg-[#4a4e69]';
 
-    const dropdownItems = [
+    const modalItems = [
         {
             id: 'login',
             label: 'Login',
-            icon: <FiLogIn size={18} className="mr-2" />,
+            description: 'Secure username and password combination',
+            icon: <FiLogIn size={18} />,
             action: () => dispatch(openAddModal())
         },
         {
             id: 'card',
             label: 'Card',
-            icon: <FiCreditCard size={18} className="mr-2" />,
+            description: 'Credit or debit card information',
+            icon: <FiCreditCard size={18} />,
             action: () => dispatch(openCardAddModal()),
         },
         {
             id: 'identity',
             label: 'Identity',
-            icon: <FiUser size={18} className="mr-2" />,
+            description: 'Personal identification details',
+            icon: <FiUser size={18} />,
             action: () => dispatch(openIdentityAddModal()),
         },
         {
             id: 'password',
             label: 'Password Generator',
-            icon: <FiKey size={18} className="mr-2" />,
+            description: 'Create strong, secure passwords',
+            icon: <FiKey size={18} />,
             action: () => dispatch(openPasswordGenerator()),
         }
     ];
-
-    const dropdownRef = useRef<HTMLDivElement>(null)
-
-    // Click outside detection
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(event.target as Node)
-            ) {
-                setIsDropdownOpen(false)
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside)
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside)
-        }
-    }, [])
 
     // Function to handle tab click
     const handleTabClick = (tabKey: string, tabPath: string) => {
@@ -311,34 +366,23 @@ const SidePanel = () => {
                             </Link>
                         </div>
                         <div className="flex flex-col h-full blue:bg-[#64b5f6] pb-8">
-                            <div className="flex justify-center relative" ref={dropdownRef}>
+                            <div className="flex justify-center relative">
                                 <div className="w-full max-w-xs px-4 ">
                                     <button
                                         className="btn hover:shadow-md mb-1 blue:bg-[#e3f2fd] blue:text-black salmonpink:bg-gray-100 salmonpink:text-black bg-[#2565C7] classic:bg-[#a8c7fa] classic:text-black cornflower:bg-gray-200 cornflower:text-black peach:bg-gray-200 peach:text-black dark:bg-[#2F2F2F] lightmint:bg-green-50 lightmint:text-black border-none shadow-md py-3 font-medium rounded-lg w-full relative text-white softazure:bg-[#363852]"
                                         type="button"
-                                        onClick={() => setIsDropdownOpen((prev) => !prev)}
+                                        onClick={() => setIsModalOpen(true)}
                                     >
                                         <FiPlus size={20} className="mr-1 inline" />
                                         Create item
                                     </button>
 
-                                    {isDropdownOpen && (
-                                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 z-10 w-52 bg-white dark:bg-[#2F2F2F] rounded-lg shadow-lg border border-gray-200 dark:border-gray-600">
-                                            {dropdownItems.map((item: any) => (
-                                                <button
-                                                    key={item.id}
-                                                    className="flex items-center w-full px-4 py-3 text-left rounded-lg text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                                                    onClick={() => {
-                                                        item.action()
-                                                        setIsDropdownOpen(false)
-                                                    }}
-                                                >
-                                                    {item.icon}
-                                                    {item.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
+                                    {/* Modal Popup */}
+                                    <CreateModal 
+                                        isOpen={isModalOpen} 
+                                        onClose={() => setIsModalOpen(false)} 
+                                        items={modalItems} 
+                                    />
                                 </div>
                             </div>
 
@@ -379,9 +423,7 @@ const SidePanel = () => {
                                                 className="h-4 cursor-pointer rounded-full hover:bg-white/20 transition duration-150 "
                                                 onClick={openDrawer}
                                             />
-                                            <Link to="/setting">
-                                                <BsGear className="h-4 cursor-pointer " />
-                                            </Link>
+                                            
                                         </div>
                                     </div>
                                 </div>

@@ -392,6 +392,28 @@ const IdentityModalUIOnly = () => {
                         className="w-full h-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
                       />
                     </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
+                      <input
+                        type="text"
+                        value={gender}
+                        onChange={(e) => setGender(e.target.value)}
+                        placeholder="Gender"
+                        className="w-full h-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nationality</label>
+                      <input
+                        type="text"
+                        value={nationality}
+                        onChange={(e) => setNationality(e.target.value)}
+                        placeholder="Nationality"
+                        className="w-full h-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex justify-end">
@@ -642,6 +664,17 @@ const IdentityModalUIOnly = () => {
                         value={workEmail}
                         onChange={(e) => setWorkEmail(e.target.value)}
                         placeholder="Work email"
+                        className="w-full h-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Work Phone</label>
+                      <input
+                        type="tel"
+                        value={workPhoneNumber}
+                        onChange={(e) => setWorkPhoneNumber(e.target.value)}
+                        placeholder="Work phone"
                         className="w-full h-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
                       />
                     </div>

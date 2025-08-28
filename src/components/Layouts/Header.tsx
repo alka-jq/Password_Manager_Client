@@ -151,17 +151,17 @@ const Header = () => {
 
 
     const apps = [
-        { src: mail, link: '/', title: 'ubMail', with: "w-10" },
-        { src: drive, link: '/', title: 'ubDrive', with: "w-10" },
-        { src: meeting, link: '/', title: 'ubMeeting', with: "w-12" },
-        { src: docs, link: '/', title: 'ubDocument', with: "w-10" },
-        { src: pad, link: '/', title: 'ubPad', with: "w-12" },
-        { src: sheet, link: '/', title: 'ubSheet', with: "w-12" },
-        { src: calendar, link: '/', title: 'ubCalendar', with: "w-14" },
-        { src: ppt, link: '/', title: 'ubPpt', with: "w-12" },
-        { src: contact, link: '/', title: 'ubContact', with: "w-14" },
-        { src: pdf, link: '/', title: 'ubPDF', with: "w-12" },
-        { src: form, link: '/', title: 'ubForm', with: "w-12" },
+        { src: mail, link: '/', title: 'JQMail', with: "w-10" },
+        { src: drive, link: '/', title: 'JQDrive', with: "w-10" },
+        { src: meeting, link: '/', title: 'JQMeeting', with: "w-12" },
+        { src: docs, link: '/', title: 'JQDocument', with: "w-10" },
+        { src: pad, link: '/', title: 'JQPad', with: "w-12" },
+        { src: sheet, link: '/', title: 'JQSheet', with: "w-12" },
+        { src: calendar, link: '/', title: 'JQCalendar', with: "w-14" },
+        { src: ppt, link: '/', title: 'JQPpt', with: "w-12" },
+        { src: contact, link: '/', title: 'JQContact', with: "w-14" },
+        { src: pdf, link: '/', title: 'JQPDF', with: "w-12" },
+        { src: form, link: '/', title: 'JQForm', with: "w-12" },
         // { src: esign, link: '/', title: 'ubE-Sign' , with : "w-22" },
     ];
 
