@@ -63,7 +63,7 @@ const taskSlice = createSlice({
       const newTask: Task = {
         ...action.payload,
         id: newId,
-
+        created_at: ''
       };
 
       state.tasks.unshift(newTask);

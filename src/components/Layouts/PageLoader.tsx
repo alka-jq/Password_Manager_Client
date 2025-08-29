@@ -1,5 +1,5 @@
 import React from 'react';
-import ubmailLogo from '../../assets/images/UB_Logos/UB Logos-loading.png'; 
+import ubmailLogo from '../../assets/images/UB_Logos/JQmailLogo.png'; 
 
 const PageLoader: React.FC = () => {
   return (
@@ -7,7 +7,7 @@ const PageLoader: React.FC = () => {
       {/* Blinking Logo */}
       <img
         src={ubmailLogo}
-        alt="UB Mail Logo"
+        alt="JQ mail Logo"
         className="w-36 h-32 mb-6 animate-pulse"
       />
 

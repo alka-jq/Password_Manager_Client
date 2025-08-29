@@ -1154,7 +1154,7 @@ const SettingsPage = () => {
                                 <img className="w-[33px] logo_shadow rounded-md  inline " src={logo} alt="logo" />
                             </div>
                             <span className="font_woff text-2xl font-medium blue:text-black align-middle hidden md:inline  classic:text-gray-900   dark:text-white-light transition-all duration-300  text-[#fff] ">
-                                UB Mail
+                                JQ Mail
                             </span>
                         </Link>
                         <div className="flex items-center pt-1 pb-3 pr-20  pl-4">

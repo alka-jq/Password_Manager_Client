@@ -334,6 +334,7 @@ export interface DynamicField {
 }
 
 export interface Card {
+  priority: string
   id: number
   title: string
   nameOnCard: string
