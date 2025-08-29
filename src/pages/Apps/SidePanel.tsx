@@ -418,9 +418,9 @@ const SidePanel = () => {
                                             <Tag className="h-4 cursor-pointer" />
                                             My Cells
                                         </div>
-                                        <div className='flex gap-1 '>
+                                        <div className='flex  gap-1'>
                                             <PlusIcon
-                                                className="h-4 cursor-pointer rounded-full hover:bg-white/20 transition duration-150 "
+                                                className="h-4 cursor-pointer rounded-full hover:bg-white/20 transition duration-150"
                                                 onClick={openDrawer}
                                             />
                                             
@@ -451,7 +451,7 @@ const SidePanel = () => {
                                                         >
                                                             {/* Left Icon and Name */}
                                                             <div
-                                                                className="flex items-center gap-2 w-full"
+                                                                className="flex items-center gap-1 w-full"
                                                             >
                                                                 <Box sx={{ color: vault.color, display: 'flex', mr: 1 }}>
                                                                     {iconComponents[vault.icon]}
@@ -461,10 +461,10 @@ const SidePanel = () => {
 
                                                             {/* Dots Dropdown (shown only on hover) */}
                                                             <div className="relative">
-                                                                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                                                                <div className="absolute right-1 top-1/2 -translate-y-1/2">
                                                                     <Menu as="div" className="relative inline-block text-left z-50">
                                                                         <Menu.Button 
-                                                                            className="p-1 rounded-full hover:bg-white/20 transition duration-150"
+                                                                            className=" rounded-full hover:bg-white/20 transition duration-150"
                                                                             onClick={(e) => e.stopPropagation()} // Prevent triggering vault selection
                                                                         >
                                                                             <HiDotsVertical className="w-4 h-4 text-white" />

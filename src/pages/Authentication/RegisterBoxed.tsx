@@ -412,10 +412,10 @@ const RegisterBoxed: React.FC = () => {
                         <div className="lg:w-[50%]">
                             <div className="mb-4 md:mb-0 flex  items-center  rounded-lg ">
                                 <img src={emailicon} alt="Logo" className="w-10" />
-                                <h1 className=" text-2xl text-primary pr-4 ml-2 font-semibold"> UB Mail</h1>
+                                <h1 className=" text-2xl text-primary pr-4 ml-2 font-semibold"> JQ Mail</h1>
                             </div>
                             <h2 className="text-4xl md:text-5xl lg:mt-16 text-black mb-4 leading-relaxed ">
-                                Sign up <span className="block pt-3 text-[16px] font-medium">to continue to UB Mail</span>
+                                Sign up <span className="block pt-3 text-[16px] font-medium">to continue to JQ Mail</span>
                             </h2>
                         </div>
 

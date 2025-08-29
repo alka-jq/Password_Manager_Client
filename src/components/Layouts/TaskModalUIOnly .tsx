@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { addTask, editTask, closeModal } from "@/store/Slices/taskSlice";
@@ -17,16 +17,9 @@ import {
   AlertCircle,
   Paperclip,
   Upload,
-  ChevronDown,
 } from "lucide-react";
 import { useVaults } from "@/useContext/VaultContext";
 import VaultDropdown from "./VaultDropdown";
-
-interface VaultDropdownProps {
-  selectedTab: string;
-  setSelectedTab: (key: string) => void;
-  vaults: Array<{ key: string; name: string; icon?: string; color?: string }>;
-}
 
 const TaskModalUIOnly = () => {
   const { vaults: rawVaults } = useVaults();
@@ -51,10 +44,10 @@ const TaskModalUIOnly = () => {
   const [attachments, setAttachments] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Initialize selectedTab with proper default value
+  // ✅ Initialize selectedTab: default "" (Personal)
   const [selectedTab, setSelectedTab] = useState<string>(() => {
     if (isEdit && task?.vaultKey) return task.vaultKey;
-    return vaults[0]?.key || "";
+    return "";
   });
 
   // Initialize form state when modal opens or task changes
@@ -66,19 +59,12 @@ const TaskModalUIOnly = () => {
       setTotp(task.totp || "");
       setWebsites(task.websites || [""]);
       setNote(task.note || "");
-      setSelectedTab(task.vaultKey || vaults[0]?.key || "");
+      setSelectedTab(task.vaultKey || "");
     } else {
-      setTitle("");
-      setEmail("");
-      setPassword("");
-      setTotp("");
-      setWebsites([""]);
-      setNote("");
-      setErrors({ title: false });
-      setAttachments([]);
-      setSelectedTab(vaults[0]?.key || "");
+      resetForm();
     }
-  }, [isModalOpen, task, isEdit, vaults]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isModalOpen, task, isEdit]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -109,7 +95,7 @@ const TaskModalUIOnly = () => {
     setErrors({ title: false });
     setIsSubmitting(false);
     setAttachments([]);
-    setSelectedTab(vaults[0]?.key || "");
+    setSelectedTab(""); // ✅ always blank (Personal)
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,7 +120,7 @@ const TaskModalUIOnly = () => {
         note,
         attachments,
         vaultKey: selectedTab,
-        vaultName: selectedVault?.name || "",
+        vaultName: selectedTab === "" ? "Personal" : selectedVault?.name || "",
         vaultIcon: selectedVault?.icon || "",
         vaultColor: selectedVault?.color || "",
       };
@@ -187,11 +173,13 @@ const TaskModalUIOnly = () => {
                 {isEdit ? "Edit Credential" : "Add New Credential"}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {isEdit ? "Update your saved credential" : "Securely store your login information"}
+                {isEdit
+                  ? "Update your saved credential"
+                  : "Securely store your login information"}
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <VaultDropdown
               selectedTab={selectedTab}
@@ -282,7 +270,11 @@ const TaskModalUIOnly = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-0 top-0 h-11 w-10 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
                   >
-                    {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4.5 w-4.5" />
+                    ) : (
+                      <Eye className="h-4.5 w-4.5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -356,13 +348,15 @@ const TaskModalUIOnly = () => {
               />
             </div>
 
-            {/* Attachments Section */}
+            {/* Attachments */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Paperclip className="h-4 w-4 text-gray-500" />
                 Attachments
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Upload files from your device.</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Upload files from your device.
+              </p>
 
               <div
                 onDragOver={handleDragOver}
@@ -371,11 +365,21 @@ const TaskModalUIOnly = () => {
                 className="border-2 border-dashed border-blue-200 dark:border-blue-800 rounded-xl p-6 text-center bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-200 cursor-pointer"
               >
                 <Upload className="h-8 w-8 text-blue-500 dark:text-blue-400 mx-auto mb-2" />
-                <p className="text-blue-600 dark:text-blue-400 font-medium">Choose a file or drag it here</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Supports all file types</p>
+                <p className="text-blue-600 dark:text-blue-400 font-medium">
+                  Choose a file or drag it here
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Supports all file types
+                </p>
               </div>
 
-              <input ref={fileInputRef} type="file" multiple onChange={handleFileUpload} className="hidden" />
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                onChange={handleFileUpload}
+                className="hidden"
+              />
 
               {attachments.length > 0 && (
                 <div className="space-y-2">
@@ -386,7 +390,9 @@ const TaskModalUIOnly = () => {
                     >
                       <div className="flex items-center gap-2">
                         <Paperclip className="h-3.5 w-3.5 text-gray-500" />
-                        <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-xs">{file.name}</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-xs">
+                          {file.name}
+                        </span>
                       </div>
                       <button
                         type="button"

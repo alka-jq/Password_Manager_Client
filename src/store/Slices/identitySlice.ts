@@ -394,6 +394,7 @@ export interface WorkDetails {
 }
 
 export interface Identity {
+  priority: string
   id: number
   title: string
   personalDetails: PersonalDetails

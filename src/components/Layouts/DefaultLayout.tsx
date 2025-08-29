@@ -135,7 +135,9 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
     return (
         <App>
             {isIframe ? (
-                <IframeTaskView />
+                <IframeTaskView onclick={function (): void {
+                    throw new Error('Function not implemented.');
+                } } />
             ) : loading && !preferences ? (
                 <PageLoader />
             ) : (
