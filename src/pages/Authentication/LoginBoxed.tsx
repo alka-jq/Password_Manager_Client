@@ -18,7 +18,7 @@ import { TiArrowSortedDown } from 'react-icons/ti';
 import { fetchUserKeys, initializeCrypto } from '@/utils/cryptoUtils';
 import { createMessage, encrypt, readKey } from 'openpgp';
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL; 
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 interface UserLogin {
     email: string;
@@ -334,22 +334,25 @@ export default function LoginBoxed() {
 
             console.log(' Login response:', loginResponse.data);
 
-       
+
             const token = loginResponse.data?.token;
             if (token) {
                 setAuthToken(token);
-                console.log(' JWT stored (dev mode). Navigating to /');
-                await initializeCrypto(token); // Initialize crypto with the token
-                const encryptionKeys = await fetchUserKeys();
-                const publicKey = await readKey({ armoredKey: encryptionKeys.publicKey });
-                console.log(publicKey, " Public key fetched before cred2storage");
-                const encryptedCred = await encrypt({
-                    message: await createMessage({ text: JSON.stringify(inputData) }),
-                    encryptionKeys: [publicKey],
-                    format: 'armored'
-                });
-                localStorage.setItem('encryptedCredentials', encryptedCred)
-                navigate('/');
+                // console.log(' JWT stored (dev mode). Navigating to /');
+                // await initializeCrypto(token); // Initialize crypto with the token
+                // const encryptionKeys = await fetchUserKeys();
+                // const publicKey = await readKey({ armoredKey: encryptionKeys.publicKey });
+                // console.log(publicKey, " Public key fetched before cred2storage");
+                // const encryptedCred = await encrypt({
+                //     message: await createMessage({ text: JSON.stringify(inputData) }),
+                //     encryptionKeys: [publicKey],
+                //     format: 'armored'
+                // });
+                // localStorage.setItem('encryptedCredentials', encryptedCred)
+                toast.success("Login Successful");
+                setTimeout(() => {
+                    navigate('/');
+                }, 300); // 300 milliseconds
             } else {
                 toast.error('No token received from server');
             }
@@ -386,18 +389,18 @@ export default function LoginBoxed() {
 
     const currentLanguage = languages.find((lang) => lang.code === selectedLanguage);
 
-     useEffect(() => {
+    useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-          if (boxRef.current && !boxRef.current.contains(event.target as Node)) {
-            setIsOpen(false);
-          }
+            if (boxRef.current && !boxRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
         };
-    
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
-          document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
-      }, []);
+    }, []);
 
     return (
         <>

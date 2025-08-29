@@ -11,7 +11,7 @@ import ProtectedRoute from './protectRoute';
 import BlankLayout from '@/components/Layouts/BlankLayout';
 import TaskList from '@/pages/Apps/TaskList';
 import { EmptyVaultState } from '@/pages/Apps/EmptyVaultState';
-import path from 'path';
+// import path from 'path';
 
 
 const unProtectedRoutes: RouteObject[] = [
@@ -42,7 +42,7 @@ const detailLayoutPaths: RouteObject[] = [
   { path: '/personal', element: <TaskList /> },
   { path: '/trash', element: <TaskList /> },
   { path: '/pin', element: <TaskList /> },
-   { path:"/Cell/:vaultId" , element: <EmptyVaultState  /> },
+  { path: "/Cell/:vaultId", element: <EmptyVaultState /> },
 ];
 
 const navigateRoute: RouteObject[] = [

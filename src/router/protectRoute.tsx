@@ -44,9 +44,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = () => {
   }
 
   const isAuthenticated = isProd ? authenticated : !!token;
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/auth/boxed-signin" replace />;
-  // }
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/boxed-signin" replace />;
+  }
 
   return <>
     <EmailPaginationProvider>

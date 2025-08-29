@@ -75,7 +75,7 @@ const Header = () => {
     const dispatch = useDispatch();
     const tasks = useSelector((state: RootState) => state.task.tasks);
     const { logout, setAuthToken, token, sideBartoggle, searchData, menuBarOpen, setMenuBarOpen } = useAuth();
-    console.log(searchData, 'search');
+    // console.log(searchData, 'search');
     const [userName, setUserName] = useState<string>('');
     const [userOption, setUserOption] = useState(false)
     const [openSearch, setOpenSearch] = useState(false);
@@ -194,13 +194,13 @@ const Header = () => {
                 // If it's a JSON string you need to parse again:
                 // const userData = JSON.parse(await response.text());
 
-                console.log(userData, 'data username');
+                // console.log(userData, 'data username');
                 setUserId(userData);
                 let decryptedImage = await decryptAvatarImg(userData.avatar);
                 // console.log(decryptedImage, "Decrypted Image")
                 setProfile({ ...userData, avatar: decryptedImage });
             } catch (error) {
-                console.error('Error fetching user profile:', error);
+                // console.error('Error fetching user profile:', error);
             }
         };
 
@@ -241,7 +241,7 @@ const Header = () => {
     const [lunrIndex, setLunrIndex] = useState<lunr.Index | null>(null);
 
     useEffect(() => {
-        console.log(' Setting up Lunr index header', emails);
+        // console.log(' Setting up Lunr index header', emails);
 
         if (!emails.length) return;
 
@@ -261,7 +261,7 @@ const Header = () => {
             });
         });
 
-        console.log('✅ Built Lunr index');
+        // console.log('✅ Built Lunr index');
         setLunrIndex(idx);
     }, [emails]);
 
@@ -272,7 +272,7 @@ const Header = () => {
     const [lunrAdvIndex, setLunrAdvIndex] = useState<lunr.Index | null>(null);
 
     useEffect(() => {
-        console.log('Setting up Lunr index header', emails);
+        // console.log('Setting up Lunr index header', emails);
 
         if (!emails.length) return;
 
@@ -292,7 +292,7 @@ const Header = () => {
             });
         });
 
-        console.log('✅ Built Lunr index');
+        // console.log('✅ Built Lunr index');
         setLunrAdvIndex(idx); // <-- corrected setter
     }, [emails]);
 
@@ -307,7 +307,7 @@ const Header = () => {
 
             return results.map((r) => emailMap.get(r.ref)).filter(Boolean) as DecryptedEmail[];
         } catch (error) {
-            console.error('🔍 Lunr search error:', error);
+            // console.error('🔍 Lunr search error:', error);
             return [];
         }
     }, [searchAdvanceTerm, emails, lunrAdvIndex]);

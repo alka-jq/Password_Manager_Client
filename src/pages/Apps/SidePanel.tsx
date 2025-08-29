@@ -97,7 +97,7 @@ const SidePanel = () => {
     // Update selectedTab based on current path
     useEffect(() => {
         const currentPath = location.pathname;
-        
+
         // Check if current path matches any tab
         const matchedTab = tabs.find(tab => tab.path === currentPath);
         if (matchedTab) {
@@ -105,7 +105,7 @@ const SidePanel = () => {
             localStorage.setItem('selectedTab', matchedTab.key);
             return;
         }
-        
+
         // Check if current path matches any vault
         const matchedVault = vaults.find(vault => vault.path === currentPath);
         if (matchedVault) {
@@ -113,7 +113,7 @@ const SidePanel = () => {
             localStorage.setItem('selectedTab', matchedVault.key);
             return;
         }
-        
+
         // Default to 'inbox' if no match found
         setSelectedTab('inbox');
         localStorage.setItem('selectedTab', 'inbox');
@@ -134,13 +134,13 @@ const SidePanel = () => {
         setVaults(prevVaults => {
             const currentVaults = Array.isArray(prevVaults) ? prevVaults : [];
             const updatedVaults = [...currentVaults, newVault];
-            
+
             try {
                 localStorage.setItem("VAULTS_STORAGE_KEY", JSON.stringify(updatedVaults));
             } catch (error) {
                 console.error("Failed to save vaults to localStorage", error);
             }
-            
+
             return updatedVaults;
         });
 
@@ -191,7 +191,7 @@ const SidePanel = () => {
             setVaults(vaults.filter(v => v.id !== vaultToDelete.id));
             setDeleteModalOpen(false);
             setVaultToDelete(null);
-            
+
             // If the deleted vault was selected, reset to inbox
             if (selectedTab === vaultToDelete.key) {
                 setSelectedTab('inbox');
@@ -343,6 +343,7 @@ const SidePanel = () => {
                             </div>
 
                             <div className="space-y-0 pl-3 pr-3 w-full mt-1  -mr-3  flex flex-col classic:text-gray-900">
+                                {/* Tabs */}
                                 <div>
                                     {tabs.map((tab) => (
                                         <Tippy content={tab.label} placement="right" key={tab.path}>
@@ -367,6 +368,7 @@ const SidePanel = () => {
 
                                 <div className='border-t border-gray-600 py-3 items-center px-2'>
                                     <div className='flex justify-between items-center'>
+                                        {/* My cells */}
                                         <div
                                             className='flex gap-1 items-center cursor-pointer '
                                             onClick={openDrawer}
@@ -379,6 +381,7 @@ const SidePanel = () => {
                                                 className="h-4 cursor-pointer rounded-full hover:bg-white/20 transition duration-150 "
                                                 onClick={openDrawer}
                                             />
+                                            {/* Setting */}
                                             <Link to="/setting">
                                                 <BsGear className="h-4 cursor-pointer " />
                                             </Link>
@@ -403,7 +406,7 @@ const SidePanel = () => {
                                             {vaults.map((vault) => (
                                                 <div key={vault.id} className="relative group">
                                                     <Tippy content={vault.name} placement="right">
-                                                        <div 
+                                                        <div
                                                             className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''}`}
                                                             onClick={() => handleVaultClick(vault)}
                                                         >
@@ -421,7 +424,7 @@ const SidePanel = () => {
                                                             <div className="relative">
                                                                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
                                                                     <Menu as="div" className="relative inline-block text-left z-50">
-                                                                        <Menu.Button 
+                                                                        <Menu.Button
                                                                             className="p-1 rounded-full hover:bg-white/20 transition duration-150"
                                                                             onClick={(e) => e.stopPropagation()} // Prevent triggering vault selection
                                                                         >

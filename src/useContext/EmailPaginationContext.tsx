@@ -39,11 +39,11 @@ export const EmailPaginationProvider = ({ children }: EmailPaginationProviderPro
 
   const fetchPagination = async () => {
     if (!token) {
-      console.warn('🔐 No token found, skipping email count fetch.');
+      // console.warn('🔐 No token found, skipping email count fetch.');
       return;
     }
 
-    console.log('📬 Fetching email pagination counts...', token);
+    // console.log('📬 Fetching email pagination counts...', token);
 
     try {
       const response = await fetch(`${baseUrl}/mails/counts`, {
@@ -54,15 +54,15 @@ export const EmailPaginationProvider = ({ children }: EmailPaginationProviderPro
         }
       });
 
-      console.log("count-------------", response);
+      // console.log("count-------------", response);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const json = await response.json();
-      console.log('✅ Email pagination data:', json);
-      console.log("system folder---------",json.counts.folders)
+      // console.log('✅ Email pagination data:', json);
+      // console.log("system folder---------",json.counts.folders)
       const folders = json.counts?.folders || {};
 
       let inboxUnread = 0;
@@ -87,7 +87,7 @@ export const EmailPaginationProvider = ({ children }: EmailPaginationProviderPro
       });
 
     } catch (err) {
-      console.error("❌ Failed to fetch email counts:", err);
+      // console.error("❌ Failed to fetch email counts:", err);
     }
   };
 

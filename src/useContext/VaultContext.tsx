@@ -9,11 +9,6 @@ export type Vault = {
   color: string;
 };
 
-// const DEFAULT_VAULTS: Vault[] = [
-//   { id: "1", key: "personal", name: "Personal", icon: "star", color: "#6b21a8" },
-//   { id: "3", key: "work", name: "Work", icon: "settings", color: "#dc2626" },
-// ];
-
 type VaultContextType = {
   vaults: Vault[];
   setVaults: React.Dispatch<React.SetStateAction<Vault[]>>;

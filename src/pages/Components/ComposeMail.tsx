@@ -213,7 +213,7 @@ function ComposeMail() {
     }, [selectedTab, searchText, mailList]);
 
     useEffect(() => {
-        console.log({ ComposerMode, DefaultComposerSize, includeSignatureByDefault }, 'Composer Mode');
+        // console.log({ ComposerMode, DefaultComposerSize, includeSignatureByDefault }, 'Composer Mode');
         if (DefaultComposerSize == 'maximized') {
             setIsExpanded(true);
             setIsMinimized(false);
@@ -384,7 +384,7 @@ function ComposeMail() {
             message_id: params.message_id || null,
         };
 
-        console.log(emailData, 'Email Data to be saved');
+        // console.log(emailData, 'Email Data to be saved');
 
         const { encryptedEmail, failedRecipients } = await encryptEmailForBackend(emailData, token);
 
@@ -494,10 +494,10 @@ function ComposeMail() {
                         const storeResult = await storeResponse.json();
 
                         if (!storeResponse.ok) {
-                            console.error('Failed to store email:', storeResult.error);
+                            // console.error('Failed to store email:', storeResult.error);
                         }
                     } catch (storageError) {
-                        console.error('Error in storage process:', storageError);
+                        // console.error('Error in storage process:', storageError);
                     }
 
                     if (result.fallback_used) {
@@ -516,13 +516,13 @@ function ComposeMail() {
                 }
             } catch (err) {
                 toast.dismiss(toastId);
-                console.error('Error sending email:', err);
+                // console.error('Error sending email:', err);
                 toast.error('Email Not Sent!');
             }
         }, undoTimeMs);
 
     } catch (err) {
-        console.error('Outer catch error:', err);
+        // console.error('Outer catch error:', err);
         toast.error('Something went wrong while preparing the email!');
     }
 };
@@ -558,7 +558,7 @@ function ComposeMail() {
 
     const changeValue = (e: any) => {
         const { value, id } = e.target;
-        console.log('test', linkUrl);
+        // console.log('test', linkUrl);
         if (id === 'linkUrl') {
             setLinkUrl(value);
         }
@@ -684,9 +684,9 @@ function ComposeMail() {
     }
 
     useEffect(() => {
-        console.log(emailData, 'EMail Data');
+        // console.log(emailData, 'EMail Data');
         let emailObj = extractAndValidateEmail(emailData?.to_email || '');
-        console.log(emailData, 'Email Data');
+        // console.log(emailData, 'Email Data');
         if (emailData && emailData) {
             setParams({
                 from_email: '',
@@ -705,12 +705,12 @@ function ComposeMail() {
 
     useEffect(() => {
         if (emailData && emailData.body !== '') {
-            console.log('Found Body in COmpose');
-            console.log(emailData.body);
+            // console.log('Found Body in COmpose');
+            // console.log(emailData.body);
             editor?.commands.setContent(emailData.body || '');
         } else {
             editor?.commands.setContent(emailData?.plainText || '');
-            console.log(emailData?.plainText);
+            // console.log(emailData?.plainText);
         }
     }, [isOpen, emailData]);
 
@@ -753,7 +753,7 @@ function ComposeMail() {
         setShowBar((prevState) => !prevState);
     };
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-    console.log('selected ', selectedFiles);
+    // console.log('selected ', selectedFiles);
     // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     //     const files = e.target.files;
     //     if (files && files.length > 0) {
@@ -871,11 +871,11 @@ function ComposeMail() {
                 throw new Error("Failed to get sender's public key");
             }
 
-            console.log('Input Draft for Encryption', { subject: params.subject || '', body: params.body || '', plainText: params.plainText || '', publicKey: senderPublicKey });
+            // console.log('Input Draft for Encryption', { subject: params.subject || '', body: params.body || '', plainText: params.plainText || '', publicKey: senderPublicKey });
             const storageEncrypted = await encryptForStorage(params.subject || '', params.body || '', params.plainText || '', senderPublicKey, 'Draft');
-            console.log(storageEncrypted, 'Encrypted Output Draft');
+            // console.log(storageEncrypted, 'Encrypted Output Draft');
             const filteredParams = filterNonEmptyParams(storageEncrypted);
-            console.log(filteredParams, 'PARAMS BEFORE SENDING TO DRAFT');
+            // console.log(filteredParams, 'PARAMS BEFORE SENDING TO DRAFT');
 
             const saveDraftTimeout = setTimeout(async () => {
                 const response = await fetch(`${baseUrl}/mails/save-draft`, {
@@ -987,32 +987,32 @@ function ComposeMail() {
   if (!files || files.length === 0) return;
 
   try {
-    console.log('Starting file attachment processing...');
-    console.log(`Processing ${files.length} file(s)`);
+    // console.log('Starting file attachment processing...');
+    // console.log(`Processing ${files.length} file(s)`);
 
     const token = localStorage.getItem('token');
     if (!token) throw new Error('Authentication required');
-    console.log('Authentication token verified');
+    // console.log('Authentication token verified');
     
     await initializeCrypto(token);
-    console.log('Crypto initialized');
+    // console.log('Crypto initialized');
 
     const { publicKey } = await fetchUserKeys();
     if (!publicKey) throw new Error('No encryption key available');
-    console.log('Public key retrieved:', publicKey.substring(0, 20) + '...');
+    // console.log('Public key retrieved:', publicKey.substring(0, 20) + '...');
 
     const newAttachments: EncryptedAttachment[] = [];
     const newSelectedFiles: File[] = [];
 
     for (const [index, file] of Array.from(files).entries()) {
-      console.log(`\nProcessing file ${index + 1}/${files.length}:`);
-      console.log('File name:', file.name);
-      console.log('File type:', file.type);
-      console.log('File size:', file.size, 'bytes');
+    //   console.log(`\nProcessing file ${index + 1}/${files.length}:`);
+    //   console.log('File name:', file.name);
+    //   console.log('File type:', file.type);
+    //   console.log('File size:', file.size, 'bytes');
 
       const encryptedAttachment = await encryptFileattachment(file, publicKey);
-      console.log('File encrypted successfully');
-      console.log('Encrypted data length:', encryptedAttachment.encryptedData.length);
+    //   console.log('File encrypted successfully');
+    //   console.log('Encrypted data length:', encryptedAttachment.encryptedData.length);
       
       const completeAttachment: EncryptedAttachment = {
         id: crypto.randomUUID(),
@@ -1026,23 +1026,23 @@ function ComposeMail() {
         }
       };
 
-      console.log('Complete attachment object:', {
-        ...completeAttachment,
-        encryptedData: completeAttachment.encryptedData.substring(0, 20) + '...'
-      });
+    //   console.log('Complete attachment object:', {
+    //     ...completeAttachment,
+    //     encryptedData: completeAttachment.encryptedData.substring(0, 20) + '...'
+    //   });
 
       newAttachments.push(completeAttachment);
       
       newSelectedFiles.push(file);
     }
 
-    console.log('\nAll files processed. Updating state...');
-    console.log('New attachments count:', newAttachments.length);
-    console.log('Previous attachments count:', attachments?.length || 0);
+    // console.log('\nAll files processed. Updating state...');
+    // console.log('New attachments count:', newAttachments.length);
+    // console.log('Previous attachments count:', attachments?.length || 0);
 
     setAttachments(prev => [...(prev || []), ...newAttachments]);
     setSelectedFiles(prev => [...(prev || []), ...newSelectedFiles]);
-    console.log(newAttachments, "New Attachments Object")
+    // console.log(newAttachments, "New Attachments Object")
     setParams(prev => ({
       ...prev,
       attachments: [
@@ -1051,13 +1051,13 @@ function ComposeMail() {
       ]
     }));
 
-    console.log('State updated successfully');
-    console.log('Total attachments now:', (attachments?.length || 0) + newAttachments.length);
+    // console.log('State updated successfully');
+    // console.log('Total attachments now:', (attachments?.length || 0) + newAttachments.length);
 
   } catch (error) {
-    console.error('\nFile processing error:', error);
+    // console.error('\nFile processing error:', error);
     if (error instanceof Error) {
-      console.error('Error stack:', error.stack);
+    //   console.error('Error stack:', error.stack);
       alert(error.message);
     } else {
       alert('File encryption failed');
@@ -1065,9 +1065,9 @@ function ComposeMail() {
   } finally {
     if (e.target) {
       e.target.value = '';
-      console.log('File input reset');
+    //   console.log('File input reset');
     }
-    console.log('File processing complete');
+    // console.log('File processing complete');
   }
 };
 
@@ -1082,7 +1082,7 @@ function ComposeMail() {
     };
 
     useEffect(() => {
-        console.log(params, 'PARAMS');
+        // console.log(params, 'PARAMS');
     }, [fileInputRef]);
 
     const [openDatePicker, setOpenDatePicker] = useState(false);
@@ -1140,7 +1140,7 @@ function ComposeMail() {
 
     // In your date picker handling
     const handleSaveSnooze = (mailId: string, date: Date) => {
-        console.log('Snoozed mail:', mailId, 'until:', date);
+        // console.log('Snoozed mail:', mailId, 'until:', date);
         setCustomDate(date);
         setOpenDatePicker(false);
     };

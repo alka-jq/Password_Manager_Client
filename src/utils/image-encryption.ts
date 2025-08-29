@@ -16,7 +16,7 @@ export const encryptAvatar = async (
 ): Promise<string> => {
   try {
     const publicKey = await readKey({ armoredKey: publicKeyArmored });
-    console.log(publicKey, "PUBLIC Key for encrypting image")
+    // console.log(publicKey, "PUBLIC Key for encrypting image")
     // Validate base64
     const cleanBase64 = base64Data.replace(/\s/g, '');
     if (!/^[A-Za-z0-9+/=]+$/.test(cleanBase64)) {
@@ -38,7 +38,7 @@ export const encryptAvatar = async (
     // 🚫 Do NOT modify or remove whitespace/linebreaks in armored data
     return encrypted;
   } catch (err) {
-    console.error('Error encrypting avatar:', err);
+    // console.error('Error encrypting avatar:', err);
     throw err;
   }
 };
@@ -56,7 +56,7 @@ if (token !== null) {
 
     const encryptionKey = await fetchUserKeys(); // Replace with secure storage
     const privateKeyArmored = encryptionKey.privateKey;
-    console.log(privateKeyArmored, "Private Key")
+    // console.log(privateKeyArmored, "Private Key")
     if (!privateKeyArmored) {
       throw new Error('Missing private key or passphrase for decryption.');
     }
@@ -101,7 +101,7 @@ if (token !== null) {
 
     return base64Data;
   } catch (err) {
-    console.error('Error decrypting avatar:', err);
+    // console.error('Error decrypting avatar:', err);
     return null;
   }
 };

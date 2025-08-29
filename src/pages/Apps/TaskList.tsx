@@ -155,12 +155,9 @@ const TaskList = () => {
        <FilterDropdown typeFilter={typeFilter} setTypeFilter={setTypeFilter} />
 
 
-
-
         {/* Pagination */}
         {filteredCombinedItems.length > ITEMS_PER_PAGE && (
           <div className="flex items-center space-x-2 ml-auto">
-
             <span className="text-sm text-gray-600 dark:text-gray-300">
               {currentPage} of {totalPages}
             </span>
@@ -318,22 +315,6 @@ const TaskList = () => {
         ) : (
           <div className="flex justify-center items-center h-full  text-center text-gray-500 dark:text-gray-400">
             <div>
-              {/* <div className="text-6xl mb-2">🔐</div>
-              <div className="font-medium">No items found</div> */}
-
-              {/* <div className="text-sm">
-                {selectedTab === "trash"
-                  ? "Your trash is empty"
-                  : `No ${selectedTab === "card"
-                    ? "cards"
-                    : selectedTab === "identity"
-                      ? "identities"
-                      : selectedTab === "task"
-                        ? "logins"
-                        : "items"
-                  } found`}
-              </div> */}
-
               <div className="text-center text-gray-500 dark:text-gray-400">
                 <div className="text-6xl mb-4 opacity-50">🔐</div>
                 <h3 className="text-lg font-medium mb-2">No items found</h3>
@@ -360,27 +341,7 @@ const TaskList = () => {
         <ViewIdentityModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} identity={selectedItem} />
       )}
 
-      {/* {editItem?.type === "task" && (
-        <TaskModalUIOnly
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          task={editItem}
-        />
-      )}
-      {editItem?.type === "card" && (
-        <CardModalUIOnly
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          card={editItem}
-        />
-      )}
-      {editItem?.type === "identity" && (
-        <IdentityModalUIOnly
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          identity={editItem}
-        />
-      )} */}
+    
 
     </div>
   )

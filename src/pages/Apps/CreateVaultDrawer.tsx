@@ -7,11 +7,11 @@ import {
   Box,
   useMediaQuery,
   useTheme,
-  Tooltip,
+  IconButton,
+  alpha,
 } from '@mui/material';
 import {
   Close as CloseIcon,
-  Folder as FolderIcon,
   FiberManualRecord as DotIcon,
 } from '@mui/icons-material';
 import {
@@ -98,46 +98,51 @@ const CreateVaultDrawer: React.FC<CreateVaultDrawerProps> = ({
       onClose={onClose}
       PaperProps={{
         sx: {
-          width: isMobile ? '100%' : '600px',
-          padding: isMobile ? '16px' : '24px',
-          background: 'rgba(255,255,255,0.85)',
-          backdropFilter: 'blur(16px)',
-          boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
-
+          width: isMobile ? '100%' : '420px',
+          padding: 0,
+          background: '#ffffff',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          borderLeft: '1px solid rgba(0, 0, 0, 0.08)',
+          overflow: 'hidden',
         },
       }}
     >
-      <Box display="flex" flexDirection="column" height="100%">
+      <Box display="flex" flexDirection="column" height="100%" p={isMobile ? 2 : 3}>
         {/* Header */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h6" fontWeight="bold">
+          <Typography variant="h6" fontWeight="600" color="text.primary">
             {editVault ? 'Edit Cell' : 'Create Cell'}
           </Typography>
-          <Button
+          <IconButton
             onClick={onClose}
-            color="inherit"
+            size="small"
             sx={{
-              minWidth: 'auto',
-              padding: '6px',
-              borderRadius: '50%',
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
               '&:hover': {
-                backgroundColor: '#D0D5DC', // light gray on hover
+                backgroundColor: 'rgba(0, 0, 0, 0.08)',
               },
             }}
           >
             <CloseIcon fontSize="small" />
-          </Button>
-
+          </IconButton>
         </Box>
 
         {/* Title Field */}
         <Box mb={4}>
-          <Box display="flex" alignItems="center" mb={1}>
-            <Box sx={{ color: selectedColor, mr: 1, fontSize: 20 }}>
+          <Box display="flex" alignItems="center" mb={1.5}>
+            <Box
+              sx={{
+                color: selectedColor,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mr: 1.5,
+              }}
+            >
               {iconComponents[selectedIcon]}
             </Box>
-            <Typography variant="subtitle1" color="text.secondary">
-              Title
+            <Typography variant="subtitle2" color="text.secondary" fontWeight="500">
+              CELL NAME
             </Typography>
           </Box>
           <TextField
@@ -151,53 +156,68 @@ const CreateVaultDrawer: React.FC<CreateVaultDrawerProps> = ({
             }}
             error={!!error}
             helperText={error && (
-              <Box display="flex" alignItems="center" color="error.main">
-                <DotIcon sx={{ fontSize: '10px', mr: '4px' }} />
+              <Box display="flex" alignItems="center" color="error.main" fontSize="13px" mt={0.5}>
+                <DotIcon sx={{ fontSize: '10px', mr: '6px' }} />
                 {error}
               </Box>
             )}
-            placeholder="Untitled"
+            placeholder="Enter a name for your cell"
             InputProps={{
               sx: {
-                backgroundColor: '#f9fafb',
-                borderRadius: '8px',
+                backgroundColor: '#f8fafc',
+                borderRadius: '10px',
+                '& fieldset': {
+                  borderColor: '#e2e8f0',
+                  borderRadius: '10px',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#cbd5e1',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: selectedColor,
+                  borderWidth: '2px',
+                },
               },
             }}
           />
         </Box>
 
         {/* Color Picker */}
-        <Typography variant="subtitle1" gutterBottom>
-          Choose Color
+        <Typography variant="subtitle2" color="text.secondary" fontWeight="500" mb={1.5} pl={0.5}>
+          COLOR
         </Typography>
-        <Box display="flex" flexWrap="wrap" gap={2} mb={6}>
+        <Box display="flex" flexWrap="wrap" gap={1.5} mb={4}>
           {colorOptions.map((color) => (
             <Box
               key={color}
               onClick={() => setSelectedColor(color)}
               sx={{
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
+                width: 32,
+                height: 32,
+                borderRadius: '8px',
                 backgroundColor: color,
-                border: selectedColor === color ? '2px solid #3b82f6' : '2px solid transparent',
-                boxShadow: selectedColor === color ? '0 0 0 2px white' : 'none',
+                border: selectedColor === color ? `2px solid white` : `2px solid transparent`,
+                outline: selectedColor === color ? `2px solid ${color}` : 'none',
                 cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  transform: 'scale(1.1)',
+                },
               }}
             />
           ))}
         </Box>
 
         {/* Icon Picker */}
-        <Typography variant="subtitle1" gutterBottom>
-          Choose Icon
+        <Typography variant="subtitle2" color="text.secondary" fontWeight="500" mb={1.5} pl={0.5}>
+          ICON
         </Typography>
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(36px, 1fr))', // tight columns
-            gap: '14px', // reduced spacing between icons
-            // maxWidth: '300px', // optional: control overall width
+            gridTemplateColumns: 'repeat(6, 1fr)',
+            gap: 1,
+            mb: 4,
           }}
         >
           {Object.entries(iconComponents).map(([name, icon]) => (
@@ -206,14 +226,18 @@ const CreateVaultDrawer: React.FC<CreateVaultDrawerProps> = ({
               onClick={() => setSelectedIcon(name)}
               sx={{
                 cursor: 'pointer',
-                borderRadius: '50%',
-                p: 1,
+                borderRadius: '10px',
+                p: 1.5,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: selectedIcon === name ? '#c7e8fd' : 'transparent',
+                backgroundColor: selectedIcon === name ? alpha(selectedColor, 0.1) : 'transparent',
+                border: selectedIcon === name ? `2px solid ${alpha(selectedColor, 0.3)}` : '2px solid transparent',
+                color: selectedIcon === name ? selectedColor : '#64748b',
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  backgroundColor: '#f1f5f9',
+                  backgroundColor: alpha(selectedColor, 0.05),
+                  transform: 'translateY(-2px)',
                 },
               }}
             >
@@ -222,18 +246,23 @@ const CreateVaultDrawer: React.FC<CreateVaultDrawerProps> = ({
           ))}
         </Box>
 
-
         {/* Footer Buttons */}
-        <Box mt="auto" display="flex" flexDirection={isMobile ? 'column' : 'row'} justifyContent="flex-end" gap={2} pt={3}>
+        <Box mt="auto" display="flex" flexDirection={isMobile ? 'column' : 'row'} justifyContent="flex-end" gap={1.5} pt={2}>
           <Button
             variant="outlined"
             onClick={onClose}
             fullWidth={isMobile}
             sx={{
-              borderColor: 'grey.300',
-              color: 'grey.700',
+              borderColor: '#e2e8f0',
+              color: '#64748b',
               textTransform: 'none',
-              '&:hover': { backgroundColor: 'grey.100' },
+              borderRadius: '10px',
+              py: 1.2,
+              fontWeight: 500,
+              '&:hover': {
+                backgroundColor: '#f1f5f9',
+                borderColor: '#cbd5e1',
+              },
             }}
           >
             Cancel
@@ -244,15 +273,27 @@ const CreateVaultDrawer: React.FC<CreateVaultDrawerProps> = ({
             onClick={handleSubmit}
             fullWidth={isMobile}
             sx={{
-              backgroundColor: !!error ? 'grey.300' : 'bg-[#2565C7]',
+              backgroundColor: selectedColor,
               color: '#fff',
               textTransform: 'none',
+              borderRadius: '10px',
+              py: 1.2,
+              fontWeight: 500,
+              boxShadow: `0 4px 6px ${alpha(selectedColor, 0.3)}`,
               '&:hover': {
-                backgroundColor: !!error ? 'grey.300' : 'bg-[#2565C7]',
+                backgroundColor: selectedColor,
+                boxShadow: `0 6px 10px ${alpha(selectedColor, 0.4)}`,
+                transform: 'translateY(-1px)',
+              },
+              '&.Mui-disabled': {
+                backgroundColor: '#e2e8f0',
+                color: '#94a3b8',
+                boxShadow: 'none',
+                 py: 1.2,
               },
             }}
           >
-            {editVault ? 'Save Changes' : 'Create'}
+            {editVault ? 'Save Changes' : 'Create Cell'}
           </Button>
         </Box>
       </Box>

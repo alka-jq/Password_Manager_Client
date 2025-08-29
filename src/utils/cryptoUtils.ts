@@ -26,14 +26,14 @@ export const fetchUserKeys = async (): Promise<{ publicKey: string; privateKey: 
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch keys: ${response.status}`);
+      // throw new Error(`Failed to fetch keys: ${response.status}`);
     }
 
     const { publicKey: pubKey, privateKey: privKey } = await response.json() as { publicKey: string, privateKey: string };
     
     // Validate keys
     if (!pubKey || !privKey) {
-      throw new Error('Invalid keys received from server');
+      // throw new Error('Invalid keys received from server');
     }
 
     publicKey = pubKey;
@@ -41,7 +41,7 @@ export const fetchUserKeys = async (): Promise<{ publicKey: string; privateKey: 
     
     return { publicKey, privateKey };
   } catch (error) {
-    console.error('Key fetch failed:', error);
+    // console.error('Key fetch failed:', error);
     throw error;
   }
 };
@@ -53,12 +53,12 @@ export const getPrivateKey = (): string => {
   return privateKey;
 };
 
-export const getPublicKey = (): string => {
-  if (!publicKey) {
-    throw new Error('Public key not loaded');
-  }
-  return publicKey;
-};
+// export const getPublicKey = (): string => {
+//   if (!publicKey) {
+//     // throw new Error('Public key not loaded');
+//   }
+//   return publicKey;
+// };
 
 export const decryptData = async (encryptedData: string): Promise<string> => {
   if (!privateKey) {

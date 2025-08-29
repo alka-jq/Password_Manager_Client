@@ -39,12 +39,12 @@ export const EmailFetchProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const token = localStorage.getItem('token'); // 🔄 Move here
 
   if (!token) {
-    console.error('❌ Token not found. User might not be logged in.');
+    // console.error('❌ Token not found. User might not be logged in.');
     setError('Authentication token is missing.');
     return;
   }
 
-  console.log('📩 Starting email fetch...', { page, perPage });
+  // console.log('📩 Starting email fetch...', { page, perPage });
   setIsLoading(true);
   setError(null);
 
@@ -58,35 +58,35 @@ export const EmailFetchProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     withCredentials: true,
   })
     .then((response) => {
-      console.group('✅ Email fetch successful');
-      console.log('📊 Response data:', response.data);
-      console.log('📩 Emails received:', response.data.emails.length);
-      console.log('🔢 Pagination info:', response.data.pagination);
-      console.groupEnd();
+      // console.group('✅ Email fetch successful');
+      // console.log('📊 Response data:', response.data);
+      // console.log('📩 Emails received:', response.data.emails.length);
+      // console.log('🔢 Pagination info:', response.data.pagination);
+      // console.groupEnd();
 
       setEmails(response.data.emails);
       setPagination(response.data.pagination);
     })
     .catch((err) => {
-      console.group('❌ Email fetch failed');
+      // console.group('❌ Email fetch failed');
       if (err.response) {
-        console.error('🚨 Server responded with error:', {
-          status: err.response.status,
-          data: err.response.data,
-          headers: err.response.headers,
-        });
+        // console.error('🚨 Server responded with error:', {
+        //   status: err.response.status,
+        //   data: err.response.data,
+        //   headers: err.response.headers,
+        // });
         setError(`Error ${err.response.status}: ${err.response.data.message || 'Unknown error'}`);
       } else if (err.request) {
         console.error('🚨 No response received:', err.request);
         setError(`Network Error: ${err.message}`);
       } else {
-        console.error('🚨 Request setup error:', err.message);
+        // console.error('🚨 Request setup error:', err.message);
         setError(`Request Error: ${err.message}`);
       }
-      console.groupEnd();
+      // console.groupEnd();
     })
     .finally(() => {
-      console.log('🏁 Email fetch completed', { loading: false });
+      // console.log('🏁 Email fetch completed', { loading: false });
       setIsLoading(false);
     });
 };

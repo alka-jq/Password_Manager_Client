@@ -19,7 +19,7 @@ export const fetchEncryptedEmails = async (): Promise<EncryptedEmail[]> => {
     if (!response.ok) throw new Error('Failed to fetch emails');
 
     const data = await response.json();
-    console.log("data for search",data)
+    // console.log("data for search",data)
     return data.emails as EncryptedEmail[];
   } catch (error) {
     console.error(error);

@@ -29,13 +29,13 @@ import { persistor } from './store/index';
 import { VaultProvider } from './useContext/VaultContext'; // import the provider
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <Suspense>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <AppState>
             <SettingsProvider>
-              <VaultProvider> {/* ✅ Add VaultProvider here */}
+              <VaultProvider> 
                 <BrowserRouter>
                   <NavigationRoutes />
                 </BrowserRouter>
@@ -46,5 +46,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         </PersistGate>
       </Provider>
     </Suspense>
-  </React.StrictMode>
+  // </React.StrictMode>
 );

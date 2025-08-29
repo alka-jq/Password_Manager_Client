@@ -60,11 +60,10 @@ const CardModalUIOnly = () => {
   // Initialize selectedTab with first vault's key or card's vaultKey
   const [selectedTab, setSelectedTab] = useState<string>("")
 
-  // Get initial tab value
-  const getInitialTab = useCallback(() => {
-    if (isEdit && card?.vaultKey) return card.vaultKey
-    return vaults[0]?.key || ""
-  }, [isEdit, card, vaults])
+const getInitialTab = useCallback(() => {
+  if (isEdit && card?.vaultKey) return card.vaultKey;
+  return ""; 
+}, [isEdit, card]);
 
   // Reset form completely
   const resetForm = useCallback(() => {
@@ -95,18 +94,13 @@ const CardModalUIOnly = () => {
       setPin(card.pin || "")
       setNote(card.note || "")
       setDynamicFields(card.dynamicFields || [])
-      setSelectedTab(card.vaultKey || getInitialTab())
+      setSelectedTab(card.vaultKey || "")
     } else {
       resetForm()
     }
-  }, [isModalOpen, isEdit]) // Only depend on modal state and edit mode
+  }, [isModalOpen, isEdit, card, getInitialTab, resetForm])
 
-  // Update selectedTab when vaults change (only if empty)
-  useEffect(() => {
-    if (vaults.length > 0 && !selectedTab) {
-      setSelectedTab(vaults[0].key)
-    }
-  }, [vaults]) // Only run when vaults change
+  
 
   const selectedVault = vaults.find((v) => v.key === selectedTab)
 
@@ -117,37 +111,6 @@ const CardModalUIOnly = () => {
     { type: "date" as const, label: "Date", icon: Calendar },
     { type: "note" as const, label: "Note", icon: FileText },
   ]
-
-  // const resetForm = () => {
-  //   setTitle("")
-  //   setNameOnCard("")
-  //   setCardNumber("")
-  //   setExpirationDate("")
-  //   setSecurityCode("")
-  //   setPin("")
-  //   setNote("")
-  //   setDynamicFields([])
-  //   setAttachments([])
-  //   setErrors({ title: false })
-  //   setIsSubmitting(false)
-  // }
-
-  // useEffect(() => {
-  //   if (isEdit && card) {
-  //     setTitle(card.title || "")
-  //     setNameOnCard(card.nameOnCard || "")
-  //     setCardNumber(card.cardNumber || "")
-  //     setExpirationDate(card.expirationDate || "")
-  //     setSecurityCode(card.securityCode || "")
-  //     setPin(card.pin || "")
-  //     setNote(card.note || "")
-  //     setDynamicFields(card.dynamicFields || [])
-  //     setSelectedTab(card.vaultKey || (vaults[0]?.key ?? ""))
-  //   } else {
-  //     resetForm()
-  //     setSelectedTab(vaults[0]?.key ?? "")
-  //   }
-  // }, [isEdit, card, vaults])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -242,52 +205,58 @@ const CardModalUIOnly = () => {
   if (!isModalOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div
         className="fixed inset-0"
         onClick={() => dispatch(closeCardModal())}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl border border-white/20 bg-white dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl animate-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
+        <div className="sticky top-0 z-10 flex items-center justify-between p-5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+              <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {isEdit ? "Edit Card" : "Add New Card"}
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {isEdit
                   ? "Update your saved card"
                   : "Securely store your card information"}
               </p>
             </div>
-           
-              <VaultDropdown
-                selectedTab={selectedTab}
-                setSelectedTab={setSelectedTab}
-              />
-          
           </div>
-          <button
-            onClick={() => dispatch(closeCardModal())}
-            className="h-8 w-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors duration-200"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          
+          <div className="flex items-center gap-3">
+            <VaultDropdown
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+              vaults={vaults}
+            />
+            
+            <button
+              onClick={() => dispatch(closeCardModal())}
+              className="h-9 w-9 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors duration-200"
+            >
+              <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
         <div className="overflow-y-auto max-h-[calc(90vh-80px)] thin-scrollbar">
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="p-5 space-y-5">
             {/* Title Section */}
             <div className="space-y-2">
               <label
                 htmlFor="title"
                 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                Title
+                Title <span className="text-red-500">*</span>
               </label>
               <input
                 id="title"
@@ -297,14 +266,15 @@ const CardModalUIOnly = () => {
                   setTitle(e.target.value)
                   setErrors({ ...errors, title: false })
                 }}
-                placeholder="Untitled"
-                className={`w-full h-11 px-3 py-2 border rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
-                  }`}
+                placeholder="Card Title"
+                className={`w-full h-11 px-4 py-2 border rounded-xl text-sm bg-white dark:bg-gray-800 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  errors.title
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                }`}
               />
               {errors.title && (
-                <div className="flex items-center gap-2 text-sm text-red-600">
+                <div className="flex items-center gap-2 text-sm text-red-600 mt-1">
                   <AlertCircle className="h-4 w-4" />
                   Title is required
                 </div>
@@ -312,7 +282,7 @@ const CardModalUIOnly = () => {
             </div>
 
             {/* Card Details */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Name on Card */}
               <div className="space-y-2">
                 <label
@@ -328,7 +298,7 @@ const CardModalUIOnly = () => {
                   value={nameOnCard}
                   onChange={(e) => setNameOnCard(e.target.value)}
                   placeholder="Full Name"
-                  className="w-full h-11 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                  className="w-full h-11 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-700/50 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
                 />
               </div>
 
@@ -348,56 +318,61 @@ const CardModalUIOnly = () => {
                   onChange={handleCardNumberChange}
                   placeholder="1234 1234 1234 1234"
                   maxLength={19}
-                  className="w-full h-11 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white font-mono transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                  className="w-full h-11 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-700/50 dark:text-white font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
                 />
               </div>
 
-              {/* Expiration Date */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="expirationDate"
-                  className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  Expiration date
-                </label>
-                <input
-                  id="expirationDate"
-                  type="text"
-                  value={expirationDate}
-                  onChange={(e) => setExpirationDate(e.target.value)}
-                  placeholder="MM/YY"
-                  maxLength={5}
-                  className="w-full h-11 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white font-mono transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
-                />
-              </div>
-
-              {/* Security Code */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="securityCode"
-                  className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  <CreditCard className="h-4 w-4 text-gray-500" />
-                  Security code
-                </label>
-                <div className="relative">
-                  <input
-                    id="securityCode"
-                    type={showSecurityCode ? "text" : "password"}
-                    value={securityCode}
-                    onChange={(e) => setSecurityCode(e.target.value)}
-                    placeholder="123"
-                    maxLength={4}
-                    className="w-full h-11 px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white font-mono transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowSecurityCode(!showSecurityCode)}
-                    className="absolute right-0 top-0 h-11 w-10 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Expiration Date */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="expirationDate"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    {showSecurityCode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                    <Calendar className="h-4 w-4 text-gray-500" />
+                    Expiration date
+                  </label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      id="expirationDate"
+                      type="text"
+                      value={expirationDate}
+                      onChange={(e) => setExpirationDate(e.target.value)}
+                      placeholder="MM/YY"
+                      maxLength={5}
+                      className="w-full h-11 pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-700/50 dark:text-white font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Security Code */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="securityCode"
+                    className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    <Shield className="h-4 w-4 text-gray-500" />
+                    Security code
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="securityCode"
+                      type={showSecurityCode ? "text" : "password"}
+                      value={securityCode}
+                      onChange={(e) => setSecurityCode(e.target.value)}
+                      placeholder="123"
+                      maxLength={4}
+                      className="w-full h-11 px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-700/50 dark:text-white font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSecurityCode(!showSecurityCode)}
+                      className="absolute right-0 top-0 h-11 w-10 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+                    >
+                      {showSecurityCode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -418,7 +393,7 @@ const CardModalUIOnly = () => {
                     onChange={(e) => setPin(e.target.value)}
                     placeholder="1234"
                     maxLength={6}
-                    className="w-full h-11 px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white font-mono transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                    className="w-full h-11 px-4 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-700/50 dark:text-white font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
                   />
                   <button
                     type="button"
@@ -432,7 +407,7 @@ const CardModalUIOnly = () => {
             </div>
 
             {/* Note Section */}
-            {/* <div className="space-y-2">
+            <div className="space-y-2">
               <label
                 htmlFor="note"
                 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -446,9 +421,9 @@ const CardModalUIOnly = () => {
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Add note"
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white resize-none transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-700/50 dark:text-white resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
               />
-            </div> */}
+            </div>
 
             {/* Dynamic Fields */}
             {dynamicFields.map((field) => (
@@ -465,7 +440,7 @@ const CardModalUIOnly = () => {
                   <button
                     type="button"
                     onClick={() => removeDynamicField(field.id)}
-                    className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                    className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -476,7 +451,7 @@ const CardModalUIOnly = () => {
                     onChange={(e) => updateDynamicField(field.id, e.target.value)}
                     placeholder={`Add ${field.label.toLowerCase()}`}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white resize-none transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-700/50 dark:text-white resize-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
                   />
                 ) : (
                   <input
@@ -484,14 +459,42 @@ const CardModalUIOnly = () => {
                     value={field.value}
                     onChange={(e) => updateDynamicField(field.id, e.target.value)}
                     placeholder={`Add ${field.label.toLowerCase()}`}
-                    className="w-full h-11 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
+                    className="w-full h-11 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-700/50 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
                   />
                 )}
               </div>
             ))}
 
+            {/* Add More Section */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-200 font-medium border border-dashed border-blue-200 dark:border-blue-700"
+              >
+                <Plus className="h-4 w-4" />
+                Add custom field
+              </button>
+
+              {showDropdown && (
+                <div className="absolute bottom-12 left-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-10 overflow-hidden">
+                  {fieldTypes.map((fieldType) => (
+                    <button
+                      key={fieldType.type}
+                      type="button"
+                      onClick={() => addDynamicField(fieldType.type)}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                    >
+                      <fieldType.icon className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{fieldType.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Attachments Section */}
-            <div className="space-y-4">
+            <div className="space-y-4 pt-2">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Paperclip className="h-4 w-4 text-gray-500" />
                 Attachments
@@ -502,10 +505,11 @@ const CardModalUIOnly = () => {
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-green-300 dark:border-green-600 rounded-lg p-8 text-center bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200 cursor-pointer"
+                className="border-2 border-dashed border-blue-300 dark:border-blue-600 rounded-xl p-6 text-center bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-200 cursor-pointer"
               >
-                <Upload className="h-8 w-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
-                <p className="text-green-700 dark:text-green-300 font-medium">Choose a file or drag it here</p>
+                <Upload className="h-8 w-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <p className="text-blue-700 dark:text-blue-300 font-medium">Choose a file or drag it here</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Max file size: 10MB</p>
               </div>
 
               <input ref={fileInputRef} type="file" multiple onChange={handleFileUpload} className="hidden" />
@@ -515,13 +519,16 @@ const CardModalUIOnly = () => {
                   {attachments.map((file, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
                     >
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{file.name}</span>
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-xs">{file.name}</span>
+                      </div>
                       <button
                         type="button"
                         onClick={() => removeAttachment(index)}
-                        className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                        className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -531,48 +538,20 @@ const CardModalUIOnly = () => {
               )}
             </div>
 
-            {/* Add More Section */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-green-400 dark:hover:text-green-300 text-sm font-medium transition-colors duration-200"
-              >
-                <Plus className="h-4 w-4" />
-                Add more
-              </button>
-
-              {showDropdown && (
-                <div className="absolute bottom-10 left-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
-                  {fieldTypes.map((fieldType) => (
-                    <button
-                      key={fieldType.type}
-                      type="button"
-                      onClick={() => addDynamicField(fieldType.type)}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 first:rounded-t-lg last:rounded-b-lg"
-                    >
-                      <fieldType.icon className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">{fieldType.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Action Buttons */}
-            <div className="flex justify-end flex-col-reverse sm:flex-row gap-3 pt-6 pb-6 border-t border-gray-200/50 dark:border-gray-700/50">
+            <div className="flex justify-end flex-col-reverse sm:flex-row gap-3 pt-6 pb-2 border-t border-gray-200 dark:border-gray-700">
               <button
                 type="button"
                 onClick={() => dispatch(closeCardModal())}
                 disabled={isSubmitting}
-                className="flex-1 sm:flex-none h-11 px-6 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 sm:flex-none h-11 px-6 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 sm:flex-none h-11 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="flex-1 sm:flex-none h-11 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-md hover:shadow-lg"
               >
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">

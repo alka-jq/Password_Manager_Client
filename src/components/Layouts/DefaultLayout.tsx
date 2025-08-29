@@ -135,7 +135,9 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
     return (
         <App>
             {isIframe ? (
-                <IframeTaskView />
+                <IframeTaskView onclick={function (): void {
+                    throw new Error('Function not implemented.');
+                } } />
             ) : loading && !preferences ? (
                 <PageLoader />
             ) : (
@@ -203,7 +205,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                                         >
                                             <div className="text-primary ">
                                                 <div className="mb-2">
-                                                    <Tippy content="UB Calendar">
+                                                    <Tippy content="JQ Calendar">
                                                         <button
                                                             className="hover:bg-[#DCDCDC] p-2 flex items-center justify-center rounded-full transition"
                                                             onClick={() => {
@@ -216,7 +218,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                                                     </Tippy>
                                                 </div>
                                                 <div className="mb-2">
-                                                    <Tippy content="UB Pad">
+                                                    <Tippy content="JQ Pad">
                                                         <button
                                                             className="hover:bg-[#DCDCDC] p-2 rounded-full transition"
                                                             onClick={() => {
@@ -229,7 +231,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                                                     </Tippy>
                                                 </div>
                                                 <div className="mb-2">
-                                                    <Tippy content="UB Task">
+                                                    <Tippy content="JQ Task">
                                                         <button
                                                             className="hover:bg-[#DCDCDC] p-2 rounded-full transition"
                                                             onClick={() => setTaskOpen((prev) => !prev)}
@@ -239,7 +241,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                                                     </Tippy>
                                                 </div>
                                                 <div className="mb-2">
-                                                    <Tippy content="UB Contact">
+                                                    <Tippy content="JQ Contact">
                                                         <button
                                                             className="hover:bg-[#DCDCDC] p-2 rounded-full transition"
                                                             onClick={() => {
@@ -253,7 +255,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                                                 </div>
                                                 <div className=""></div>
                                                 <div className="mb-2">
-                                                    <Tippy content="UB Meeting">
+                                                    <Tippy content="JQ Meeting">
                                                         <button className="hover:bg-[#DCDCDC] p-2 rounded-full transition">
                                                             <img src={meeting} alt="" className={"w-6 rounded-md"} />
                                                         </button>
