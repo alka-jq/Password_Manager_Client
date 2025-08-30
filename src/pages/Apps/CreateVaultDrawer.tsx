@@ -1,23 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Drawer,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  useMediaQuery,
-  useTheme,
-  IconButton,
-  alpha,
-} from '@mui/material';
-import {
-  Close as CloseIcon,
-  FiberManualRecord as DotIcon,
-} from '@mui/icons-material';
-import {
-  Home, Briefcase, Gift, Store, Heart, AlarmClock, AppWindow, Settings, Users, Ghost,
+  Home, Briefcase, Gift, Store, Heart, Clock, Grid, Settings, Users, Ghost,
   ShoppingCart, Leaf, Shield, Circle, CreditCard, Fish, Smile, Lock, UserCheck, Star,
-  Flame, Wallet, Bookmark, IceCream, Laptop, BookOpen, Infinity, FileText
+  Flame, Wallet, Bookmark, IceCream, Laptop, BookOpen, Infinity, FileText,
+  X
 } from 'lucide-react';
 
 interface Vault {
@@ -36,13 +22,16 @@ interface CreateVaultDrawerProps {
 }
 
 const iconComponents: Record<string, React.ReactNode> = {
-  Home: <Home size={20} />, Briefcase: <Briefcase size={20} />, Gift: <Gift size={20} />, Store: <Store size={20} />,
-  Heart: <Heart size={20} />, AlarmClock: <AlarmClock size={20} />, AppWindow: <AppWindow size={20} />, Settings: <Settings size={20} />,
-  Users: <Users size={20} />, Ghost: <Ghost size={20} />, ShoppingCart: <ShoppingCart size={20} />, Leaf: <Leaf size={20} />,
-  Shield: <Shield size={20} />, Circle: <Circle size={20} />, CreditCard: <CreditCard size={20} />, Fish: <Fish size={20} />,
-  Smile: <Smile size={20} />, Lock: <Lock size={20} />, UserCheck: <UserCheck size={20} />, Star: <Star size={20} />,
-  Flame: <Flame size={20} />, Wallet: <Wallet size={20} />, Bookmark: <Bookmark size={20} />, IceCream: <IceCream size={20} />,
-  Laptop: <Laptop size={20} />, BookOpen: <BookOpen size={20} />, Infinity: <Infinity size={20} />, FileText: <FileText size={20} />,
+  Home: <Home size={20} />, Briefcase: <Briefcase size={20} />, Gift: <Gift size={20} />, 
+  Store: <Store size={20} />, Heart: <Heart size={20} />, Clock: <Clock size={20} />, 
+  Grid: <Grid size={20} />, Settings: <Settings size={20} />, Users: <Users size={20} />, 
+  Ghost: <Ghost size={20} />, ShoppingCart: <ShoppingCart size={20} />, Leaf: <Leaf size={20} />,
+  Shield: <Shield size={20} />, Circle: <Circle size={20} />, CreditCard: <CreditCard size={20} />, 
+  Fish: <Fish size={20} />, Smile: <Smile size={20} />, Lock: <Lock size={20} />, 
+  UserCheck: <UserCheck size={20} />, Star: <Star size={20} />, Flame: <Flame size={20} />, 
+  Wallet: <Wallet size={20} />, Bookmark: <Bookmark size={20} />, IceCream: <IceCream size={20} />,
+  Laptop: <Laptop size={20} />, BookOpen: <BookOpen size={20} />, Infinity: <Infinity size={20} />, 
+  FileText: <FileText size={20} />,
 };
 
 const colorOptions = [
@@ -57,32 +46,33 @@ const CreateVaultDrawer: React.FC<CreateVaultDrawerProps> = ({
   onEdit,
   editVault,
 }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
   const [title, setTitle] = useState('');
   const [selectedIcon, setSelectedIcon] = useState(editVault?.icon || 'Home');
   const [selectedColor, setSelectedColor] = useState(editVault?.color || colorOptions[0]);
-  const [error, setError] = useState<string | null>(
-    editVault ? null : 'Cell name is required'
-  );
+  const [isTouched, setIsTouched] = useState(false);
+  const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
+
+  const isTitleValid = title.trim() !== '';
 
   useEffect(() => {
     if (editVault) {
       setTitle(editVault.name);
       setSelectedIcon(editVault.icon);
       setSelectedColor(editVault.color);
-      setError(null);
     } else {
       setTitle('');
       setSelectedIcon('Home');
       setSelectedColor(colorOptions[0]);
-      setError('Cell name is required');
     }
-  }, [editVault]);
+    setIsTouched(false);
+  }, [editVault, open]);
 
   const handleSubmit = () => {
-    if (error) return;
+    if (!isTitleValid) {
+      setIsTouched(true);
+      return;
+    }
+    
     if (editVault && onEdit) {
       onEdit(editVault.id, title, selectedIcon, selectedColor);
     } else {
@@ -91,212 +81,157 @@ const CreateVaultDrawer: React.FC<CreateVaultDrawerProps> = ({
     onClose();
   };
 
+  const handleClose = () => {
+    setIsTouched(false);
+    onClose();
+  };
+
+  if (!open) return null;
+
   return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: isMobile ? '100%' : '420px',
-          padding: 0,
-          background: '#ffffff',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          borderLeft: '1px solid rgba(0, 0, 0, 0.08)',
-          overflow: 'hidden',
-        },
-      }}
-    >
-      <Box display="flex" flexDirection="column" height="100%" p={isMobile ? 2 : 3}>
-        {/* Header */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h6" fontWeight="600" color="text.primary">
-            {editVault ? 'Edit Cell' : 'Create Cell'}
-          </Typography>
-          <IconButton
-            onClick={onClose}
-            size="small"
-            sx={{
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.08)',
-              },
-            }}
-          >
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </Box>
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black bg-opacity-30 transition-opacity"
+      />
+      
+      {/* Drawer */}
+      <div className="absolute inset-y-0 right-0 max-w-full flex">
+        <div className="relative w-screen max-w-md">
+          <div className="h-full flex flex-col bg-white shadow-xl overflow-y-auto">
+            <div className="p-6 flex flex-col h-full">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {editVault ? 'Edit Cell' : 'Create Cell'}
+                </h2>
+                <button
+                  onClick={handleClose}
+                  className="rounded-lg p-1.5 hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
+                >
+                  <X size={20} />
+                </button>
+              </div>
 
-        {/* Title Field */}
-        <Box mb={4}>
-          <Box display="flex" alignItems="center" mb={1.5}>
-            <Box
-              sx={{
-                color: selectedColor,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mr: 1.5,
-              }}
-            >
-              {iconComponents[selectedIcon]}
-            </Box>
-            <Typography variant="subtitle2" color="text.secondary" fontWeight="500">
-              CELL NAME
-            </Typography>
-          </Box>
-          <TextField
-            fullWidth
-            variant="outlined"
-            value={title}
-            onChange={(e) => {
-              const val = e.target.value;
-              setTitle(val);
-              setError(val.trim() ? null : 'Cell name is required');
-            }}
-            error={!!error}
-            helperText={error && (
-              <Box display="flex" alignItems="center" color="error.main" fontSize="13px" mt={0.5}>
-                <DotIcon sx={{ fontSize: '10px', mr: '6px' }} />
-                {error}
-              </Box>
-            )}
-            placeholder="Enter a name for your cell"
-            InputProps={{
-              sx: {
-                backgroundColor: '#f8fafc',
-                borderRadius: '10px',
-                '& fieldset': {
-                  borderColor: '#e2e8f0',
-                  borderRadius: '10px',
-                },
-                '&:hover fieldset': {
-                  borderColor: '#cbd5e1',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: selectedColor,
-                  borderWidth: '2px',
-                },
-              },
-            }}
-          />
-        </Box>
+              {/* Title Field */}
+              <div className="mb-6">
+                <div className="flex items-center mb-2">
+                  <div 
+                    className="mr-3 flex items-center justify-center"
+                    style={{ color: selectedColor }}
+                  >
+                    {iconComponents[selectedIcon]}
+                  </div>
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center">
+                    CELL NAME <span className="text-red-500 ml-1">*</span>
+                  </span>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => {
+                      setTitle(e.target.value);
+                      setIsTouched(true);
+                    }}
+                    placeholder="Enter a name for your cell"
+                    className={`w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-offset-1 pr-10 text-gray-800 ${
+                      isTouched && !isTitleValid
+                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200' 
+                        : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
+                    }`}
+                    style={isTouched && !isTitleValid ? {} : { borderColor: selectedColor }}
+                  />
+                  
+                  
+                </div>               
+              </div>
 
-        {/* Color Picker */}
-        <Typography variant="subtitle2" color="text.secondary" fontWeight="500" mb={1.5} pl={0.5}>
-          COLOR
-        </Typography>
-        <Box display="flex" flexWrap="wrap" gap={1.5} mb={4}>
-          {colorOptions.map((color) => (
-            <Box
-              key={color}
-              onClick={() => setSelectedColor(color)}
-              sx={{
-                width: 32,
-                height: 32,
-                borderRadius: '8px',
-                backgroundColor: color,
-                border: selectedColor === color ? `2px solid white` : `2px solid transparent`,
-                outline: selectedColor === color ? `2px solid ${color}` : 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  transform: 'scale(1.1)',
-                },
-              }}
-            />
-          ))}
-        </Box>
+              {/* Color Picker */}
+              <div className="mb-6">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2 block">
+                  COLOR
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {colorOptions.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`w-8 h-8 rounded-lg transition-transform hover:scale-110 ${
+                        selectedColor === color ? 'ring-2 ring-offset-2' : ''
+                      }`}
+                      style={{ 
+                        backgroundColor: color,
+                        border: selectedColor === color ? '2px solid white' : 'none',
+                        outline: selectedColor === color ? `2px solid ${color}` : 'none'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
 
-        {/* Icon Picker */}
-        <Typography variant="subtitle2" color="text.secondary" fontWeight="500" mb={1.5} pl={0.5}>
-          ICON
-        </Typography>
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(6, 1fr)',
-            gap: 1,
-            mb: 4,
-          }}
-        >
-          {Object.entries(iconComponents).map(([name, icon]) => (
-            <Box
-              key={name}
-              onClick={() => setSelectedIcon(name)}
-              sx={{
-                cursor: 'pointer',
-                borderRadius: '10px',
-                p: 1.5,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: selectedIcon === name ? alpha(selectedColor, 0.1) : 'transparent',
-                border: selectedIcon === name ? `2px solid ${alpha(selectedColor, 0.3)}` : '2px solid transparent',
-                color: selectedIcon === name ? selectedColor : '#64748b',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  backgroundColor: alpha(selectedColor, 0.05),
-                  transform: 'translateY(-2px)',
-                },
-              }}
-            >
-              {icon}
-            </Box>
-          ))}
-        </Box>
+              {/* Icon Picker */}
+              <div className="mb-6">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2 block">
+                  ICON
+                </span>
+                <div className="grid grid-cols-6 gap-2">
+                  {Object.entries(iconComponents).map(([name, icon]) => (
+                    <div key={name} className="relative group">
+                      <button
+                        onClick={() => setSelectedIcon(name)}
+                        onMouseEnter={() => setHoveredIcon(name)}
+                        onMouseLeave={() => setHoveredIcon(null)}
+                        className={`p-3 rounded-xl flex items-center justify-center transition-all transform ${
+                          selectedIcon === name 
+                            ? 'bg-opacity-10 border-2 scale-105' 
+                            : 'border-2 border-transparent text-gray-500 hover:bg-gray-100'
+                        } ${hoveredIcon === name ? 'scale-110' : 'scale-100'}`}
+                        style={{
+                          backgroundColor: selectedIcon === name ? `${selectedColor}1a` : '',
+                          borderColor: selectedIcon === name ? `${selectedColor}4d` : 'transparent',
+                          color: selectedIcon === name ? selectedColor : '',
+                          transition: 'transform 0.2s ease, background-color 0.2s ease'
+                        }}
+                      >
+                        {icon}
+                      </button>
+                      
+                      {/* Tooltip */}
+                      <div className={`absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 
+                        text-xs font-medium text-white bg-gray-800 rounded-md opacity-0 group-hover:opacity-100 
+                        transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap`}>
+                        {name}
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 
+                          border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-        {/* Footer Buttons */}
-        <Box mt="auto" display="flex" flexDirection={isMobile ? 'column' : 'row'} justifyContent="flex-end" gap={1.5} pt={2}>
-          <Button
-            variant="outlined"
-            onClick={onClose}
-            fullWidth={isMobile}
-            sx={{
-              borderColor: '#e2e8f0',
-              color: '#64748b',
-              textTransform: 'none',
-              borderRadius: '10px',
-              py: 1.2,
-              fontWeight: 500,
-              '&:hover': {
-                backgroundColor: '#f1f5f9',
-                borderColor: '#cbd5e1',
-              },
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            disabled={!!error}
-            onClick={handleSubmit}
-            fullWidth={isMobile}
-            sx={{
-              backgroundColor: selectedColor,
-              color: '#fff',
-              textTransform: 'none',
-              borderRadius: '10px',
-              py: 1.2,
-              fontWeight: 500,
-              boxShadow: `0 4px 6px ${alpha(selectedColor, 0.3)}`,
-              '&:hover': {
-                backgroundColor: selectedColor,
-                boxShadow: `0 6px 10px ${alpha(selectedColor, 0.4)}`,
-                transform: 'translateY(-1px)',
-              },
-              '&.Mui-disabled': {
-                backgroundColor: '#e2e8f0',
-                color: '#94a3b8',
-                boxShadow: 'none',
-              },
-            }}
-          >
-            {editVault ? 'Save Changes' : 'Create Cell'}
-          </Button>
-        </Box>
-      </Box>
-    </Drawer>
+              {/* Footer Buttons - Right Aligned */}
+              <div className="mt-auto pt-4 flex flex-col sm:flex-row gap-3 justify-end">
+                <button
+                  onClick={handleClose}
+                  className="px-4 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="px-4 py-3 text-white rounded-xl font-medium transition-all hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  style={{ backgroundColor: selectedColor }}
+                  disabled={!isTitleValid}
+                >
+                  {editVault ? 'Save Changes' : 'Create Cell'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

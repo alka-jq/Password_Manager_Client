@@ -15,7 +15,9 @@ type Props = {
   defaultName?: string;  // ✅ configurable default option label
   defaultIcon?: string;  // ✅ configurable default icon key
   defaultColor?: string; // ✅ configurable default color
+  vaults: Array<{ key: string; name: string; icon?: string; color?: string }>;
 };
+
 
 const iconComponents: Record<string, JSX.Element> = {
   Home: <Home size={16} />,

@@ -406,6 +406,10 @@ export interface Identity {
   note: string
   created_at: string
   date: string
+  vaultKey?: string
+   vaultName?: string 
+  vaultIcon?: string 
+  vaultColor?: string
   // assigneeColor: string
   // Optional fields
   // description?: string
@@ -493,6 +497,11 @@ const identitySlice = createSlice({
         // tag: "",
         // priority: "medium",
         status: "",
+        // Ensure vault properties are included if provided
+    vaultKey: action.payload.vaultKey || "",
+    vaultName: action.payload.vaultName || "",
+    vaultIcon: action.payload.vaultIcon || "",
+    vaultColor: action.payload.vaultColor || "",
       }
 
       state.identities.unshift(newIdentity)

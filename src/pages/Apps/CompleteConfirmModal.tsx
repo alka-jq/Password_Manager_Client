@@ -37,9 +37,9 @@ const CompleteConfirmModal = ({ isOpen, onClose, onConfirm, type, title }: Compl
 
   const message = type === "complete" 
     ? "Are you sure this data is completed?" 
-    : "Are you sure this data is uncompleted?"
+    : "Are you sure this data is incompleted?"
 
-  const buttonText = type === "complete" ? "Complete" : "Uncomplete"
+  const buttonText = type === "complete" ? "Complete" : "Incomplete"
   const icon = type === "complete" ? 
     <CheckCircle className="w-8 h-8 text-green-500" /> : 
     <XCircle className="w-8 h-8 text-amber-500" />

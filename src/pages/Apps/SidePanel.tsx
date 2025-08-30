@@ -11,7 +11,7 @@ import { FiCreditCard, FiKey, FiPlus, FiUser, FiX } from 'react-icons/fi';
 import { FaRegStar, FaRegTrashAlt } from 'react-icons/fa';
 import { RxUpdate } from 'react-icons/rx';
 import { IoAlertCircleOutline } from 'react-icons/io5';
-import { AiOutlineTeam } from "react-icons/ai";
+import { AiOutlineTeam } from 'react-icons/ai';
 import { getCombinedItemCountsByTab } from '@/store/selectors/taskSelectors';
 import { useDispatch, useSelector } from 'react-redux';
 import { openAddModal } from '@/store/Slices/taskSlice';
@@ -23,17 +23,42 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { HiDotsVertical } from 'react-icons/hi';
 import { GoPencil } from 'react-icons/go';
 import { FiUserPlus, FiLogIn } from 'react-icons/fi';
-import { getCardCountsByTab } from "@/store/selectors/cardSelectors"
-import { openAddModal as openCardAddModal } from "@/store/Slices/cardSlice"
+import { getCardCountsByTab } from '@/store/selectors/cardSelectors';
+import { openAddModal as openCardAddModal } from '@/store/Slices/cardSlice';
 import {
-    Home, Briefcase, Gift, Store, Heart, AlarmClock, AppWindow, Settings, Users, Ghost,
-    ShoppingCart, Leaf, Shield, Circle, CreditCard, Fish, Smile, Lock, UserCheck, Star,
-    Flame, Wallet, Bookmark, IceCream, Laptop, BookOpen, Infinity, FileText
+    Home,
+    Briefcase,
+    Gift,
+    Store,
+    Heart,
+    AlarmClock,
+    AppWindow,
+    Settings,
+    Users,
+    Ghost,
+    ShoppingCart,
+    Leaf,
+    Shield,
+    Circle,
+    CreditCard,
+    Fish,
+    Smile,
+    Lock,
+    UserCheck,
+    Star,
+    Flame,
+    Wallet,
+    Bookmark,
+    IceCream,
+    Laptop,
+    BookOpen,
+    Infinity,
+    FileText,
 } from 'lucide-react';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
-import { openAddModal as openIdentityAddModal } from "@/store/Slices/identitySlice"
-import { openPasswordGenerator } from "@/store/Slices/passwordSlice"
-import PasswordGenerator from "./passwordgenerator"
+import { openAddModal as openIdentityAddModal } from '@/store/Slices/identitySlice';
+import { openPasswordGenerator } from '@/store/Slices/passwordSlice';
+import PasswordGenerator from './passwordgenerator';
 import { useVaults } from '@/useContext/VaultContext';
 
 interface Vault {
@@ -48,71 +73,74 @@ const VAULTS_STORAGE_KEY = 'userVaults';
 
 // Create Modal Component
 const CreateModal = ({ isOpen, onClose, items }) => {
-  if (!isOpen) return null;
+    if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      
-      {/* Modal */}
-      <div className="relative bg-white dark:bg-[#2a2f3b] rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden transform transition-all duration-300 scale-95 animate-in fade-in-90 zoom-in-90">
-        {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Create New Item
-          </h3>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          >
-            <FiX className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-          </button>
-        </div>
-        
-        {/* Content */}
-        <div className="p-5">
-          <div className="grid grid-cols-1 gap-3">
-            {items.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  item.action();
-                  onClose();
-                }}
-                className="flex items-center w-full p-4 rounded-lg text-left transition-all duration-200 
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+
+            {/* Modal */}
+            <div className="relative bg-white dark:bg-[#2a2f3b] rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden transform transition-all duration-300 scale-95 animate-in fade-in-90 zoom-in-90">
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Create New Item</h3>
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <FiX className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="p-5">
+                    <div className="grid grid-cols-1 gap-3">
+                        {items.map(
+                            (item: {
+                                id: React.Key | null | undefined;
+                                action: () => void;
+                                icon:
+                                    | string
+                                    | number
+                                    | boolean
+                                    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+                                    | Iterable<React.ReactNode>
+                                    | React.ReactPortal
+                                    | Iterable<React.ReactNode>
+                                    | null
+                                    | undefined;
+                                label: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined;
+                                description: any;
+                            }) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => {
+                                        item.action();
+                                        onClose();
+                                    }}
+                                    className="flex items-center w-full p-4 rounded-lg text-left transition-all duration-200 
                   bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 
                   border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700
                   hover:shadow-md group"
-              >
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 mr-4">
-                  {item.icon}
+                                >
+                                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 mr-4">
+                                        {item.icon}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-medium text-gray-800 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300">{item.label}</h4>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{item.description || `Create a new ${item.label.toLowerCase()}`}</p>
+                                    </div>
+                                </button>
+                            )
+                        )}
+                    </div>
                 </div>
-                <div>
-                  <h4 className="font-medium text-gray-800 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300">
-                    {item.label}
-                  </h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {item.description || `Create a new ${item.label.toLowerCase()}`}
-                  </p>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl">
+                    <p className="text-xs text-center text-gray-500 dark:text-gray-400">Select an item type to create</p>
                 </div>
-              </button>
-            ))}
-          </div>
+            </div>
         </div>
-        
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl">
-          <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-            Select an item type to create
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 const SidePanel = () => {
@@ -167,23 +195,23 @@ const SidePanel = () => {
     // Update selectedTab based on current path
     useEffect(() => {
         const currentPath = location.pathname;
-        
+
         // Check if current path matches any tab
-        const matchedTab = tabs.find(tab => tab.path === currentPath);
+        const matchedTab = tabs.find((tab) => tab.path === currentPath);
         if (matchedTab) {
             setSelectedTab(matchedTab.key);
             localStorage.setItem('selectedTab', matchedTab.key);
             return;
         }
-        
+
         // Check if current path matches any vault
-        const matchedVault = vaults.find(vault => vault.path === currentPath);
+        const matchedVault = vaults.find((vault) => vault.path === currentPath);
         if (matchedVault) {
             setSelectedTab(matchedVault.key);
             localStorage.setItem('selectedTab', matchedVault.key);
             return;
         }
-        
+
         // Default to 'inbox' if no match found
         setSelectedTab('inbox');
         localStorage.setItem('selectedTab', 'inbox');
@@ -201,16 +229,16 @@ const SidePanel = () => {
         };
 
         // Completely safe update with multiple fallbacks
-        setVaults(prevVaults => {
+        setVaults((prevVaults) => {
             const currentVaults = Array.isArray(prevVaults) ? prevVaults : [];
             const updatedVaults = [...currentVaults, newVault];
-            
+
             try {
-                localStorage.setItem("VAULTS_STORAGE_KEY", JSON.stringify(updatedVaults));
+                localStorage.setItem('VAULTS_STORAGE_KEY', JSON.stringify(updatedVaults));
             } catch (error) {
-                console.error("Failed to save vaults to localStorage", error);
+                console.error('Failed to save vaults to localStorage', error);
             }
-            
+
             return updatedVaults;
         });
 
@@ -225,15 +253,19 @@ const SidePanel = () => {
     };
 
     const handleUpdateVault = (vaultId: string, name: string, icon: string, color: string) => {
-        setVaults(vaults.map(v =>
-            v.id === vaultId ? {
-                ...v,
-                name,
-                icon,
-                color,
-                path: `/vault/${name.toLowerCase().replace(/\s+/g, '-')}`
-            } : v
-        ));
+        setVaults(
+            vaults.map((v) =>
+                v.id === vaultId
+                    ? {
+                          ...v,
+                          name,
+                          icon,
+                          color,
+                          path: `/vault/${name.toLowerCase().replace(/\s+/g, '-')}`,
+                      }
+                    : v
+            )
+        );
         setEditingVault(null);
     };
 
@@ -258,10 +290,10 @@ const SidePanel = () => {
 
     const handleConfirmDelete = () => {
         if (vaultToDelete) {
-            setVaults(vaults.filter(v => v.id !== vaultToDelete.id));
+            setVaults(vaults.filter((v) => v.id !== vaultToDelete.id));
             setDeleteModalOpen(false);
             setVaultToDelete(null);
-            
+
             // If the deleted vault was selected, reset to inbox
             if (selectedTab === vaultToDelete.key) {
                 setSelectedTab('inbox');
@@ -308,7 +340,7 @@ const SidePanel = () => {
             label: 'Login',
             description: 'Secure username and password combination',
             icon: <FiLogIn size={18} />,
-            action: () => dispatch(openAddModal())
+            action: () => dispatch(openAddModal()),
         },
         {
             id: 'card',
@@ -330,7 +362,7 @@ const SidePanel = () => {
             description: 'Create strong, secure passwords',
             icon: <FiKey size={18} />,
             action: () => dispatch(openPasswordGenerator()),
-        }
+        },
     ];
 
     // Function to handle tab click
@@ -352,7 +384,9 @@ const SidePanel = () => {
             <div className="lg:flex lg:relative h-full text-[#fff] lightmint:bg-[#629e7c]">
                 <div className={`overlay bg-black/60 z-[5] w-full h-full fixed inset-0 xl:!hidden ${menuBarOpen ? 'block' : 'hidden'}`} onClick={() => setMenuBarOpen(false)}></div>
                 <div
-                    className={`  lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtr:right-0' : ''}`}
+                    className={`  lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${
+                        menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtr:right-0' : ''
+                    }`}
                 >
                     <div className="lightmint:bg-[#629e7c]">
                         <div className="py-3 px-5 blue:bg-[#64b5f6]">
@@ -378,11 +412,7 @@ const SidePanel = () => {
                                     </button>
 
                                     {/* Modal Popup */}
-                                    <CreateModal 
-                                        isOpen={isModalOpen} 
-                                        onClose={() => setIsModalOpen(false)} 
-                                        items={modalItems} 
-                                    />
+                                    <CreateModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} items={modalItems} />
                                 </div>
                             </div>
 
@@ -390,40 +420,25 @@ const SidePanel = () => {
                                 <div>
                                     {tabs.map((tab) => (
                                         <Tippy content={tab.label} placement="right" key={tab.path}>
-                                            <button
-                                                type="button"
-                                                onClick={() => handleTabClick(tab.key, tab.path)}
-                                                className={`${baseClasses} ${selectedTab === tab.key ? activeClasses : ''}`}
-                                            >
+                                            <button type="button" onClick={() => handleTabClick(tab.key, tab.path)} className={`${baseClasses} ${selectedTab === tab.key ? activeClasses : ''}`}>
                                                 <div className="flex items-center">
                                                     <tab.icon className="shrink-0 w-4 h-4" />
                                                     <div className="ltr:ml-2 rtl:mr-3 text-white font-medium text-sm truncate">{tab.label}</div>
                                                 </div>
-                                                {tab.count !== undefined && (
-                                                    <div className="text-white text-xs font-semibold ml-auto">
-                                                        {tab.count}
-                                                    </div>
-                                                )}
+                                                {tab.count !== undefined && <div className="text-white text-xs font-semibold ml-auto">{tab.count}</div>}
                                             </button>
                                         </Tippy>
                                     ))}
                                 </div>
 
-                                <div className='border-t border-gray-600 py-3 items-center px-2'>
-                                    <div className='flex justify-between items-center'>
-                                        <div
-                                            className='flex gap-1 items-center cursor-pointer '
-                                            onClick={openDrawer}
-                                        >
+                                <div className="border-t border-gray-600 py-3 items-center px-2">
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex gap-1 items-center cursor-pointer " onClick={openDrawer}>
                                             <Tag className="h-4 cursor-pointer" />
                                             My Cells
                                         </div>
-                                        <div className='flex  gap-1'>
-                                            <PlusIcon
-                                                className="h-4 cursor-pointer rounded-full hover:bg-white/20 transition duration-150"
-                                                onClick={openDrawer}
-                                            />
-                                            
+                                        <div className="flex  gap-1">
+                                            <PlusIcon className="h-4 cursor-pointer rounded-full hover:bg-white/20 transition duration-150" onClick={openDrawer} />
                                         </div>
                                     </div>
                                 </div>
@@ -439,98 +454,86 @@ const SidePanel = () => {
                                     editVault={editingVault}
                                 />
 
-                                <div className=" h-[50vh] thin-scrollbar  overflow-auto">
+                                <div className="h-[50vh] overflow-hidden">
                                     {vaults && vaults.length > 0 && (
-                                        <div className=" ">
+                                        <div className="">
                                             {vaults.map((vault) => (
                                                 <div key={vault.id} className="relative group">
                                                     <Tippy content={vault.name} placement="right">
-                                                        <div 
-                                                            className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''}`}
+                                                        <div
+                                                            className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${
+                                                                selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''
+                                                            }`}
                                                             onClick={() => handleVaultClick(vault)}
                                                         >
                                                             {/* Left Icon and Name */}
-                                                            <div
-                                                                className="flex items-center gap-1 w-full"
-                                                            >
-                                                                <Box sx={{ color: vault.color, display: 'flex', mr: 1 }}>
-                                                                    {iconComponents[vault.icon]}
-                                                                </Box>
+                                                            <div className="flex items-center gap-1 w-full">
+                                                                <Box sx={{ color: vault.color, display: 'flex', mr: 1 }}>{iconComponents[vault.icon]}</Box>
                                                                 <span className="text-white font-medium text-sm truncate">{vault.name}</span>
                                                             </div>
 
-                                                            {/* Dots Dropdown (shown only on hover) */}
-                                                            <div className="relative">
-                                                                <div className="absolute right-1 top-1/2 -translate-y-1/2">
-                                                                    <Menu as="div" className="relative inline-block text-left z-50">
-                                                                        <Menu.Button 
-                                                                            className=" rounded-full hover:bg-white/20 transition duration-150"
-                                                                            onClick={(e) => e.stopPropagation()} // Prevent triggering vault selection
-                                                                        >
-                                                                            <HiDotsVertical className="w-4 h-4 text-white" />
-                                                                        </Menu.Button>
+                                                            {/* Dots Dropdown */}
+                                                            <div className="relative flex-shrink-0 z-50">
+                                                                <Menu as="div" className="relative inline-block text-left">
+                                                                    <Menu.Button className="rounded-full p-1 hover:bg-white/20 transition duration-150" onClick={(e) => e.stopPropagation()}>
+                                                                        <HiDotsVertical className="w-4 h-4 text-white" />
+                                                                    </Menu.Button>
 
-                                                                        <Menu.Items className="absolute right-0 mt-2 w-44 origin-top-right rounded-md bg-white dark:bg-gray-900 shadow-xl ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 dark:divide-gray-700 focus:outline-none">
-                                                                            <div className="py-1 text-gray-900 dark:text-gray-100">
-                                                                                <Menu.Item>
-                                                                                    {({ active }) => (
-                                                                                        <button
-                                                                                            onClick={(e) => {
-                                                                                                e.stopPropagation();
-                                                                                                handleEditVault(vault);
-                                                                                            }}
-                                                                                            className={`${active ? "bg-gray-100 dark:bg-gray-700" : ""
-                                                                                                } flex items-center w-full px-4 py-2 text-sm font-medium`}
-                                                                                        >
-                                                                                            <GoPencil className="mr-2 w-4 h-4" />
-                                                                                            Edit Cell
-                                                                                        </button>
-                                                                                    )}
-                                                                                </Menu.Item>
+                                                                    <Menu.Items className="fixed left-[200px] mt-1 w-44 rounded-md bg-white dark:bg-gray-900 shadow-lg ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 dark:divide-gray-700 focus:outline-none z-[100]">
+                                                                        <div className="py-1 text-gray-900 dark:text-gray-100">
+                                                                            <Menu.Item>
+                                                                                {({ active }) => (
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleEditVault(vault);
+                                                                                        }}
+                                                                                        className={`${
+                                                                                            active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium`}
+                                                                                    >
+                                                                                        <GoPencil className="mr-2 w-4 h-4" />
+                                                                                        Edit Cell
+                                                                                    </button>
+                                                                                )}
+                                                                            </Menu.Item>
 
-                                                                                <Menu.Item>
-                                                                                    {({ active }) => (
-                                                                                        <button
-                                                                                            onClick={(e) => {
-                                                                                                e.stopPropagation();
-                                                                                                handleShareVault(vault);
-                                                                                            }}
-                                                                                            className={`${active ? "bg-gray-100 dark:bg-gray-700" : ""
-                                                                                                } flex items-center w-full px-4 py-2 text-sm font-medium`}
-                                                                                        >
-                                                                                            <FiUserPlus className="mr-2 w-4 h-4" />
-                                                                                            Share Cell
-                                                                                        </button>
-                                                                                    )}
-                                                                                </Menu.Item>
+                                                                            <Menu.Item>
+                                                                                {({ active }) => (
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleShareVault(vault);
+                                                                                        }}
+                                                                                        className={`${
+                                                                                            active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium`}
+                                                                                    >
+                                                                                        <FiUserPlus className="mr-2 w-4 h-4" />
+                                                                                        Share Cell
+                                                                                    </button>
+                                                                                )}
+                                                                            </Menu.Item>
 
-                                                                                <Menu.Item>
-                                                                                    {({ active }) => (
-                                                                                        <button
-                                                                                            onClick={(e) => {
-                                                                                                e.stopPropagation();
-                                                                                                handleDeleteClick(vault);
-                                                                                            }}
-                                                                                            className={`${active ? "bg-red-100 dark:bg-red-900/30" : ""
-                                                                                                } flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`}
-                                                                                        >
-                                                                                            <FaRegTrashAlt className="mr-2 w-4 h-4" />
-                                                                                            Delete Cell
-                                                                                        </button>
-                                                                                    )}
-                                                                                </Menu.Item>
-                                                                            </div>
-                                                                        </Menu.Items>
-
-                                                                        {/* Delete Confirmation Modal */}
-                                                                        <DeleteConfirmationModal
-                                                                            open={deleteModalOpen}
-                                                                            onClose={handleCancelDelete}
-                                                                            onConfirm={handleConfirmDelete}
-                                                                            vaultName={vaultToDelete?.name || ""}
-                                                                        />
-                                                                    </Menu>
-                                                                </div>
+                                                                            <Menu.Item>
+                                                                                {({ active }) => (
+                                                                                    <button
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleDeleteClick(vault);
+                                                                                        }}
+                                                                                        className={`${
+                                                                                            active ? 'bg-red-100 dark:bg-red-900/30' : ''
+                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`}
+                                                                                    >
+                                                                                        <FaRegTrashAlt className="mr-2 w-4 h-4" />
+                                                                                        Delete Cell
+                                                                                    </button>
+                                                                                )}
+                                                                            </Menu.Item>
+                                                                        </div>
+                                                                    </Menu.Items>
+                                                                </Menu>
                                                             </div>
                                                         </div>
                                                     </Tippy>

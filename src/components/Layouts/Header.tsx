@@ -323,7 +323,7 @@ const Header = () => {
                 }`}
         >
             <div className=" ">
-                <div className="relative  flex w-full items-center px-4 py-2  salmonpink:bg-[#006d77]  dark:bg-[#202127]">
+                <div className="relative  flex w-full items-center px-4 py-2  salmonpink:bg-[#006d77]  dark:bg-[#202127] ml-2">
                     <div className="horizontal-logo flex lg:hidden justify-between items-center ltr:mr-2 rtl:ml-2">
                         <Link to="/" className="font_woff main-logo  items-center shrink-0 hidden">
                             <img width={50} height={'auto'} className="w-8 ltr:-ml-1 rtl:-mr-1 inline" src="/assets/images/ubsmail_logo.png" alt="logo" />

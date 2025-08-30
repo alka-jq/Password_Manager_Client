@@ -183,8 +183,7 @@ const TaskModalUIOnly = () => {
           <div className="flex items-center gap-3">
             <VaultDropdown
               selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-            />
+              setSelectedTab={setSelectedTab} vaults={[]}            />
             <button
               onClick={() => dispatch(closeModal())}
               className="h-9 w-9 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors duration-200 text-gray-500 dark:text-gray-400"

@@ -202,10 +202,10 @@ const IdentityModalUIOnly = () => {
       dynamicFields,
       attachments: attachments.map((file) => file.name),
       note,
-      vaultKey: selectedTab || selectedVault.key,
-      vaultName: selectedVault?.name || "",
-      vaultIcon: selectedVault?.icon || "",
-      vaultColor: selectedVault?.color || "",
+      // vaultKey: selectedTab || selectedVault.key,
+      // vaultName: selectedVault?.name || "",
+      // vaultIcon: selectedVault?.icon || "",
+      // vaultColor: selectedVault?.color || "",
     }
 
     if (isEdit && identity) {

@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export type Vault = {
+  path: string;
   id: string;
   key: string;
   name: string;

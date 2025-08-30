@@ -222,7 +222,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
         
         
         toast.success(
-          `UB ${formatPreferenceName(key)} updated to ${formatPreferenceValue(
+          `JQ ${formatPreferenceName(key)} updated to ${formatPreferenceValue(
             value
           )}`
         );

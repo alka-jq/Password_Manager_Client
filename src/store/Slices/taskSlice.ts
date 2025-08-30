@@ -9,7 +9,11 @@ export interface Task {
   totp: string;
   websites: string[];
   note: string;
-  created_at: string
+  created_at: string;
+   vaultKey?: string
+   vaultName?: string 
+  vaultIcon?: string 
+  vaultColor?: string
   status?: '' | 'complete' | 'important' | 'trash';
 }
 

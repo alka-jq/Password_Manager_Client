@@ -334,6 +334,7 @@ export interface DynamicField {
 }
 
 export interface Card {
+  vaultKey: string
   priority: string
   id: number
   title: string

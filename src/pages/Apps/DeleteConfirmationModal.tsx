@@ -15,6 +15,8 @@ interface DeleteConfirmationModalProps {
   onClose: () => void;
   onConfirm: () => void;
   vaultName: string;
+  itemType?: string;
+  bulk?: boolean;
 }
 
 export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
@@ -22,6 +24,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
   onClose,
   onConfirm,
   vaultName,
+  
 }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [error, setError] = useState(false);

@@ -1,4 +1,4 @@
-import { FiCreditCard, FiKey, FiLogIn, FiUser } from 'react-icons/fi';
+import { FiCreditCard, FiDownload, FiKey, FiLogIn, FiUser } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
 import { openAddModal } from '@/store/Slices/taskSlice';
 import { openAddModal as openCardAddModal } from '@/store/Slices/cardSlice';
@@ -93,13 +93,13 @@ export const EmptyVaultState: React.FC<EmptyVaultStateProps> = ({
         </div>
 
         {/* Uncomment if needed */}
-        {/* <button
+         {/* <button
           onClick={onImport}
           className="flex items-center justify-center w-full px-4 py-2 border border-gray-300 rounded-full text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition"
         >
           <FiDownload className="w-4 h-4 mr-2" />
           Import passwords
-        </button> */}
+        </button>  */}
       </div>
     </div>
   );

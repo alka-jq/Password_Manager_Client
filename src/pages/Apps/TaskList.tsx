@@ -18,95 +18,16 @@ import ViewCardModal from './ViewCardModal';
 import ViewIdentityModal from './ViewIdentityModal';
 import { selectCombinedItems } from '@/store/selectors/combinedSelector';
 import type { RootState } from '@/store';
-import { MoreHorizontal, Edit, Trash2, RotateCcw, CheckCircle, XCircle, Pin, Eye, AlertTriangle, Move, PinOff } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, RotateCcw, CheckCircle, XCircle, Pin, Eye, PinOff } from 'lucide-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { CiShare1 } from 'react-icons/ci';
 import { FiUserPlus } from 'react-icons/fi';
 import FilterDropdown from './FilterDropdown';
 import CompleteConfirmModal from './CompleteConfirmModal';
 import ShareModal from './ShareModal';
+import DeleteModals from './DeleteModal';
+import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
 
 const ITEMS_PER_PAGE = 7;
-
-const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, itemType, bulk = false }) => {
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-md">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{bulk ? 'Move items to trash' : 'Move to trash'}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                    {itemType === 'identity'
-                        ? 'Aliases in trash will continue forwarding emails. If you want to stop receiving emails on this address, disable it instead.'
-                        : 'Selected items will be moved to trash. You can restore them later from the trash.'}
-                </p>
-
-                <div className="flex items-center mb-4">
-                    <input type="checkbox" id="dontRemind" className="mr-2 h-4 w-4 text-blue-600 rounded" />
-                    <label htmlFor="dontRemind" className="text-sm text-gray-700 dark:text-gray-300">
-                        Don't remind me again
-                    </label>
-                </div>
-
-                <div className="flex justify-end space-x-3">
-                    <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
-                        Cancel
-                    </button>
-                    <button onClick={onConfirm} className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700">
-                        {bulk ? 'Move All to Trash' : 'Move to trash'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const PermanentDeleteConfirmationModal = ({ isOpen, onClose, onConfirm, itemCount }) => {
-    const [neverNeedChecked, setNeverNeedChecked] = useState(false);
-
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-96 max-w-md">
-                <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 dark:bg-red-900/30 rounded-full">
-                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
-                </div>
-
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-2">
-                    Delete {itemCount} item{itemCount > 1 ? 's' : ''}?
-                </h3>
-
-                <p className="text-sm text-gray-600 dark:text-gray-300 text-center mb-6">
-                    Are you sure you want to permanently delete {itemCount} item{itemCount > 1 ? 's' : ''}?
-                </p>
-
-                <div className="flex items-center justify-center mb-6">
-                    <input type="checkbox" id="neverNeed" checked={neverNeedChecked} onChange={() => setNeverNeedChecked(!neverNeedChecked)} className="mr-2 h-4 w-4 text-blue-600 rounded" />
-                    <label htmlFor="neverNeed" className="text-sm text-gray-700 dark:text-gray-300">
-                        Understood, I will never need it
-                    </label>
-                </div>
-
-                <div className="flex justify-center space-x-4">
-                    <button
-                        onClick={onClose}
-                        className="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        disabled={!neverNeedChecked}
-                        className="px-5 py-2.5 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Delete Permanently
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 const TaskList = () => {
     const dispatch = useDispatch();
@@ -127,9 +48,9 @@ const TaskList = () => {
         bulk: false,
     });
     const [shareModal, setShareModal] = useState({
-  isOpen: false,
-  item: null as Task | Card | Identity | null
-})
+        isOpen: false,
+        item: null as Task | Card | Identity | null,
+    });
     const [permanentDeleteModal, setPermanentDeleteModal] = useState({
         isOpen: false,
         items: [],
@@ -466,14 +387,14 @@ const TaskList = () => {
                                         </div>
 
                                         {/* Title */}
-                                      <div className="col-span-6">
-  <div className="group">
-      <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
-          {item.title}
-      </h3>
-      {item.description && <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">{item.description}</p>}
-  </div>
-</div>
+                                        <div className="col-span-6">
+                                            <div className="group">
+                                                <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                                                    {item.title}
+                                                </h3>
+                                                {item.description && <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">{item.description}</p>}
+                                            </div>
+                                        </div>
 
                                         {/* Type Badge */}
                                         <div className="col-span-2">
@@ -494,7 +415,7 @@ const TaskList = () => {
                                         <div className="col-span-2 flex justify-end items-center gap-2">
                                             <button
                                                 onClick={(e) => {
-                                                   e.stopPropagation();
+                                                    e.stopPropagation();
                                                     setSelectedItem(item);
                                                     setIsModalOpen(true);
                                                 }}
@@ -519,44 +440,56 @@ const TaskList = () => {
                                                     >
                                                         {selectedTab !== 'trash' ? (
                                                             <>
-                                                                <button
-                                                                    onClick={() => {
-                                                                        handleEdit(item);
-                                                                        setOpenMenuId(null);
-                                                                    }}
-                                                                    className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
-                                                                >
-                                                                    <Edit className="w-4 h-4" /> Edit
-                                                                </button>
-                                                               <button
-  onClick={() => setShareModal({ isOpen: true, item })}
-  className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
->
-  <FiUserPlus className="w-4 h-4" /> Share
-</button>
-                                                                {item.status !== 'complete' && (
-                                                                    <button
-                                                                        onClick={() => setCompleteConfirmModal({ isOpen: true, item, type: 'complete' })}
-                                                                        className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
-                                                                    >
-                                                                        <CheckCircle className="w-4 h-4" /> Complete
-                                                                    </button>
+                                                                {/* For Personal tab (completed items), show only Incomplete and Delete */}
+                                                                {selectedTab === 'personal' ? (
+                                                                    <>
+                                                                        <button
+                                                                            onClick={() => setCompleteConfirmModal({ isOpen: true, item, type: 'uncomplete' })}
+                                                                            className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
+                                                                        >
+                                                                            <XCircle className="w-4 h-4" /> Incomplete
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => openDeleteConfirm(item, false)}
+                                                                            className="w-full flex gap-2 items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-left"
+                                                                        >
+                                                                            <Trash2 className="w-4 h-4" /> Delete
+                                                                        </button>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        {/* For other tabs, show all options */}
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                handleEdit(item);
+                                                                                setOpenMenuId(null);
+                                                                            }}
+                                                                            className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
+                                                                        >
+                                                                            <Edit className="w-4 h-4" /> Edit
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => setShareModal({ isOpen: true, item })}
+                                                                            className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
+                                                                        >
+                                                                            <FiUserPlus className="w-4 h-4" /> Share
+                                                                        </button>
+                                                                        {item.status !== 'complete' && (
+                                                                            <button
+                                                                                onClick={() => setCompleteConfirmModal({ isOpen: true, item, type: 'complete' })}
+                                                                                className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
+                                                                            >
+                                                                                <CheckCircle className="w-4 h-4" /> Complete
+                                                                            </button>
+                                                                        )}
+                                                                        <button
+                                                                            onClick={() => openDeleteConfirm(item, false)}
+                                                                            className="w-full flex gap-2 items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-left"
+                                                                        >
+                                                                            <Trash2 className="w-4 h-4" /> Delete
+                                                                        </button>
+                                                                    </>
                                                                 )}
-
-                                                                {selectedTab === 'personal' && item.status === 'complete' && (
-                                                                    <button
-                                                                        onClick={() => setCompleteConfirmModal({ isOpen: true, item, type: 'uncomplete' })}
-                                                                        className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
-                                                                    >
-                                                                        <XCircle className="w-4 h-4" /> Uncomplete
-                                                                    </button>
-                                                                )}
-                                                                <button
-                                                                    onClick={() => openDeleteConfirm(item, false)}
-                                                                    className="w-full flex gap-2 items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-left"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" /> Delete
-                                                                </button>
                                                             </>
                                                         ) : (
                                                             <>
@@ -602,13 +535,15 @@ const TaskList = () => {
             </div>
 
             {/* Delete Confirmation Modal */}
-            <DeleteConfirmationModal
+            <DeleteModals
                 isOpen={deleteConfirmModal.isOpen}
                 onClose={() => setDeleteConfirmModal({ isOpen: false, items: [], permanent: false, bulk: false })}
                 onConfirm={() => handleDelete(deleteConfirmModal.items, deleteConfirmModal.permanent)}
                 itemType={deleteConfirmModal.items[0]?.type}
                 bulk={deleteConfirmModal.bulk}
             />
+
+            {/* Complete Confirmation Modal */}
             <CompleteConfirmModal
                 isOpen={completeConfirmModal.isOpen}
                 onClose={() => setCompleteConfirmModal({ ...completeConfirmModal, isOpen: false })}
@@ -620,6 +555,7 @@ const TaskList = () => {
                     setCompleteConfirmModal({ ...completeConfirmModal, isOpen: false });
                 }}
             />
+
             {/* Permanent Delete Confirmation Modal */}
             <PermanentDeleteConfirmationModal
                 isOpen={permanentDeleteModal.isOpen}
@@ -628,47 +564,56 @@ const TaskList = () => {
                 itemCount={permanentDeleteModal.items.length}
             />
 
+            {/* Share Modal */}
             <ShareModal
-  isOpen={shareModal.isOpen}
-  onClose={() => setShareModal({ ...shareModal, isOpen: false })}
-  onShare={(email) => {
-    if (shareModal.item) {
-      console.log(`Sharing ${shareModal.item.title} with ${email}`)
-      // TODO: Add your real share logic here (e.g., send email via API)
-    }
-  }}
-/>
-
+                isOpen={shareModal.isOpen}
+                onClose={() => setShareModal({ ...shareModal, isOpen: false })}
+                onShare={(email) => {
+                    if (shareModal.item) {
+                        console.log(`Sharing ${shareModal.item.title} with ${email}`);
+                        // TODO: Add your real share logic here (e.g., send email via API)
+                    }
+                }}
+            />
 
             {/* View Modals */}
             {isModalOpen && selectedItem && (
-  <>
-    {selectedItem.type === 'task' && (
-      <ViewTaskModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                task={selectedItem as Task} selectedTab={''} setSelectedTab={function (key: string): void {
-                  throw new Error('Function not implemented.');
-                } }      />
-    )}
-    {selectedItem.type === 'card' && (
-      <ViewCardModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                card={selectedItem as Card} selectedTab={''} setSelectedTab={function (key: string): void {
-                  throw new Error('Function not implemented.');
-                } }      />
-    )}
-    {selectedItem.type === 'identity' && (
-      <ViewIdentityModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                identity={selectedItem as Identity} selectedTab={''} setSelectedTab={function (key: string): void {
-                  throw new Error('Function not implemented.');
-                } }      />
-    )}
-  </>
-)}
+                <>
+                    {selectedItem.type === 'task' && (
+                        <ViewTaskModal
+                            isOpen={isModalOpen}
+                            onClose={() => setIsModalOpen(false)}
+                            task={selectedItem as Task}
+                            selectedTab={''}
+                            setSelectedTab={function (key: string): void {
+                                throw new Error('Function not implemented.');
+                            }}
+                        />
+                    )}
+                    {selectedItem.type === 'card' && (
+                        <ViewCardModal
+                            isOpen={isModalOpen}
+                            onClose={() => setIsModalOpen(false)}
+                            card={selectedItem as Card}
+                            selectedTab={''}
+                            setSelectedTab={function (key: string): void {
+                                throw new Error('Function not implemented.');
+                            }}
+                        />
+                    )}
+                    {selectedItem.type === 'identity' && (
+                        <ViewIdentityModal
+                            isOpen={isModalOpen}
+                            onClose={() => setIsModalOpen(false)}
+                            identity={selectedItem as Identity}
+                            selectedTab={''}
+                            setSelectedTab={function (key: string): void {
+                                throw new Error('Function not implemented.');
+                            }}
+                        />
+                    )}
+                </>
+            )}
         </div>
     );
 };
