@@ -27,43 +27,69 @@ import ShareModal from './ShareModal';
 import DeleteModals from './DeleteModal';
 import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
 
-const ITEMS_PER_PAGE = 7;
+// Import your separate components
+import AllItems from './AllItems';
+import PersonalItems from './PersonalItems';
+import TrashItems from './TrashItems';
+import PinItems from './PinItems';
+import TableHeader from './TableHeader';
 
+const ITEMS_PER_PAGE = 7;
+type Item = (Task | Card | Identity) & { type: 'task' | 'card' | 'identity' };
 const TaskList = () => {
     const dispatch = useDispatch();
     const location = useLocation();
     const pathname = location.pathname.replace('/', '');
 
     const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-    const [selectedItem, setSelectedItem] = useState<Task | Card | Identity | null>(null);
+    
+    const [selectedItem, setSelectedItem] = useState<(Task | Card | Identity) & { type: 'task' | 'card' | 'identity' } | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [filterKeyword, setFilterKeyword] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
     const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-    const [deleteConfirmModal, setDeleteConfirmModal] = useState({
-        isOpen: false,
-        items: [],
-        permanent: false,
-        bulk: false,
-    });
-    const [shareModal, setShareModal] = useState({
-        isOpen: false,
-        item: null as Task | Card | Identity | null,
-    });
-    const [permanentDeleteModal, setPermanentDeleteModal] = useState({
-        isOpen: false,
-        items: [],
-    });
-    const [moveToModal, setMoveToModal] = useState({
-        isOpen: false,
-        items: [],
-    });
-    const [completeConfirmModal, setCompleteConfirmModal] = useState({
-        isOpen: false,
-        item: null as Task | Card | Identity | null,
-        type: 'complete' as 'complete' | 'uncomplete',
-    });
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
+    isOpen: boolean;
+    items: Item[];
+    permanent: boolean;
+    bulk: boolean;
+}>({
+    isOpen: false,
+    items: [],
+    permanent: false,
+    bulk: false,
+});
+    const [shareModal, setShareModal] = useState<{
+    isOpen: boolean;
+    item: Task | Card | Identity | null;
+}>({
+    isOpen: false,
+    item: null,
+});
+   const [permanentDeleteModal, setPermanentDeleteModal] = useState<{
+    isOpen: boolean;
+    items: (Task | Card | Identity)[];
+}>({
+    isOpen: false,
+    items: [],
+});
+    const [moveToModal, setMoveToModal] = useState<{
+    isOpen: boolean;
+    items: (Task | Card | Identity)[];
+}>({
+    isOpen: false,
+    items: [],
+});
+  const [completeConfirmModal, setCompleteConfirmModal] = useState<{
+    isOpen: boolean;
+    item: Task | Card | Identity | null;
+    type: 'complete' | 'uncomplete';
+}>({
+    isOpen: false,
+    item: null,
+    type: 'complete',
+});
     const { selectedTab, searchTerm } = useSelector((state: RootState) => state.task);
     const combinedItems = useSelector(selectCombinedItems);
 
@@ -234,6 +260,44 @@ const TaskList = () => {
     // Check if some items are selected
     const hasSelectedItems = selectedItems.size > 0;
 
+    // Render the appropriate component based on selectedTab
+    const renderContent = () => {
+        const commonProps = {
+            paginatedItems,
+            selectedItems,
+            hasSelectedItems,
+            allSelected,
+            openMenuId,
+            toggleSelectAll,
+            toggleItemSelection,
+            handleBulkDelete,
+            handleBulkRestore,
+            handleBulkToggleImportant,
+            handleToggleImportant,
+            setSelectedItem,
+            setIsModalOpen,
+            setOpenMenuId,
+            setShareModal,
+            setCompleteConfirmModal,
+            openDeleteConfirm,
+            handleEdit,
+            handleRestore,
+            selectedTab
+        };
+
+      switch (selectedTab) {
+    case 'trash':
+        return <TrashItems items={paginatedItems} {...commonProps} />;
+    case 'personal':
+        return <PersonalItems items={paginatedItems} {...commonProps} />;
+    case 'pin':
+        return <PinItems items={paginatedItems} {...commonProps} />;
+    default:
+        return <AllItems items={paginatedItems} {...commonProps} />;
+}
+
+    };
+
     return (
         <div className="h-full flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             {/* Filter + Pagination Controls - Hidden when items are selected */}
@@ -267,281 +331,31 @@ const TaskList = () => {
                 </div>
             )}
 
-            {/* Item List Header - Modified when items are selected */}
-            <div className="grid grid-cols-12 gap-4 px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                <div className="col-span-1 flex items-center">
-                    <input
-                        type="checkbox"
-                        checked={allSelected}
-                        onChange={toggleSelectAll}
-                        className="h-4 w-4 border border-gray-300 text-blue-600 rounded-sm focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
-                    />
-                </div>
+            {/* Render the appropriate component */}           
 
-                {hasSelectedItems ? (
-                    <>
-                        <div className="col-span-8 flex items-center">
-                            <span className="text-sm font-normal text-gray-700 dark:text-gray-300">Select {paginatedItems.length} items</span>
-                        </div>
-                        <div className="col-span-3 flex justify-end items-center space-x-3">
-                            {/* Different buttons based on current tab */}
-                            {selectedTab !== 'trash' ? (
-                                <>
-                                    <button
-                                        onClick={() => handleBulkDelete(false)}
-                                        className="p-1.5 text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                                        title="Move to trash"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
+<>
+  <TableHeader
+    allSelected={allSelected}
+    toggleSelectAll={toggleSelectAll}
+    hasSelectedItems={hasSelectedItems}
+    selectedTab={selectedTab}
+    handleBulkDelete={handleBulkDelete}
+    handleBulkRestore={handleBulkRestore}
+    handleBulkToggleImportant={handleBulkToggleImportant}
+  />
 
-                                    {selectedTab !== 'pin' ? (
-                                        <button
-                                            onClick={handleBulkToggleImportant}
-                                            className="p-1.5 text-gray-500 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                                            title="Pin items"
-                                        >
-                                            <Pin className="w-4 h-4" />
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={handleBulkToggleImportant}
-                                            className="p-1.5 text-gray-500 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                                            title="Unpin items"
-                                        >
-                                            <PinOff className="w-4 h-4" />
-                                        </button>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    <button
-                                        onClick={() => handleBulkDelete(true)}
-                                        className="p-1.5 text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                                        title="Delete permanently"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-
-                                    <button
-                                        onClick={handleBulkRestore}
-                                        className="p-1.5 text-gray-500 hover:text-green-600 dark:hover:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
-                                        title="Restore items"
-                                    >
-                                        <RotateCcw className="w-4 h-4" />
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <div className="col-span-1">PIN</div>
-                        <div className="col-span-6">TITLE</div>
-                        <div className="col-span-2">TYPE</div>
-                        <div className="col-span-2 text-right">ACTIONS</div>
-                    </>
-                )}
-            </div>
-
-            {/* Item List */}
-            <div className="flex-1 overflow-y-auto">
-                {paginatedItems.length > 0 ? (
-                    <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                        {paginatedItems.map((item) => {
-                            const itemId = `${item.type}-${item.id}`;
-                            const isSelected = selectedItems.has(itemId);
-                            const isPinned = item.status === 'important';
-
-                            return (
-                                <div
-                                    key={itemId}
-                                    className={`px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : ''} ${
-                                        item.status === 'complete' ? 'bg-gray-50 dark:bg-gray-800' : ''
-                                    }`}
-                                >
-                                    <div className="grid grid-cols-12 gap-4 items-center">
-                                        {/* Selection checkbox */}
-                                        <div className="col-span-1 flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={isSelected}
-                                                onChange={() => toggleItemSelection(itemId)}
-                                                className="h-4 w-4 border border-gray-300 text-blue-600 rounded-sm focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
-                                            />
-                                        </div>
-
-                                        {/* Pin button */}
-                                        <div className="col-span-1 flex items-center">
-                                            <button
-                                                onClick={() => handleToggleImportant(item)}
-                                                className={`p-1.5 rounded-full ${
-                                                    isPinned
-                                                        ? 'text-yellow-500 hover:text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20'
-                                                        : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600'
-                                                }`}
-                                                title={isPinned ? 'Unpin item' : 'Pin item'}
-                                            >
-                                                {isPinned ? <Pin className="w-4 h-4 fill-current" /> : <Pin className="w-4 h-4" />}
-                                            </button>
-                                        </div>
-
-                                        {/* Title */}
-                                        <div className="col-span-6">
-                                            <div className="group">
-                                                <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
-                                                    {item.title}
-                                                </h3>
-                                                {item.description && <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">{item.description}</p>}
-                                            </div>
-                                        </div>
-
-                                        {/* Type Badge */}
-                                        <div className="col-span-2">
-                                            <span
-                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                    item.type === 'task'
-                                                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                                                        : item.type === 'card'
-                                                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                                        : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-                                                }`}
-                                            >
-                                                {item.type === 'task' ? 'login' : item.type}
-                                            </span>
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div className="col-span-2 flex justify-end items-center gap-2">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setSelectedItem(item);
-                                                    setIsModalOpen(true);
-                                                }}
-                                                className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md"
-                                                title="View details"
-                                            >
-                                                <Eye className="w-4 h-4" />
-                                            </button>
-
-                                            <div className="relative">
-                                                <button
-                                                    onClick={() => setOpenMenuId((prev) => (prev === itemId ? null : itemId))}
-                                                    className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md"
-                                                >
-                                                    <MoreHorizontal className="w-4 h-4" />
-                                                </button>
-
-                                                {openMenuId === itemId && (
-                                                    <div
-                                                        className="absolute right-0 top-10 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-30 py-1"
-                                                        data-dropdown="menu"
-                                                    >
-                                                        {selectedTab !== 'trash' ? (
-                                                            <>
-                                                                {/* For Personal tab (completed items), show only Incomplete and Delete */}
-                                                                {selectedTab === 'personal' ? (
-                                                                    <>
-                                                                        <button
-                                                                            onClick={() => setCompleteConfirmModal({ isOpen: true, item, type: 'uncomplete' })}
-                                                                            className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
-                                                                        >
-                                                                            <XCircle className="w-4 h-4" /> Incomplete
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={() => openDeleteConfirm(item, false)}
-                                                                            className="w-full flex gap-2 items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-left"
-                                                                        >
-                                                                            <Trash2 className="w-4 h-4" /> Delete
-                                                                        </button>
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        {/* For other tabs, show all options */}
-                                                                        <button
-                                                                            onClick={() => {
-                                                                                handleEdit(item);
-                                                                                setOpenMenuId(null);
-                                                                            }}
-                                                                            className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
-                                                                        >
-                                                                            <Edit className="w-4 h-4" /> Edit
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={() => setShareModal({ isOpen: true, item })}
-                                                                            className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
-                                                                        >
-                                                                            <FiUserPlus className="w-4 h-4" /> Share
-                                                                        </button>
-                                                                        {item.status !== 'complete' && (
-                                                                            <button
-                                                                                onClick={() => setCompleteConfirmModal({ isOpen: true, item, type: 'complete' })}
-                                                                                className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
-                                                                            >
-                                                                                <CheckCircle className="w-4 h-4" /> Complete
-                                                                            </button>
-                                                                        )}
-                                                                        <button
-                                                                            onClick={() => openDeleteConfirm(item, false)}
-                                                                            className="w-full flex gap-2 items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-left"
-                                                                        >
-                                                                            <Trash2 className="w-4 h-4" /> Delete
-                                                                        </button>
-                                                                    </>
-                                                                )}
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <button
-                                                                    onClick={() => {
-                                                                        handleRestore(item);
-                                                                        setOpenMenuId(null);
-                                                                    }}
-                                                                    className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
-                                                                >
-                                                                    <RotateCcw className="w-4 h-4" /> Restore
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => openDeleteConfirm(item, true)}
-                                                                    className="w-full flex gap-2 items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-left"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" /> Delete Permanently
-                                                                </button>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <div className="flex justify-center items-center h-full text-center py-12">
-                        <div className="max-w-md mx-auto">
-                            <div className="text-6xl mb-4 opacity-20">🔐</div>
-                            <h3 className="text-lg font-medium text-gray-500 dark:text-gray-300 mb-2">No items found</h3>
-                            <p className="text-sm text-gray-400 dark:text-gray-500">
-                                {selectedTab === 'trash'
-                                    ? 'Your trash is empty'
-                                    : `No ${selectedTab === 'card' ? 'cards' : selectedTab === 'identity' ? 'identities' : selectedTab === 'task' ? 'logins' : 'items'} found`}
-                            </p>
-                        </div>
-                    </div>
-                )}
-            </div>
-
+  {renderContent()}
+</>
             {/* Delete Confirmation Modal */}
-            <DeleteModals
-                isOpen={deleteConfirmModal.isOpen}
-                onClose={() => setDeleteConfirmModal({ isOpen: false, items: [], permanent: false, bulk: false })}
-                onConfirm={() => handleDelete(deleteConfirmModal.items, deleteConfirmModal.permanent)}
-                itemType={deleteConfirmModal.items[0]?.type}
-                bulk={deleteConfirmModal.bulk}
-            />
+        <DeleteModals
+    isOpen={deleteConfirmModal.isOpen}
+    onClose={() =>
+        setDeleteConfirmModal({ isOpen: false, items: [], permanent: false, bulk: false })
+    }
+    onConfirm={() => handleDelete(deleteConfirmModal.items, deleteConfirmModal.permanent)}
+    itemType={deleteConfirmModal.items.length > 0 ? (deleteConfirmModal.items[0].type as 'task' | 'card' | 'identity') : 'task'}
+    bulk={deleteConfirmModal.bulk}
+/>
 
             {/* Complete Confirmation Modal */}
             <CompleteConfirmModal
@@ -584,10 +398,8 @@ const TaskList = () => {
                             isOpen={isModalOpen}
                             onClose={() => setIsModalOpen(false)}
                             task={selectedItem as Task}
-                            selectedTab={''}
-                            setSelectedTab={function (key: string): void {
-                                throw new Error('Function not implemented.');
-                            }}
+                            selectedTab={selectedTab}
+                            setSelectedTab={(key: string) => dispatch(setSelectedTab(key))}
                         />
                     )}
                     {selectedItem.type === 'card' && (
@@ -595,10 +407,8 @@ const TaskList = () => {
                             isOpen={isModalOpen}
                             onClose={() => setIsModalOpen(false)}
                             card={selectedItem as Card}
-                            selectedTab={''}
-                            setSelectedTab={function (key: string): void {
-                                throw new Error('Function not implemented.');
-                            }}
+                            selectedTab={selectedTab}
+                            setSelectedTab={(key: string) => dispatch(setSelectedTab(key))}
                         />
                     )}
                     {selectedItem.type === 'identity' && (
@@ -606,10 +416,8 @@ const TaskList = () => {
                             isOpen={isModalOpen}
                             onClose={() => setIsModalOpen(false)}
                             identity={selectedItem as Identity}
-                            selectedTab={''}
-                            setSelectedTab={function (key: string): void {
-                                throw new Error('Function not implemented.');
-                            }}
+                            selectedTab={selectedTab}
+                            setSelectedTab={(key: string) => dispatch(setSelectedTab(key))}
                         />
                     )}
                 </>

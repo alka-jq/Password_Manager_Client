@@ -12,6 +12,7 @@ import {
     CheckCircle
 } from 'lucide-react';
 import { useVaults } from "@/useContext/VaultContext";
+import { Task } from '@/store/Slices/taskSlice';
 
 const iconComponents: Record<string, JSX.Element> = {
     Home: <Home size={16} />,

@@ -296,11 +296,11 @@ function Field({ label, value }: { label: string; value?: string }) {
 }
 
 // Render fields from an object
-function renderFields(obj: Record<string, string>) {
+function renderFields(obj: Record<string, any>) {
   const fields = Object.entries(obj || {}).map(([key, value], index) => (
     <Field key={index} label={key} value={value} />
   ));
-  
+
   return fields.length > 0 ? <>{fields}</> : null;
 }
 
@@ -309,5 +309,5 @@ function formatLabel(key: string) {
   return key
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, str => str.toUpperCase())
-    .trim()
+    .trim();
 }
