@@ -9,8 +9,11 @@ const Error = lazy(() => import('../components/Error'));
 import { Navigate, RouteObject } from 'react-router-dom';
 import ProtectedRoute from './protectRoute';
 import BlankLayout from '@/components/Layouts/BlankLayout';
-import TaskList from '@/pages/Apps/TaskList';
+import TaskList from '@/pages/Apps/Table';
 import { EmptyVaultState } from '@/pages/Apps/EmptyVaultState';
+import AllItems from '@/pages/Apps/AllItems';
+import Personal from '@/pages/Apps/Personal';
+import Pin from '@/pages/Apps/Pin';
 // import path from 'path';
 
 
@@ -38,10 +41,10 @@ const unProtectedRoutes: RouteObject[] = [
 
 const detailLayoutPaths: RouteObject[] = [
   { path: '/', element: <Navigate to="/all_items" replace /> },
-  { path: '/all_items', element: <TaskList /> },
-  { path: '/personal', element: <TaskList /> },
+  { path: '/all_items', element: <AllItems/> },
+  { path: '/personal', element: <Personal /> },
   { path: '/trash', element: <TaskList /> },
-  { path: '/pin', element: <TaskList /> },
+  { path: '/pin', element: <Pin/> },
   { path: "/Cell/:vaultId", element: <EmptyVaultState /> },
 ];
 

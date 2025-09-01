@@ -24,7 +24,7 @@ import {
   Globe,
   Building,
 } from "lucide-react"
-import VaultDropdown from "./VaultDropdown"
+import VaultDropdown from "../Layouts/VaultDropdown"
 import { useVaults } from "@/useContext/VaultContext"
 
 const IdentityModalUIOnly = () => {
@@ -211,7 +211,7 @@ const IdentityModalUIOnly = () => {
     if (isEdit && identity) {
       dispatch(editIdentity({ id: identity.id, updates: payload }))
     } else {
-      dispatch(addIdentity(payload))
+      // dispatch(addIdentity(payload))
     }
 
     dispatch(closeIdentityModal())

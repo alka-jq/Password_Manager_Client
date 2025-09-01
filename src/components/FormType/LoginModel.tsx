@@ -19,7 +19,7 @@ import {
   Upload,
 } from "lucide-react";
 import { useVaults } from "@/useContext/VaultContext";
-import VaultDropdown from "./VaultDropdown";
+import VaultDropdown from "../Layouts/VaultDropdown";
 
 const TaskModalUIOnly = () => {
   const { vaults: rawVaults } = useVaults();
@@ -46,7 +46,7 @@ const TaskModalUIOnly = () => {
 
   // ✅ Initialize selectedTab: default "" (Personal)
   const [selectedTab, setSelectedTab] = useState<string>(() => {
-    if (isEdit && task?.vaultKey) return task.vaultKey;
+    // if (isEdit && task?.vaultKey) return task.vaultKey;
     return "";
   });
 
@@ -59,7 +59,7 @@ const TaskModalUIOnly = () => {
       setTotp(task.totp || "");
       setWebsites(task.websites || [""]);
       setNote(task.note || "");
-      setSelectedTab(task.vaultKey || "");
+      // setSelectedTab(task.vaultKey || "");
     } else {
       resetForm();
     }
@@ -180,7 +180,7 @@ const TaskModalUIOnly = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* <div className="flex items-center gap-3">
             <VaultDropdown
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
@@ -191,7 +191,7 @@ const TaskModalUIOnly = () => {
             >
               <X className="h-5 w-5" />
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Form */}
@@ -201,7 +201,7 @@ const TaskModalUIOnly = () => {
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <FileText className="h-4 w-4 text-gray-500" />
-                Title
+                Title Nishan
                 <span className="text-xs text-red-500 ml-1">*</span>
               </label>
               <input

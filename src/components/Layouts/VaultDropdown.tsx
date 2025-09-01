@@ -1,7 +1,7 @@
 // components/VaultDropdown.tsx
 import { Menu } from "@headlessui/react";
 import React from "react";
-import { useVaults } from "@/useContext/VaultContext";
+import { useVaults, Vault } from "@/useContext/VaultContext";
 import {
   Home, Briefcase, Gift, Store, Heart, AlarmClock, AppWindow, Settings, Users, Ghost,
   ShoppingCart, Leaf, Shield, Circle, CreditCard, Fish, Smile, Lock, UserCheck, Star,
@@ -15,6 +15,7 @@ type Props = {
   defaultName?: string;  // ✅ configurable default option label
   defaultIcon?: string;  // ✅ configurable default icon key
   defaultColor?: string; // ✅ configurable default color
+  vaults: Vault[]
 };
 
 const iconComponents: Record<string, JSX.Element> = {
@@ -53,7 +54,7 @@ const VaultDropdown: React.FC<Props> = ({
   selectedTab,
   setSelectedTab,
   defaultKey = "personal",        // ✅ fallback values
-  defaultName = "Personal",
+  defaultName = "Personal ",
   defaultIcon = "Personal",
   defaultColor = "#2563eb",
 }) => {
@@ -91,13 +92,12 @@ const VaultDropdown: React.FC<Props> = ({
             {({ active }) => (
               <button
                 onClick={() => setSelectedTab("")}
-                className={`${
-                  selectedTab === ""
+                className={`${selectedTab === ""
                     ? "bg-gray-300 text-black"
                     : active
-                    ? "bg-gray-200 text-black"
-                    : "text-gray-900"
-                } group flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors duration-150`}
+                      ? "bg-gray-200 text-black"
+                      : "text-gray-900"
+                  } group flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors duration-150`}
               >
                 <span className="flex items-center gap-2">
                   <span style={{ color: defaultColor }}>
@@ -115,13 +115,12 @@ const VaultDropdown: React.FC<Props> = ({
               {({ active }) => (
                 <button
                   onClick={() => setSelectedTab(vault.key)}
-                  className={`${
-                    selectedTab === vault.key
+                  className={`${selectedTab === vault.key
                       ? "bg-gray-300 text-black"
                       : active
-                      ? "bg-gray-200 text-black"
-                      : "text-gray-900"
-                  } group flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors duration-150`}
+                        ? "bg-gray-200 text-black"
+                        : "text-gray-900"
+                    } group flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors duration-150`}
                 >
                   <span className="flex items-center gap-2">
                     <span style={{ color: vault.color }}>

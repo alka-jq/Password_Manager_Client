@@ -406,6 +406,9 @@ export interface Identity {
   note: string
   created_at: string
   date: string
+  vaultKey?:string
+  vaultName?:string
+  vaultColor?:string
   // assigneeColor: string
   // Optional fields
   // description?: string

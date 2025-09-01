@@ -47,15 +47,15 @@ import passwordSlice from "./Slices/passwordSlice"
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["task", "card","identity","password"], // Added 'card' to persist card data
+  whitelist: ["task", "card", "identity", "password"], // Added 'card' to persist card data
 }
 
 const rootReducer = combineReducers({
   themeConfig: themeConfigSlice,
   task: tasksSlice,
   card: cardSlice,
-   identity: identitySlice,
-   password: passwordSlice, // Added cardSlice to the root reducer
+  identity: identitySlice,
+  password: passwordSlice, // Added cardSlice to the root reducer
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

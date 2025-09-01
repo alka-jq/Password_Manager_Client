@@ -1744,6 +1744,16 @@ input:-webkit-autofill:active {
     /* z-index: 9999; */
    }
 
+   .hide-scrollbar {
+  overflow: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Edge */
+}
+
  
 
    @keyframes mymove {

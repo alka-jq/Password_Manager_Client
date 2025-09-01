@@ -1,33 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
+// FilterDropdown.tsx
+import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { filterConfig } from '../Components/filterConfig';
+import { filterConfig } from './filterConfig'; // Correct path se import karna
 
-type FilterDropdownProps = {
+type Props = {
   selected: string;
   onChange: (val: string) => void;
 };
 
-const FilterDropdown: React.FC<FilterDropdownProps> = ({ selected, onChange }) => {
+const FilterDropdown = ({ selected, onChange }: Props) => {
   const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const options = Object.keys(filterConfig);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
   return (
-    <div className="relative w-[12vw] ml-4 mt-2 text-sm z-20" ref={dropdownRef}>
+    <div className="relative w-[12vw] ml-4 mt-2 text-sm z-20">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex justify-between items-center border px-3 py-2 bg-white rounded shadow-sm"

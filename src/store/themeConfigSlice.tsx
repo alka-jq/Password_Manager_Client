@@ -9,7 +9,7 @@ const defaultState = {
     isLightMintGreenMode: false,
     isCornflowerMode: false,
     isSalmonPinkMode: false,
-    isClassicMode: false, // ✅ New theme flag
+    isClassicMode: false, 
     mainLayout: 'app',
     theme: 'light',
     menu: 'vertical',
@@ -57,7 +57,7 @@ const initialState = {
     isLightMintGreenMode: false,
     isCornflowerMode: false,
     isSalmonPinkMode: false,
-    isClassicMode: false, // ✅ Initialize here too
+    isClassicMode: false, 
     languageList: [
         ...defaultState.languageList,
         { code: 'ae', name: 'Arabic' },

@@ -21,7 +21,7 @@ import {
   AlertCircle,
   Trash2,
 } from "lucide-react"
-import VaultDropdown from "./VaultDropdown"
+import VaultDropdown from "../Layouts/VaultDropdown"
 import { useVaults } from "@/useContext/VaultContext"
 
 interface DynamicField {
@@ -61,7 +61,7 @@ const CardModalUIOnly = () => {
   const [selectedTab, setSelectedTab] = useState<string>("")
 
 const getInitialTab = useCallback(() => {
-  if (isEdit && card?.vaultKey) return card.vaultKey;
+  // if (isEdit && card?.vaultKey) return card.vaultKey;
   return ""; 
 }, [isEdit, card]);
 
@@ -94,7 +94,7 @@ const getInitialTab = useCallback(() => {
       setPin(card.pin || "")
       setNote(card.note || "")
       setDynamicFields(card.dynamicFields || [])
-      setSelectedTab(card.vaultKey || "")
+      // setSelectedTab(card.vaultKey || "")
     } else {
       resetForm()
     }
@@ -140,7 +140,7 @@ const getInitialTab = useCallback(() => {
     if (isEdit && card) {
       dispatch(editCard({ id: card.id, updates: payload }))
     } else {
-      dispatch(addCard(payload))
+      // dispatch(addCard(payload))
     }
 
     dispatch(closeCardModal())

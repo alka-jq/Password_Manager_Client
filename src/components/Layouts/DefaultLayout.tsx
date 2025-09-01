@@ -11,7 +11,7 @@ import MyTask from '../../pages/Components/MyTask';
 import MyContact from '../../pages/Components/MyContact';
 import Todo from '../../pages/Components/Todo';
 import Tippy from '@tippyjs/react';
-import Mailbox from '../../pages/Apps/TaskList';
+import Mailbox from '../../pages/Apps/Table';
 import SidePanel from '../../pages/Apps/SidePanel';
 import pad from '../../assets/images/ubs icons/pad.png';
 import contact from '../../assets/images/ubs icons/contect.png';
@@ -28,11 +28,11 @@ import { useSettings } from '@/useContext/useSettings';
 import SettingComponent from '../SettingComponent';
 import PageLoader from './PageLoader';
 import { Outlet } from 'react-router-dom';
-import TaskModalUIOnly from './TaskModalUIOnly ';
+import TaskModalUIOnly from '../FormType/LoginModel';
 import IframeTaskView from '@/pages/Apps/IframeTaskView';
-import CardModalUIOnly from './CardModalUIOnly';
-import IdentityModalUIOnly from './IdentityModalUIOnly';
-import PasswordGenerator from '@/pages/Apps/passwordgenerator';
+import CardModalUIOnly from '../FormType/CardModalUIOnly';
+import IdentityModalUIOnly from '../FormType/IdentityModalUIOnly';
+import PasswordGenerator from '@/components/FormType/passwordgenerator';
 
 
 
