@@ -60,6 +60,7 @@ const TaskModalUIOnly = () => {
       setWebsites(task.websites || [""]);
       setNote(task.note || "");
       setSelectedTab(task.vaultKey || "");
+      setAttachments(task.attachments || []);
     } else {
       resetForm();
     }
@@ -123,6 +124,7 @@ const TaskModalUIOnly = () => {
         vaultName: selectedTab === "" ? "Personal" : selectedVault?.name || "",
         vaultIcon: selectedVault?.icon || "",
         vaultColor: selectedVault?.color || "",
+        files: attachments, // Add this line to satisfy the required property
       };
 
       if (isEdit && task) {

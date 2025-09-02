@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useRef, useState } from "react"
 import {
     Home, Briefcase, Gift, Store, Heart, AlarmClock, AppWindow, Settings, Users, Ghost,
     ShoppingCart, Leaf, Shield, Circle, CreditCard, Fish, Smile, Lock, UserCheck, Star,
@@ -229,6 +229,46 @@ export default function ViewTaskModal({ selectedTab, setSelectedTab, isOpen, onC
                             )}
                         </div>
                     </div>
+
+                    {/* Files - Added section */}
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wide">
+                            <FileText className="w-4 h-4" />
+                            Uploaded Files ({task.files ? task.files.length : 0})
+                        </div>
+                        <div className={`p-3 rounded-lg ${task.files && task.files.length > 0 ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-gray-100/50 dark:bg-gray-800/30'}`}>
+                            {task.files && task.files.length > 0 ? (
+                                <div className="space-y-2">
+                                    {task.files.map((file: { url: string | undefined; name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Iterable<ReactNode> | null | undefined; }, idx: Key | null | undefined) => (
+                                        <div key={idx} className="flex items-center justify-between">
+                                            <a
+                                                href={file.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[70%]"
+                                            >
+                                                {file.name}
+                                            </a>
+                                            <button
+                                                onClick={() => handleCopy(file.url ?? "", `file-${idx}`)}
+                                                className="p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                                                title="Copy URL"
+                                            >
+                                                {copiedField === `file-${idx}` ? (
+                                                    <CheckCircle size={16} className="text-green-500" />
+                                                ) : (
+                                                    <Copy size={16} />
+                                                )}
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <span className="text-gray-400 dark:text-gray-500 italic">No files uploaded</span>
+                            )}
+                        </div>
+                    </div>
+
 
                     {/* Note - Always visible */}
                     <div className="space-y-2">

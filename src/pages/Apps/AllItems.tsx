@@ -4,6 +4,7 @@ import { Identity } from '@/store/Slices/identitySlice';
 import { Pin, Eye, MoreHorizontal, Trash2, Edit } from 'lucide-react';
 import { CheckCircle } from 'react-feather';
 import { FiUserPlus } from 'react-icons/fi';
+import { drop } from 'lodash';
 
 type Item = (Task | Card | Identity) & { type: 'task' | 'card' | 'identity' };
 
@@ -114,6 +115,7 @@ const AllItems = ({
                 </button>
 
                 <div className="relative">
+
                   <button
                     onClick={() => setOpenMenuId(openMenuId === itemId ? null : itemId)}
                     className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md"
@@ -130,6 +132,7 @@ const AllItems = ({
                         onClick={() => {
                           handleEdit(item);
                           setOpenMenuId(null);
+                          
                         }}
                         className="w-full flex gap-2 items-center px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
                       >

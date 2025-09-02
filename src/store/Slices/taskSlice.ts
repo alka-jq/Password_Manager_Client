@@ -1,7 +1,9 @@
 import { getColorFromString } from '@/utils/getColorFromString';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
+import { addTaskAsync } from "./taskThunks"
 export interface Task {
+  attachments: any;
+    files: any;
   id: number;
   title: string;
   email: string;
@@ -148,11 +150,12 @@ const taskSlice = createSlice({
       state.editTask = null;
     },
   },
+
 });
 
 export const {
   addTask,
-  editTask,
+  editTask, 
   deleteTask,
   restoreTask,
   toggleComplete,

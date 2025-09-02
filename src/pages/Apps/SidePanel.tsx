@@ -22,6 +22,7 @@ import { Box } from '@mui/material';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { HiDotsVertical } from 'react-icons/hi';
 import { GoPencil } from 'react-icons/go';
+
 import { FiUserPlus, FiLogIn } from 'react-icons/fi';
 import { getCardCountsByTab } from '@/store/selectors/cardSelectors';
 import { openAddModal as openCardAddModal } from '@/store/Slices/cardSlice';
@@ -539,6 +540,15 @@ const SidePanel = () => {
                                         </div>
                                     )}
                                 </div>
+                                    
+                                         <DeleteConfirmationModal
+                                    open={deleteModalOpen}
+                                    onClose={handleCancelDelete}
+                                    onConfirm={handleConfirmDelete}
+                                    vaultName={vaultToDelete?.name || ""}
+                                />
+
+
 
                                 <div className="h-px dark:border-[#1b2e4b]"></div>
                             </div>
@@ -560,6 +570,8 @@ const SidePanel = () => {
                     </div>
                 </div>
             </div>
+
+     
         </>
     );
 };
