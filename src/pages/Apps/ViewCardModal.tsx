@@ -12,9 +12,11 @@ type TableItem = {
 
 type Props = {
   item: TableItem;
+  onClose: () => void;
+  editMode?: boolean;
 };
 
-const ViewCardModal: React.FC<Props> = ({ item }) => {
+const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
   const [details, setDetails] = useState<any>(null);
   const [showSecurityCode, setShowSecurityCode] = useState(false);
   const [showPin, setShowPin] = useState(false);
@@ -22,19 +24,37 @@ const ViewCardModal: React.FC<Props> = ({ item }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        const res = await fetch(`/api/cards/${item.id}`);
-        const data = await res.json();
-        setDetails(data);
-      } catch (err) {
-        console.error(err);
-        console.log("server error");
-      }
+    const dummyDetails = {
+      title: "Personal Visa",
+      type: "Credit Card",
+      nameOnCard: "John Doe",
+      cardNumber: "4111 1111 1111 1111",
+      expirationDate: "12/28",
+      securityCode: "123",
+      pin: "4321",
+      note: "This is my primary card for online purchases.",
+      dynamicFields: [
+        { id: "Bank Name", value: "Chase Bank" },
+        { id: "Customer ID", value: "9876543210" },
+      ],
+      attachments: [
+        "https://example.com/statement.pdf",
+        "https://example.com/card-photo.jpg",
+      ],
     };
 
-    fetchDetails();
+
+    
+
+    setDetails(dummyDetails);
   }, [item]);
+
+
+  const handleSave = () => {
+    console.log("Saving item:", details);
+    // Here, you would typically call an API to update the item
+    onClose(); // Close after saving
+  };
 
   if (!details) return <p className="text-center p-4">Loading card details...</p>;
 
@@ -56,7 +76,7 @@ const ViewCardModal: React.FC<Props> = ({ item }) => {
             </div>
           </div>
           <button
-            onClick={() => setDetails(null)}
+            onClick={onClose}
             className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-all"
           >
             <X className="w-4 h-4" />
@@ -66,31 +86,121 @@ const ViewCardModal: React.FC<Props> = ({ item }) => {
         {/* Body */}
         <div className="px-5 py-4 space-y-4 text-sm overflow-y-auto flex-1">
           <div className="grid grid-cols-1 gap-4">
-            <Field label="Name on Card" value={details.nameOnCard} icon={<User className="w-4 h-4" />} />
-            <Field label="Card Number" value={details.cardNumber} icon={<CreditCard className="w-4 h-4" />} isSensitive />
-            <Field label="Expiration Date" value={details.expirationDate} icon={<CalendarDays className="w-4 h-4" />} />
+            <div className="space-y-2">
+              {/* =========Card Name=== */}
+              <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
+                <User className="w-4 h-4" />
+                Name on Card
+              </div>
+              {editMode ? (
+                <input
+                  type="text"
+                  className="ml-6 w-full p-2 rounded border dark:bg-gray-900 dark:text-white"
+                  value={details.nameOnCard}
+                  onChange={(e) =>
+                    setDetails((prev: any) => ({ ...prev, nameOnCard: e.target.value }))
+                  }
+                />
+              ) : (
+                <span className="ml-6 text-gray-600 dark:text-gray-400">
+                  {details.nameOnCard || "Not provided"}
+                </span>
+              )}
+            </div>
+            {/* =========================== */}
 
-            <div className="space-y-1">
-              <Label icon={<Lock className="w-4 h-4" />} text="Security Code" />
+            {/* ==========================Card Number========================== */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
+                <CreditCard className="w-4 h-4" />
+                Card Number
+              </div>
+              {editMode ? (
+                <input
+                  type="text"
+                  className="ml-6 w-full p-2 rounded border dark:bg-gray-900 dark:text-white"
+                  value={details.cardNumber}
+                  onChange={(e) =>
+                    setDetails((prev: any) => ({ ...prev, cardNumber: e.target.value }))
+                  }
+                />
+              ) : (
+                <span className="ml-6 text-gray-600 dark:text-gray-400 font-mono tracking-wide">
+                  •••• •••• •••• ••••
+                </span>
+              )}
+            </div>
+            {/* ============================================================= */}
+
+
+            {/* =============Expiration Date================ */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
+                <CalendarDays className="w-4 h-4" />
+                Expiration Date
+              </div>
+              {editMode ? (
+                <input
+                  type="text"
+                  className="ml-6 w-full p-2 rounded border dark:bg-gray-900 dark:text-white"
+                  value={details.expirationDate}
+                  onChange={(e) =>
+                    setDetails((prev: any) => ({ ...prev, expirationDate: e.target.value }))
+                  }
+                />
+              ) : (
+                <span className="ml-6 text-gray-600 dark:text-gray-400">
+                  {details.expirationDate || "Not provided"}
+                </span>
+              )}
+            </div>
+            {/* ============================================*/}
+
+            {/* ===========================Sensitive Field======================== */}
+            {editMode ? (
+              <input
+                type="text"
+                className="ml-6 w-40 p-2 rounded border dark:bg-gray-900 dark:text-white"
+                value={details.securityCode}
+                onChange={(e) =>
+                  setDetails((prev: any) => ({ ...prev, securityCode: e.target.value }))
+                }
+              />
+            ) : (
               <SensitiveField
                 isVisible={showSecurityCode}
                 value={details.securityCode}
                 onToggle={() => setShowSecurityCode(prev => !prev)}
               />
-            </div>
-
-            <div className="space-y-1">
-              <Label icon={<Lock className="w-4 h-4" />} text="PIN" />
-              <SensitiveField
-                isVisible={showPin}
-                value={details.pin}
-                onToggle={() => setShowPin(prev => !prev)}
-              />
-            </div>
+            )}
+            {/* ============================================================= */}
           </div>
 
-          <Field label="Note" value={details.note} icon={<FileText className="w-4 h-4" />} fullWidth />
+          {/* ====================================Note====================================== */}
+          <div className="space-y-2 md:col-span-2">
+            <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
+              <FileText className="w-4 h-4" />
+              Note
+            </div>
+            {editMode ? (
+              <textarea
+                className="ml-6 w-full p-2 rounded border dark:bg-gray-900 dark:text-white"
+                value={details.note}
+                rows={3}
+                onChange={(e) =>
+                  setDetails((prev: any) => ({ ...prev, note: e.target.value }))
+                }
+              />
+            ) : (
+              <span className="ml-6 text-gray-600 dark:text-gray-400">{details.note || "Not provided"}</span>
+            )}
+          </div>
+          {/* ==================================================================================== */}
 
+
+
+
+          {/* ========================Dynamic field======================== */}
           {details.dynamicFields?.length > 0 && (
             <div className="space-y-2 pt-1">
               <Label icon={<Info className="w-4 h-4" />} text="Additional Fields" />
@@ -98,14 +208,27 @@ const ViewCardModal: React.FC<Props> = ({ item }) => {
                 {details.dynamicFields.map((field: any, i: number) => (
                   <div key={i} className="bg-gray-50 dark:bg-gray-900/50 p-2 rounded-lg">
                     <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{field.id}</div>
-                    <div className="text-gray-800 dark:text-gray-200 mt-0.5 break-words">{field.value}</div>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        className="w-full mt-1 p-1 rounded border dark:bg-gray-800 dark:text-white"
+                        value={field.value}
+                        onChange={(e) => {
+                          const updatedFields = [...details.dynamicFields];
+                          updatedFields[i].value = e.target.value;
+                          setDetails((prev: any) => ({ ...prev, dynamicFields: updatedFields }));
+                        }}
+                      />
+                    ) : (
+                      <div className="text-gray-800 dark:text-gray-200 mt-0.5 break-words">{field.value}</div>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
           )}
-
-          {details.attachments?.length > 0 && (
+          {/* ===================================== */}
+          {/* {details.attachments?.length > 0 && (
             <div className="space-y-2 pt-1">
               <Label icon={<Paperclip className="w-4 h-4" />} text={`Attachments (${details.attachments.length})`} />
               <div className="ml-1 space-y-1">
@@ -117,7 +240,7 @@ const ViewCardModal: React.FC<Props> = ({ item }) => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Footer */}
@@ -125,19 +248,33 @@ const ViewCardModal: React.FC<Props> = ({ item }) => {
           <div className="text-xs text-gray-500 dark:text-gray-400">
             Last updated: {new Date().toLocaleDateString()}
           </div>
-          <button
-            onClick={() => setDetails(null)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-lg"
-          >
-            Close
-          </button>
+
+          {editMode ? (
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-lg"
+            >
+              Save
+            </button>
+          ) : (
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-lg"
+            >
+              Close
+            </button>
+          )}
         </div>
+
       </div>
     </div>
   );
 };
 
 export default ViewCardModal;
+
+
+
 
 function Field({
   label,

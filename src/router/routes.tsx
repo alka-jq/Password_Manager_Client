@@ -14,6 +14,7 @@ import { EmptyVaultState } from '@/pages/Apps/EmptyVaultState';
 import AllItems from '@/pages/Apps/AllItems';
 import Personal from '@/pages/Apps/Personal';
 import Pin from '@/pages/Apps/Pin';
+import TrashList from '@/pages/Apps/Trash';
 // import path from 'path';
 
 
@@ -43,7 +44,7 @@ const detailLayoutPaths: RouteObject[] = [
   { path: '/', element: <Navigate to="/all_items" replace /> },
   { path: '/all_items', element: <AllItems/> },
   { path: '/personal', element: <Personal /> },
-  { path: '/trash', element: <TaskList /> },
+  { path: '/trash', element: <TrashList /> },
   { path: '/pin', element: <Pin/> },
   { path: "/Cell/:vaultId", element: <EmptyVaultState /> },
 ];
