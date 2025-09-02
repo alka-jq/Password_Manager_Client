@@ -71,8 +71,22 @@ interface Vault {
 }
 const VAULTS_STORAGE_KEY = 'userVaults';
 
+interface ModalItem {
+    id: string;
+    label: string;
+    description: string;
+    icon: React.ReactNode;
+    action: () => void;
+}
+
+interface CreateModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    items: ModalItem[];
+}
+
 // Create Modal Component
-const CreateModal = ({ isOpen, onClose, items }) => {
+const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose, items }) => {
     if (!isOpen) return null;
 
     return (
@@ -93,44 +107,27 @@ const CreateModal = ({ isOpen, onClose, items }) => {
                 {/* Content */}
                 <div className="p-5">
                     <div className="grid grid-cols-1 gap-3">
-                        {items.map(
-                            (item: {
-                                id: React.Key | null | undefined;
-                                action: () => void;
-                                icon:
-                                    | string
-                                    | number
-                                    | boolean
-                                    | React.ReactElement<any, string | React.JSXElementConstructor<any>>
-                                    | Iterable<React.ReactNode>
-                                    | React.ReactPortal
-                                    | Iterable<React.ReactNode>
-                                    | null
-                                    | undefined;
-                                label: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined;
-                                description: any;
-                            }) => (
-                                <button
-                                    key={item.id}
-                                    onClick={() => {
-                                        item.action();
-                                        onClose();
-                                    }}
-                                    className="flex items-center w-full p-4 rounded-lg text-left transition-all duration-200 
-                  bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 
+                        {items.map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => {
+                                    item.action();
+                                    onClose();
+                                }}
+                                className="flex items-center w-full p-4 rounded-lg text-left transition-all duration-200
+                  bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20
                   border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700
                   hover:shadow-md group"
-                                >
-                                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 mr-4">
-                                        {item.icon}
-                                    </div>
-                                    <div>
-                                        <h4 className="font-medium text-gray-800 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300">{item.label}</h4>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{item.description || `Create a new ${item.label.toLowerCase()}`}</p>
-                                    </div>
-                                </button>
-                            )
-                        )}
+                            >
+                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 mr-4">
+                                    {item.icon}
+                                </div>
+                                <div>
+                                    <h4 className="font-medium text-gray-800 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300">{item.label}</h4>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{item.description || `Create a new ${item.label.toLowerCase()}`}</p>
+                                </div>
+                            </button>
+                        ))}
                     </div>
                 </div>
 

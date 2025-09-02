@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react"
 import type { Card } from "@/store/Slices/cardSlice"
 import {
   Home, Briefcase, Gift, Store, Heart, AlarmClock, AppWindow, Settings, Users, Ghost,
@@ -102,8 +102,8 @@ export default function ViewCardModal({ selectedTab, setSelectedTab, isOpen, onC
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">{card.title || "Untitled Card"}</h2>
           <div className="flex items-center gap-2 mt-1">
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-800">
-              {iconComponents[vaults.find((v) => v.key === card.vaultKey)?.icon || "Folder"]}
-              {card.vaultName || "Uncategorized"}
+              {iconComponents[vaults.find((v) => v.key === card.vaultKey)?.icon || "Home"]}
+              {vaults.find((v) => v.key === card.vaultKey)?.name || "Uncategorized"}
             </span>
           </div>
         </div>

@@ -164,7 +164,7 @@ const IdentityModalUIOnly = () => {
 
     await new Promise((resolve) => setTimeout(resolve, 500))
 
-    const selectedVault = vaults.find((v) => v.key === selectedTab) || vaults[0] || { key: "", name: "" }
+    const selectedVault = vaults.find((v) => v.key === selectedTab) || vaults[0] || { key: "", name: "", icon: "", color: "" }
 
     const payload = {
       title: title.trim(),
@@ -202,10 +202,11 @@ const IdentityModalUIOnly = () => {
       dynamicFields,
       attachments: attachments.map((file) => file.name),
       note,
-      // vaultKey: selectedTab || selectedVault.key,
-      // vaultName: selectedVault?.name || "",
-      // vaultIcon: selectedVault?.icon || "",
-      // vaultColor: selectedVault?.color || "",
+      vaultKey: selectedTab || selectedVault.key,
+      vaultName: selectedVault?.name || "",
+      vaultIcon: selectedVault?.icon || "",
+      vaultColor: selectedVault?.color || "",
+      priority: "medium",
     }
 
     if (isEdit && identity) {

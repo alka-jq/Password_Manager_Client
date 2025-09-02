@@ -135,6 +135,7 @@ const getInitialTab = useCallback(() => {
       vaultName: selectedVault?.name || "",
       vaultIcon: selectedVault?.icon || "",
       vaultColor: selectedVault?.color || "",
+      priority: "medium",
     }
 
     if (isEdit && card) {

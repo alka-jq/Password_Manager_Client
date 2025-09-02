@@ -2,9 +2,14 @@ import React, { useState, useRef, useEffect } from "react";
 import { FiLogIn, FiUser, FiChevronDown } from "react-icons/fi";
 import { MdCreditCard, MdPerson, MdOutlineApps } from "react-icons/md";
 
-const FilterDropdown = ({ typeFilter, setTypeFilter }) => {
+interface FilterDropdownProps {
+  typeFilter: string;
+  setTypeFilter: (filter: string) => void;
+}
+
+const FilterDropdown: React.FC<FilterDropdownProps> = ({ typeFilter, setTypeFilter }) => {
   const [open, setOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const options = [
     {
