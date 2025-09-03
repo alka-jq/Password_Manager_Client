@@ -5,7 +5,9 @@ import apiClient from '../../service/apiClient';
 // 🔹 Define type for a single item
 export interface Item {
     id: string;
-    name: string;
+    title: string;
+    type:string
+
     // Add other fields based on your API response
 }
 
@@ -24,9 +26,9 @@ const initialState: DataState = {
 };
 
 // 🔹 Thunk to fetch all data
-export const fetchAlldata = createAsyncThunk<Item[]>('data/fetchAll', async () => {
-    const res = await apiClient.get<Item[]>('/api/filter/all');
-    return res.data;
+export const fetchAlldata = createAsyncThunk('data/fetchAll', async () => {
+    const res = await apiClient.get('/api/filter/all');
+    return res.data?.data;
 });
 
 // 🔹 Slice
