@@ -7,6 +7,7 @@ export type Vault = {
   name: string;
   icon: string;
   color: string;
+  path: string;
 };
 
 type VaultContextType = {
@@ -17,17 +18,17 @@ type VaultContextType = {
 const VaultContext = createContext<VaultContextType | undefined>(undefined);
 
 export const VaultProvider = ({ children }: { children: ReactNode }) => {
-const [vaults, setVaults] = useState<Vault[]>(() => {
-  try {
-    const saved = localStorage.getItem("VAULTS_STORAGE_KEY");
-    return saved ? JSON.parse(saved) : []; // Always return an array
-  } catch (error) {
-    console.error("Failed to parse vaults from localStorage", error);
-    return []; // Fallback to empty array on error
-  }
-});
+  const [vaults, setVaults] = useState<Vault[]>(() => {
+    try {
+      const saved = localStorage.getItem("userVaults");
+      return saved ? JSON.parse(saved) : []; // Always return an array
+    } catch (error) {
+      console.error("Failed to parse vaults from localStorage", error);
+      return []; // Fallback to empty array on error
+    }
+  });
   useEffect(() => {
-    localStorage.setItem("VAULTS_STORAGE_KEY", JSON.stringify(vaults));
+    localStorage.setItem("userVaults", JSON.stringify(vaults));
   }, [vaults]);
 
   return (

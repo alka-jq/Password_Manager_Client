@@ -19,6 +19,7 @@ type CommonTableProps = {
     // filterOptions?: string[];
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
+    onBulkDelete?: (ids: string[]) => void;
     onView?: (id: string) => void;
     onClose?: () => void;
     isLoading?: boolean;
@@ -29,6 +30,7 @@ const TaskList: React.FC<CommonTableProps> = ({
     // filterOptions = [],
     onEdit,
     onDelete,
+    onBulkDelete,
     onView,
     onClose,
     isLoading = false,
@@ -153,18 +155,16 @@ const TaskList: React.FC<CommonTableProps> = ({
     };
 
     // Handle bulk delete action
-    const handleBulkDelete = () => {
-        const selectedIds = safeData
-            .filter((_, index) => selected[index])
-            .map(item => item.id);
+  const handleBulkDelete = () => {
+  const selectedIds = safeData
+    .filter((_, index) => selected[index])
+    .map(item => item.id);
 
-        if (selectedIds.length > 0) {
-            if (window.confirm(`Are you sure you want to delete ${selectedIds.length} item(s)?`)) {
-                selectedIds.forEach(id => onDelete(id));
-                setSelected(selected.map(() => false)); // Clear selection
-            }
-        }
-    };
+  if (selectedIds.length > 0 && onBulkDelete) {
+    onBulkDelete(selectedIds);
+    setSelected(selected.map(() => false)); // clear selection after delete request
+  }
+};
 
     // Close dropdown if clicked outside
     const handleClickOutside = (e: MouseEvent) => {
@@ -256,13 +256,13 @@ const TaskList: React.FC<CommonTableProps> = ({
                                                         <th className='w-[23%]'>Title</th>
                                                         <th className='w-[23%]'>Type</th>
                                                         <th className='w-[10%]'>
-                                                            {(someSelected || allSelected) && safeData.length > 0 ? (
-                                                                <button onClick={handleBulkDelete} className="flex items-center justify-center">
-                                                                    <FaTrash color='gray' /> {/* Bulk Delete */}
-                                                                </button>
-                                                            ) : (
-                                                                'Action'
-                                                            )}
+                                                          {someSelected || allSelected ? (
+  <button onClick={handleBulkDelete} className="flex items-center justify-center">
+    <FaTrash color="gray" />
+  </button>
+) : (
+  'Action'
+)}  
                                                         </th>
                                                     </tr>
                                                 </thead>

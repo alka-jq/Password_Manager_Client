@@ -46,7 +46,7 @@ const detailLayoutPaths: RouteObject[] = [
   { path: '/personal', element: <Personal /> },
   { path: '/trash', element: <TrashList /> },
   { path: '/pin', element: <Pin/> },
-  { path: "/Cell/:vaultId", element: <EmptyVaultState /> },
+   { path: '/vault/:vaultId', element: <EmptyVaultState onCreateItem={() => {}} onImport={() => {}} /> },
 ];
 
 const navigateRoute: RouteObject[] = [

@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import TaskList from "./Table";
+import TaskList from './Table';
 import { getPersonaldata } from '@/service/TableDataService';
-
+import  DeleteModal  from './DeleteModal';
 type Item = {
     id: string;
     title: string;
     type: string;
 };
-
-
-
 
 const Personal = () => {
     // Dummy data
@@ -34,24 +31,24 @@ const Personal = () => {
         { id: '18', title: 'WiFi Password', type: 'Password' },
         { id: '19', title: 'WiFi Password', type: 'Password' },
         { id: '20', title: 'Nishan', type: 'Password' },
-
     ];
 
     // const [items, setItems] = useState(dummyData);
     const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(false);
-
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
     useEffect(() => {
         const fetchData = async () => {
-            console.log("Personal data")
+            console.log('Personal data');
             try {
-                setLoading(true)
+                setLoading(true);
                 const res = await getPersonaldata();
-                console.log("all data", res);
+                console.log('all data', res);
                 setItems(res.data);
             } catch (err) {
-                console.log("backend error")
-                console.error(err)
+                console.log('backend error');
+                console.error(err);
             } finally {
                 setLoading(false);
             }
@@ -67,16 +64,35 @@ const Personal = () => {
     };
 
     const handleDelete = (id: string) => {
-        console.log('Delete item with ID:', id);
-        // Remove the item from state
-        setItems(prevItems => prevItems.filter(item => item.id !== id));
-        alert(`Deleted item with ID: ${id}`);
+        requestDelete([id]); // opens modal for single delete
+    };
+
+    const handleBulkDelete = (ids: string[]) => {
+        requestDelete(ids); // opens modal for bulk delete
     };
 
     const handleView = (id: string) => {
         console.log('View item with ID:', id);
         // You can implement your view logic here
         alert(`Viewing item with ID: ${id}`);
+    };
+
+    const requestDelete = (ids: string[]) => {
+        setIdsToDelete(ids);
+        setDeleteModalOpen(true);
+    };
+
+    // Step 3.2: When user confirms in modal
+    const handleDeleteConfirm = () => {
+        setItems((prev) => prev.filter((item) => !idsToDelete.includes(item.id)));
+        setDeleteModalOpen(false);
+        setIdsToDelete([]);
+    };
+
+    // Step 3.3: When user cancels modal
+    const handleDeleteCancel = () => {
+        setDeleteModalOpen(false);
+        setIdsToDelete([]);
     };
 
     return (
@@ -87,13 +103,14 @@ const Personal = () => {
                 // filterOptions={['All Items', 'Login', 'Identity Card', 'Password']}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onBulkDelete={handleBulkDelete}
                 onView={handleView}
                 isLoading={loading}
             />
+
+            <DeleteModal isOpen={deleteModalOpen} onClose={handleDeleteCancel} onConfirm={handleDeleteConfirm} bulk={idsToDelete.length > 1} />
         </div>
-    )
-}
+    );
+};
 
-export default Personal
-
-
+export default Personal;

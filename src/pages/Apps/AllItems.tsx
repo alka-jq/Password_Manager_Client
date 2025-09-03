@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TaskList from "./Table";
 import { getAlldata } from '@/service/TableDataService';
-
+import DeleteModal from './DeleteModal';
 type Item = {
   id: string;
   title: string;
@@ -21,32 +21,47 @@ const AllItems = () => {
     { id: '7', title: 'WiFi Password', type: 'Card' }
   ];
 
-  const [items, setItems] = useState<Item[]>([]);
-    // const [items, setItems] = useState(dummyData);
+  // const [items, setItems] = useState<Item[]>([]);
+    const [items, setItems] = useState(dummyData);
   const [loading, setLoading] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
-
-  useEffect(() => {
-    const fetchData = async () => {
-      console.log("nisahn")
-      try {
-        setLoading(true)
-        const res = await getAlldata();
-        console.log("all data", res);
-        setItems(res.data);
-      } catch (err) {
-        console.log("backend error")
-        console.error(err)
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     console.log("nisahn")
+  //     try {
+  //       setLoading(true)
+  //       const res = await getAlldata();
+  //       console.log("all data", res);
+  //       setItems(res.data);
+  //     } catch (err) {
+  //       console.log("backend error")
+  //       console.error(err)
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
 
   // Handler functions
- 
+ const requestDelete = (ids: string[]) => {
+  setIdsToDelete(ids);
+  setDeleteModalOpen(true);
+};
+
+const handleDeleteConfirm = () => {
+  setItems(prev => prev.filter(item => !idsToDelete.includes(item.id)));
+  setDeleteModalOpen(false);
+  setIdsToDelete([]);
+};
+
+const handleDeleteCancel = () => {
+  setDeleteModalOpen(false);
+  setIdsToDelete([]);
+};
   
   const handleEdit = (id: string) => {
     console.log('Edit item with ID:', id);
@@ -54,12 +69,13 @@ const AllItems = () => {
     alert(`Editing item with ID: ${id}`);
   };
 
-  const handleDelete = (id: string) => {
-    console.log('Delete item with ID:', id);
-    // Remove the item from state
-    setItems(prevItems => prevItems.filter(item => item.id !== id));
-    alert(`Deleted item with ID: ${id}`);
-  };
+ const handleDelete = (id: string) => {
+  requestDelete([id]);
+};
+
+const handleBulkDelete = (ids: string[]) => {
+  requestDelete(ids);
+};
 
   const handleView = (id: string) => {
     console.log('View item with ID:', id);
@@ -72,14 +88,20 @@ const AllItems = () => {
   return (
     <div>
       {/* TaskList component */}
-      <TaskList
-        data={items}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onView={handleView}
-        isLoading={loading}
-      />
+    <TaskList
+  data={items}
+  onEdit={(id) => alert(`Editing ${id}`)}
+  onDelete={handleDelete}
+  onBulkDelete={handleBulkDelete}   // Pass bulk delete handler here
+  isLoading={loading}
+/>
 
+<DeleteModal
+  isOpen={deleteModalOpen}
+  onClose={handleDeleteCancel}
+  onConfirm={handleDeleteConfirm}
+  bulk={idsToDelete.length > 1}
+/>
 
     </div>
   );

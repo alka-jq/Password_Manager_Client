@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TaskList from "./Table";
 import { getPindata } from '@/service/TableDataService';
-
+import DeleteModal from './DeleteModal';
 type Item = {
     id: string;
     title: string;
@@ -21,7 +21,8 @@ const Pin = () => {
     // const [items, setItems] = useState(dummyData);
     const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(false);
-
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
     useEffect(() => {
         const fetchData = async () => {
             console.log("pin data")
@@ -48,9 +49,29 @@ const Pin = () => {
     };
 
     const handleDelete = (id: string) => {
-        console.log('Delete item with ID:', id);
-        setItems(prevItems => prevItems.filter(item => item.id !== id));
-        alert(`Deleted item with ID: ${id}`);
+        requestDelete([id]); // opens modal for single delete
+    };
+
+    const handleBulkDelete = (ids: string[]) => {
+        requestDelete(ids); // opens modal for bulk delete
+    };
+
+    const requestDelete = (ids: string[]) => {
+        setIdsToDelete(ids);
+        setDeleteModalOpen(true);
+    };
+
+    // Step 3.2: When user confirms in modal
+    const handleDeleteConfirm = () => {
+        setItems((prev) => prev.filter((item) => !idsToDelete.includes(item.id)));
+        setDeleteModalOpen(false);
+        setIdsToDelete([]);
+    };
+
+    // Step 3.3: When user cancels modal
+    const handleDeleteCancel = () => {
+        setDeleteModalOpen(false);
+        setIdsToDelete([]);
     };
 
     const handleView = (id: string) => {
@@ -65,9 +86,12 @@ const Pin = () => {
                 // filterOptions={['All Items', 'Login', 'Identity Card', 'Password']}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onBulkDelete={handleBulkDelete}
                 onView={handleView}
                 isLoading={loading}
             />
+
+            <DeleteModal isOpen={deleteModalOpen} onClose={handleDeleteCancel} onConfirm={handleDeleteConfirm} bulk={idsToDelete.length > 1} />
         </div>
     )
 }
