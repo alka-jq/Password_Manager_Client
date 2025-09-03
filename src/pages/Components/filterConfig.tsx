@@ -1,29 +1,40 @@
-// filterConfig.ts (or keep inline inside TaskList if small)
-
 import {
-  CreditCard, User, Lock, Globe, Shield, Folder
+  CreditCard,
+  User,
+  Lock,
+  Shield,
+  Folder,
 } from 'lucide-react';
 
-export const filterConfig: Record<string, { label: string; icon: JSX.Element }> = {
+const iconBaseClass = 'w-4 h-4'; // Ensures consistency (16px)
+const iconColorVariants = {
+  default: 'text-gray-500 dark:text-gray-300',
+  all: 'text-blue-500',
+  login: 'text-red-500',
+  id: 'text-yellow-500',
+  password: 'text-purple-500',
+  card: 'text-green-500',
+  
+};
+
+export const filterConfig: Record<
+  string,
+  { label: string; icon: JSX.Element }
+> = {
   'All Items': {
     label: 'All Items',
-    icon: <Folder size={16} />,
+    icon: <Folder className={`${iconBaseClass} ${iconColorVariants.all}`} />,
   },
   'Login': {
     label: 'Login',
-    icon: <User size={16} color='red' />,
+    icon: <User className={`${iconBaseClass} ${iconColorVariants.login}`} />,
   },
   'Identity Card': {
     label: 'Identity Card',
-    icon: <Shield size={16} />,
-  },
-  'Password': {
-    label: 'Password',
-    icon: <Lock size={16} />,
+    icon: <Shield className={`${iconBaseClass} ${iconColorVariants.id}`} />,
   },
   'Card': {
     label: 'Card',
-    icon: <CreditCard size={16} />,
+    icon: <CreditCard className={`${iconBaseClass} ${iconColorVariants.card}`} />,
   },
- 
 };
