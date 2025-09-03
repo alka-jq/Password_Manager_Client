@@ -18,8 +18,8 @@ const Pin = () => {
         { id: '6', title: 'WiFi Password', type: 'Password' },
     ];
 
-    // const [items, setItems] = useState(dummyData);
-    const [items, setItems] = useState<Item[]>([]);
+    const [items, setItems] = useState(dummyData);
+    // const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);

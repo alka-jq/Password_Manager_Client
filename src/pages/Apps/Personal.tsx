@@ -33,8 +33,8 @@ const Personal = () => {
         { id: '20', title: 'Nishan', type: 'Password' },
     ];
 
-    // const [items, setItems] = useState(dummyData);
-    const [items, setItems] = useState<Item[]>([]);
+    const [items, setItems] = useState(dummyData);
+    // const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
@@ -57,6 +57,8 @@ const Personal = () => {
     }, []);
 
     // Handler functions
+   
+   
     const handleEdit = (id: string) => {
         console.log('Edit item with ID:', id);
         // You can implement your edit logic here

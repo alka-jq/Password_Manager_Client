@@ -22,7 +22,7 @@ const AllItems = () => {
   ];
 
   // const [items, setItems] = useState<Item[]>([]);
-    const [items, setItems] = useState(dummyData);
+  const [items, setItems] = useState(dummyData);  
   const [loading, setLoading] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 const [idsToDelete, setIdsToDelete] = useState<string[]>([]);

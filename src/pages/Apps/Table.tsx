@@ -224,7 +224,7 @@ const TaskList: React.FC<CommonTableProps> = ({
 
                                 {/* Table */}
                                 <div className='py-3'>
-                                    <div className='w-full font-sans overflow-hidden border rounded-lg'>
+                                    <div className='w-full font-sans overflow-hidden border '>
                                         {/* Fixed Header */}
                                         <div className='bg-white sticky top-0 z-10'>
                                             <table className='w-full'>

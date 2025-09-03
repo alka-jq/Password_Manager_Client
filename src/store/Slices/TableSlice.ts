@@ -1,0 +1,54 @@
+// redux/dataSlice.ts
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import apiClient from '../../service/apiClient';
+
+// 🔹 Define type for a single item
+export interface Item {
+    id: string;
+    name: string;
+    // Add other fields based on your API response
+}
+
+// 🔹 Initial state type
+interface DataState {
+    items: Item[];
+    loading: boolean;
+    error: string | null;
+}
+
+// 🔹 Initial state
+const initialState: DataState = {
+    items: [],
+    loading: false,
+    error: null,
+};
+
+// 🔹 Thunk to fetch all data
+export const fetchAlldata = createAsyncThunk<Item[]>('data/fetchAll', async () => {
+    const res = await apiClient.get<Item[]>('/api/filter/all');
+    return res.data;
+});
+
+// 🔹 Slice
+const dataSlice = createSlice({
+    name: 'data',
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchAlldata.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAlldata.fulfilled, (state, action) => {
+                state.loading = false;
+                state.items = action.payload;
+            })
+            .addCase(fetchAlldata.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message ?? 'Unknown error';
+            });
+    },
+});
+
+export default dataSlice.reducer;
