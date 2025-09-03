@@ -33,28 +33,28 @@ const TrashList: React.FC = () => {
   const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
   // Fetch trash items from API
-  // useEffect(() => {
-  //   const fetchTrashItems = async () => {
-  //     console.log("Fetching trash data...");
-  //     try {
-  //       const res = await getTrashdata();
-  //       console.log("Response:", res.data);
-  //       setData(res.data);
-  //       setSelected(res.data.map(() => false));
-  //       setPins(res.data.map(() => false));
-  //     } catch (err) {
-  //       console.error('Error fetching trash data:', err);
-  //     }
-  //   };
-
-  //   fetchTrashItems();
-  // }, []); // <-- empty array ensures effect runs only once
-
   useEffect(() => {
-    setData(dummyData);
-    setSelected(dummyData.map(() => false));
-    setPins(dummyData.map(() => false));
-  }, []);
+    const fetchTrashItems = async () => {
+      console.log("Fetching trash data...");
+      try {
+        const res = await getTrashdata();
+        console.log("Response:", res.data);
+        setData(res.data);
+        setSelected(res.data.map(() => false));
+        setPins(res.data.map(() => false));
+      } catch (err) {
+        console.error('Error fetching trash data:', err);
+      }
+    };
+
+    fetchTrashItems();
+  }, []); // <-- empty array ensures effect runs only once
+
+  // useEffect(() => {
+  //   setData(dummyData);
+  //   setSelected(dummyData.map(() => false));
+  //   setPins(dummyData.map(() => false));
+  // }, []);
 
 
 

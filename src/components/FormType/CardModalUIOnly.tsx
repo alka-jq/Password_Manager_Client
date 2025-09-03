@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import VaultDropdown from "../Layouts/VaultDropdown"
 import { useVaults } from "@/useContext/VaultContext"
+import apiClient from "@/service/apiClient"
 
 interface DynamicField {
   id: string
@@ -113,39 +114,60 @@ const getInitialTab = useCallback(() => {
   ]
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!title.trim()) {
-      setErrors({ ...errors, title: true })
-      return
-    }
-    setIsSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, 500))
+  e.preventDefault()
 
-    const payload = {
-      title: title.trim(),
-      nameOnCard,
-      cardNumber,
-      expirationDate,
-      securityCode,
-      pin,
-      note,
-      dynamicFields,
-      attachments: attachments.map((file) => file.name),
-      vaultKey: selectedTab,
-      vaultName: selectedVault?.name || "",
-      vaultIcon: selectedVault?.icon || "",
-      vaultColor: selectedVault?.color || "",
+  if (!title.trim()) {
+    setErrors({ ...errors, title: true })
+    return
+  }
+
+  setIsSubmitting(true)
+
+  try {
+    const formData = new FormData()
+
+    formData.append("title", title.trim())
+    formData.append("name_on_card", nameOnCard)
+formData.append("card_number", cardNumber.replace(/\s+/g, ""))
+    formData.append("expiration_date", expirationDate) // Or use convertExpiryToISO
+    formData.append("security_code", securityCode)
+    formData.append("pin", pin)
+    formData.append("note", note)
+
+    // 🔥 NEW: Add dynamic fields (as JSON string)
+    if (dynamicFields.length > 0) {
+      formData.append("dynamic_fields", JSON.stringify(dynamicFields))
     }
 
-    if (isEdit && card) {
-      dispatch(editCard({ id: card.id, updates: payload }))
-    } else {
-      // dispatch(addCard(payload))
+    // Attach files
+    attachments.forEach((file) => {
+      formData.append("attachments", file)
+    })
+
+  const response = await apiClient.post("/api/card/create", formData, {
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
+})
+
+const data = response.data
+
+    if (!response) {
+      throw new Error(data.message || "Something went wrong.")
     }
+
+    console.log("✅ Card added successfully:", data)
 
     dispatch(closeCardModal())
     resetForm()
+  } catch (error) {
+    console.error("❌ Error creating card:", error)
+    alert("Failed to create card. Please try again.")
+  } finally {
+    setIsSubmitting(false)
   }
+}
+
 
   const formatCardNumber = (value: string) => {
     const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "")

@@ -3,6 +3,7 @@ import {
   CreditCard, CalendarDays, Lock, Eye, EyeOff,
   FileText, Info, Paperclip, LinkIcon, X, User
 } from 'lucide-react';
+import apiClient from '@/service/apiClient';
 
 type TableItem = {
   id: string;
@@ -18,37 +19,60 @@ type Props = {
 
 const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
   const [details, setDetails] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showSecurityCode, setShowSecurityCode] = useState(false);
   const [showPin, setShowPin] = useState(false);
 
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const dummyDetails = {
-      title: "Personal Visa",
-      type: "Credit Card",
-      nameOnCard: "John Doe",
-      cardNumber: "4111 1111 1111 1111",
-      expirationDate: "12/28",
-      securityCode: "123",
-      pin: "4321",
-      note: "This is my primary card for online purchases.",
-      dynamicFields: [
-        { id: "Bank Name", value: "Chase Bank" },
-        { id: "Customer ID", value: "9876543210" },
-      ],
-      attachments: [
-        "https://example.com/statement.pdf",
-        "https://example.com/card-photo.jpg",
-      ],
+    const fetchCardDetails = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await apiClient.get(`https://password-api.jqmail.me/api/password/items/${item.id}`);
+        const data = await response.data;
+
+        if (response && data.item) {
+          const card = data.item;
+
+          // Format expiration date (YYYY-MM-DD to MM/YY)
+          const formattedDate = card.expiration_date
+            ? new Date(card.expiration_date).toLocaleDateString('en-US', {
+              year: '2-digit',
+              month: '2-digit',
+            }).replace('/', '/')
+            : '';
+
+          const mappedDetails = {
+            title: card.title,
+            type: card.type,
+            nameOnCard: card.name_on_card,
+            cardNumber: card.card_number,
+            expirationDate: formattedDate,
+            securityCode: card.security_code,
+            pin: card.pin,
+            note: card.note || '',
+            dynamicFields: [], // You can populate this if needed
+            attachments: card.attachments || [],
+          };
+
+          setDetails(mappedDetails);
+        } else {
+          throw new Error(data.message || 'Failed to fetch card details');
+        }
+      } catch (err: any) {
+        setError(err.message || 'Something went wrong');
+      } finally {
+        setLoading(false);
+      }
     };
 
-
-    
-
-    setDetails(dummyDetails);
+    if (item?.id) {
+      fetchCardDetails();
+    }
   }, [item]);
-
 
   const handleSave = () => {
     console.log("Saving item:", details);
@@ -126,7 +150,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
                 />
               ) : (
                 <span className="ml-6 text-gray-600 dark:text-gray-400 font-mono tracking-wide">
-                  •••• •••• •••• ••••
+                  {details.cardNumber}
                 </span>
               )}
             </div>
