@@ -3,6 +3,7 @@ import { LuTrash2 } from "react-icons/lu";
 import { LuPin, LuPinOff } from 'react-icons/lu';
 import { MdOutlineRestore } from "react-icons/md";
 import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
+import { getTrashdata } from '@/service/TableDataService';
 
 type TableItem = {
   id: string;
