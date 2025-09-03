@@ -21,33 +21,33 @@ const AllItems = () => {
     { id: '7', title: 'WiFi Password', type: 'Card' }
   ];
 
-  const [items, setItems] = useState<Item[]>([]);
-    // const [items, setItems] = useState(dummyData);
+  // const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState(dummyData);  
   const [loading, setLoading] = useState(false);
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      console.log("nisahn")
-      try {
-        setLoading(true)
-        const res = await getAlldata();
-        console.log("all data", res);
-        setItems(res.data);
-      } catch (err) {
-        console.log("backend error")
-        console.error(err)
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     console.log("nisahn")
+  //     try {
+  //       setLoading(true)
+  //       const res = await getAlldata();
+  //       console.log("all data", res);
+  //       setItems(res.data);
+  //     } catch (err) {
+  //       console.log("backend error")
+  //       console.error(err)
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
 
   // Handler functions
- 
-  
+
+
   const handleEdit = (id: string) => {
     console.log('Edit item with ID:', id);
     // You can implement your edit logic here

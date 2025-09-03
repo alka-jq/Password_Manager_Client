@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaTrash } from 'react-icons/fa';
+import { LuTrash2 } from "react-icons/lu";
 import { LuPin, LuPinOff } from 'react-icons/lu';
-import { BsThreeDots } from 'react-icons/bs';
+import { BsThreeDotsVertical } from 'react-icons/bs';
 import { getTrashdata } from '@/service/TableDataService';
+import { MdOutlineRestore } from "react-icons/md";
 
 type TableItem = {
   id: string;
@@ -11,6 +12,18 @@ type TableItem = {
 };
 
 const TrashList: React.FC = () => {
+  // Dummy data
+  const dummyData = [
+    { id: '1', title: 'Email Login', type: 'Login' },
+    { id: '2', title: 'Office ID Card', type: 'Identity Card' },
+    { id: '3', title: 'Bank Password', type: 'Password' },
+    { id: '4', title: 'Social Media Account', type: 'Login' },
+    { id: '5', title: 'University ID', type: 'Identity Card' },
+    { id: '6', title: 'WiFi Password', type: 'Password' },
+    { id: '7', title: 'WiFi Password', type: 'Card' }
+  ];
+
+  // const [data, setData] = useState(dummyData);
   const [data, setData] = useState<TableItem[]>([]);
   const [selected, setSelected] = useState<boolean[]>([]);
   const [pins, setPins] = useState<boolean[]>([]);
@@ -20,22 +33,31 @@ const TrashList: React.FC = () => {
   const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
   // Fetch trash items from API
-  useEffect(() => {
-    const fetchTrashItems = async () => {
-      console.log("Fetching trash data...");
-      try {
-        const res = await getTrashdata();
-        console.log("Response:", res.data);
-        setData(res.data);
-        setSelected(res.data.map(() => false));
-        setPins(res.data.map(() => false));
-      } catch (err) {
-        console.error('Error fetching trash data:', err);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchTrashItems = async () => {
+  //     console.log("Fetching trash data...");
+  //     try {
+  //       const res = await getTrashdata();
+  //       console.log("Response:", res.data);
+  //       setData(res.data);
+  //       setSelected(res.data.map(() => false));
+  //       setPins(res.data.map(() => false));
+  //     } catch (err) {
+  //       console.error('Error fetching trash data:', err);
+  //     }
+  //   };
 
-    fetchTrashItems();
-  }, []); // <-- empty array ensures effect runs only once
+  //   fetchTrashItems();
+  // }, []); // <-- empty array ensures effect runs only once
+
+  useEffect(() => {
+    setData(dummyData);
+    setSelected(dummyData.map(() => false));
+    setPins(dummyData.map(() => false));
+  }, []);
+
+
+
 
   const toggleSelect = (index: number) => {
     const newSelected = [...selected];
@@ -121,13 +143,13 @@ const TrashList: React.FC = () => {
   }, []);
 
   return (
-    <div className='p-4'>
+    <div>
       {data.length === 0 ? (
         <div className='flex justify-center items-center h-[80vh]'>
           <h1 className='text-xl'>Trash is empty</h1>
         </div>
       ) : (
-        <div className='overflow-hidden border rounded-lg'>
+        <div className='overflow-hidden '>
           {/* Header */}
           <div className='bg-white sticky top-0 z-10'>
             <table className='w-full'>
@@ -145,7 +167,7 @@ const TrashList: React.FC = () => {
                   </th>
                   <th className='w-[23%]'>
                     {(someSelected || allSelected) ? (
-                      <button onClick={handleBulkRestore}>♻️</button>
+                      <button onClick={handleBulkRestore}><MdOutlineRestore size={20} /></button>
                     ) : 'Pin'}
                   </th>
                   <th className='w-[23%]'>Title</th>
@@ -153,7 +175,7 @@ const TrashList: React.FC = () => {
                   <th className='w-[10%]'>
                     {(someSelected || allSelected) ? (
                       <button onClick={handleBulkDelete}>
-                        <FaTrash color='gray' />
+                        <LuTrash2 color='red' size={20} />
                       </button>
                     ) : 'Action'}
                   </th>
@@ -163,7 +185,7 @@ const TrashList: React.FC = () => {
           </div>
 
           {/* Body */}
-          <div className='overflow-y-auto h-[75vh]'>
+          <div className='overflow-y-auto h-[84vh]'>
             <table className='w-full'>
               <tbody>
                 {data.map((item, index) => (
@@ -187,17 +209,23 @@ const TrashList: React.FC = () => {
                     <td className='w-[23%]'>{item.type}</td>
                     <td className='w-[10%] relative flex gap-3'>
                       <button onClick={() => handleRestore(item.id)} title='Restore'>
-                        ♻️
+                        <MdOutlineRestore />
                       </button>
-                      <button
+                      {/* <button
                         ref={el => (buttonRefs.current[item.id] = el)}
                         onClick={e => toggleDropdown(item.id, e)}
                         title='More'
                       >
-                        <BsThreeDots color='gray' />
+                        <BsThreeDotsVertical />
+                      </button> */}
+
+                      <button
+                        onClick={() => handlePermanentDelete(item.id)}
+                      >
+                        <LuTrash2 color='gray' />
                       </button>
 
-                      {dropdownVisible === item.id && (
+                      {/* {dropdownVisible === item.id && (
                         <div
                           ref={dropdownRef}
                           className={`absolute bg-white border rounded-md shadow-lg w-32 z-10 ${dropdownPosition === 'above'
@@ -209,7 +237,7 @@ const TrashList: React.FC = () => {
                             className='w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex gap-2 items-center'
                             onClick={() => handleRestore(item.id)}
                           >
-                            ♻️ Restore
+                            <MdOutlineRestore />Restore
                           </button>
                           <button
                             className='w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-100 flex gap-2 items-center'
@@ -218,7 +246,7 @@ const TrashList: React.FC = () => {
                             <FaTrash /> Delete
                           </button>
                         </div>
-                      )}
+                      )} */}
                     </td>
                   </tr>
                 ))}

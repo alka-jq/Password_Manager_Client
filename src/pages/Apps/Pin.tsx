@@ -18,27 +18,27 @@ const Pin = () => {
         { id: '6', title: 'WiFi Password', type: 'Password' },
     ];
 
-    // const [items, setItems] = useState(dummyData);
-    const [items, setItems] = useState<Item[]>([]);
+    const [items, setItems] = useState(dummyData);
+    // const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            console.log("pin data")
-            try {
-                setLoading(true)
-                const res = await getPindata();
-                console.log("all data", res);
-                setItems(res.data);
-            } catch (err) {
-                console.log("backend error")
-                console.error(err)
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         console.log("pin data")
+    //         try {
+    //             setLoading(true)
+    //             const res = await getPindata();
+    //             console.log("all data", res);
+    //             setItems(res.data);
+    //         } catch (err) {
+    //             console.log("backend error")
+    //             console.error(err)
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+    //     fetchData();
+    // }, []);
 
 
     // Handler functions

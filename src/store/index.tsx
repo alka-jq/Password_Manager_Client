@@ -44,6 +44,7 @@ import identitySlice from "./Slices/identitySlice"
 import passwordSlice from "./Slices/passwordSlice"
 
 
+
 const persistConfig = {
   key: "root",
   storage,
@@ -56,6 +57,7 @@ const rootReducer = combineReducers({
   card: cardSlice,
   identity: identitySlice,
   password: passwordSlice, // Added cardSlice to the root reducer
+  
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
