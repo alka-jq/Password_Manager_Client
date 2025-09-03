@@ -14,7 +14,7 @@ import {
   removeFromPasswordHistory,
 } from "@/store/Slices/passwordSlice"
 import type { PasswordHistory } from "@/store/Slices/passwordSlice"
-import { RefreshCw, Copy, X, Settings, ChevronRight, Check, Eye, EyeOff, Trash2, Key } from "lucide-react"
+import { RefreshCw, Copy, X, Settings, ChevronRight, Check, Eye, EyeOff, Trash2, Key, Sparkles } from "lucide-react"
 
 const PasswordGenerator: React.FC = () => {
   const dispatch = useDispatch()
@@ -45,73 +45,17 @@ const PasswordGenerator: React.FC = () => {
 
   // Word lists for memorable passwords
   const adjectives = [
-    "Legal",
-    "Track",
-    "Failing",
-    "Unhealthy",
-    "Crafty",
-    "Silent",
-    "Brave",
-    "Quick",
-    "Gentle",
-    "Fierce",
-    "Calm",
-    "Bold",
-    "Swift",
-    "Bright",
-    "Dark",
-    "Light",
-    "Strong",
-    "Weak",
-    "Fast",
-    "Slow",
-    "Big",
-    "Small",
-    "Hot",
-    "Cold",
-    "Happy",
-    "Sad",
-    "Lucky",
-    "Smart",
-    "Wild",
-    "Tame",
-    "Rich",
-    "Poor",
+    "Legal", "Track", "Failing", "Unhealthy", "Crafty", "Silent", "Brave", "Quick", 
+    "Gentle", "Fierce", "Calm", "Bold", "Swift", "Bright", "Dark", "Light", 
+    "Strong", "Weak", "Fast", "Slow", "Big", "Small", "Hot", "Cold", 
+    "Happy", "Sad", "Lucky", "Smart", "Wild", "Tame", "Rich", "Poor"
   ]
 
   const nouns = [
-    "Craftsman",
-    "Tiger",
-    "Eagle",
-    "Mountain",
-    "River",
-    "Ocean",
-    "Forest",
-    "Desert",
-    "Castle",
-    "Bridge",
-    "Tower",
-    "Garden",
-    "Library",
-    "Museum",
-    "Theater",
-    "Stadium",
-    "Warrior",
-    "Knight",
-    "Wizard",
-    "Dragon",
-    "Phoenix",
-    "Lion",
-    "Wolf",
-    "Bear",
-    "Storm",
-    "Thunder",
-    "Lightning",
-    "Rainbow",
-    "Sunset",
-    "Sunrise",
-    "Moon",
-    "Star",
+    "Craftsman", "Tiger", "Eagle", "Mountain", "River", "Ocean", "Forest", "Desert", 
+    "Castle", "Bridge", "Tower", "Garden", "Library", "Museum", "Theater", "Stadium", 
+    "Warrior", "Knight", "Wizard", "Dragon", "Phoenix", "Lion", "Wolf", "Bear", 
+    "Storm", "Thunder", "Lightning", "Rainbow", "Sunset", "Sunrise", "Moon", "Star"
   ]
 
   // Load password history from localStorage on mount
@@ -250,37 +194,53 @@ const PasswordGenerator: React.FC = () => {
     }
   }
 
+  // Get strength bar colors
+  const getStrengthBars = (strength: string) => {
+    switch (strength) {
+      case "Weak":
+        return "bg-red-500"
+      case "Fair":
+        return "bg-orange-500"
+      case "Good":
+        return "bg-yellow-500"
+      case "Strong":
+        return "bg-green-500"
+      default:
+        return "bg-gray-300"
+    }
+  }
+
   if (!isModalOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="fixed inset-0" onClick={() => dispatch(closePasswordGenerator())} />
 
-      <div className="relative w-full max-w-2xl h-[90vh] overflow-hidden rounded-2xl border border-white/20 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl animate-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-2xl h-[90vh] overflow-hidden rounded-xl border border-gray-200/30 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-2xl animate-in zoom-in-95 duration-300">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-gray-700/50">
+        <div className="flex items-center justify-between p-5 border-b border-gray-200/50 dark:border-gray-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
-              <Key className="h-4 w-4 text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 shadow-md">
+              <Key className="h-5 w-5 text-white" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Password Generator</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Password Generator</h2>
           </div>
           <button
             onClick={() => dispatch(closePasswordGenerator())}
-            className="h-8 w-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors duration-200"
+            className="h-9 w-9 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors duration-200 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-4 space-y-4 max-h-[calc(90vh-120px)] overflow-y-auto">
+        <div className="p-5 space-y-5 max-h-[calc(90vh-120px)] overflow-y-auto">
           {/* Generated Password Display */}
-          <div className="space-y-3">
+          <div className="space-y-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 p-4 rounded-xl border border-blue-100 dark:border-gray-700">
             <div className="relative">
-              <div className="min-h-[60px] p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+              <div className="min-h-[70px] p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
                 <div className="text-center">
-                  <div className={`font-mono text-sm break-all ${showPassword ? "" : "filter blur-sm select-none"}`}>
+                  <div className={`font-mono text-lg break-all ${showPassword ? "" : "filter blur-md select-none"}`}>
                     {currentPassword || "Click generate to create password"}
                   </div>
                 </div>
@@ -289,59 +249,97 @@ const PasswordGenerator: React.FC = () => {
               {/* Password visibility toggle */}
               <button
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute top-2 right-2 p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors duration-200"
+                className="absolute top-3 right-3 p-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
 
             {/* Strength indicator */}
-            <div className="flex items-center justify-center gap-2">
-              <Check className={`h-4 w-4 ${getStrengthColor(passwordStrength)}`} />
-              <span className={`text-sm font-medium ${getStrengthColor(passwordStrength)}`}>{passwordStrength}</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4].map((bar) => (
+                    <div 
+                      key={bar} 
+                      className={`h-1.5 w-6 rounded-full transition-all duration-300 ${
+                        (passwordStrength === "Weak" && bar <= 1) ||
+                        (passwordStrength === "Fair" && bar <= 2) ||
+                        (passwordStrength === "Good" && bar <= 3) ||
+                        (passwordStrength === "Strong" && bar <= 4)
+                          ? getStrengthBars(passwordStrength) 
+                          : "bg-gray-200 dark:bg-gray-700"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className={`text-sm font-semibold ${getStrengthColor(passwordStrength)}`}>
+                  {passwordStrength} Password
+                </span>
+              </div>
             </div>
 
             {/* Action buttons */}
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <button
                 onClick={copyToClipboard}
-                className="flex-1 h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                className="flex-1 h-12 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
               >
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                {copied ? "Copied!" : "Copy"}
+                {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
+                {copied ? "Copied!" : "Copy Password"}
               </button>
               <button
                 onClick={generatePassword}
-                className="h-10 w-10 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg flex items-center justify-center transition-colors duration-200"
+                className="h-12 w-12 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow"
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className="h-5 w-5" />
               </button>
             </div>
           </div>
 
           {/* Password Type Selection */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
-            <select
-              value={passwordType}
-              onChange={(e) => {
-                setPasswordType(e.target.value as "memorable" | "random")
-                setTimeout(generatePassword, 100)
-              }}
-              className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white "
-            >
-              <option value="memorable">Memorable Password</option>
-              <option value="random">Random Password</option>
-            </select>
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Password Type</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => {
+                  setPasswordType("memorable")
+                  setTimeout(generatePassword, 100)
+                }}
+                className={`h-12 rounded-xl border transition-all duration-200 flex items-center justify-center gap-2 ${
+                  passwordType === "memorable" 
+                    ? "bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-300 shadow-sm" 
+                    : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                <Sparkles className="h-4 w-4" />
+                Memorable
+              </button>
+              <button
+                onClick={() => {
+                  setPasswordType("random")
+                  setTimeout(generatePassword, 100)
+                }}
+                className={`h-12 rounded-xl border transition-all duration-200 flex items-center justify-center gap-2 ${
+                  passwordType === "random" 
+                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 shadow-sm" 
+                    : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                <Key className="h-4 w-4" />
+                Random
+              </button>
+            </div>
           </div>
 
           {/* Memorable Password Options */}
           {passwordType === "memorable" && (
-            <div className="space-y-4">
+            <div className="space-y-4 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/10 dark:to-amber-900/10 p-4 rounded-xl border border-orange-100 dark:border-orange-900/20">
               {/* Word count slider */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{wordCount} words</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Word Count</label>
+                  <span className="text-sm font-semibold text-orange-600 dark:text-orange-400">{wordCount} words</span>
                 </div>
                 <input
                   type="range"
@@ -352,20 +350,24 @@ const PasswordGenerator: React.FC = () => {
                     setWordCount(Number.parseInt(e.target.value))
                     setTimeout(generatePassword, 100)
                   }}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                  className="w-full h-2 bg-orange-200 dark:bg-orange-800 rounded-full appearance-none cursor-pointer slider accent-orange-500"
                 />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
+                  <span>3</span>
+                  <span>8</span>
+                </div>
               </div>
 
               {/* Capitalize toggle */}
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Capitalize</label>
+              <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Capitalize Words</label>
                 <button
                   onClick={() => {
                     setCapitalize(!capitalize)
                     setTimeout(generatePassword, 100)
                   }}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-                    capitalize ? "bg-orange-600" : "bg-gray-300 dark:bg-gray-600"
+                    capitalize ? "bg-orange-500" : "bg-gray-300 dark:bg-gray-600"
                   }`}
                 >
                   <span
@@ -380,11 +382,12 @@ const PasswordGenerator: React.FC = () => {
 
           {/* Random Password Options */}
           {passwordType === "random" && (
-            <div className="space-y-4">
+            <div className="space-y-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/20">
               {/* Length slider */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Length: {length}</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Password Length</label>
+                  <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">{length} characters</span>
                 </div>
                 <input
                   type="range"
@@ -395,19 +398,23 @@ const PasswordGenerator: React.FC = () => {
                     setLength(Number.parseInt(e.target.value))
                     setTimeout(generatePassword, 100)
                   }}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                  className="w-full h-2 bg-blue-200 dark:bg-blue-800 rounded-full appearance-none cursor-pointer slider accent-blue-500"
                 />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
+                  <span>8</span>
+                  <span>50</span>
+                </div>
               </div>
 
               {/* Character options */}
-              <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: "Uppercase (A-Z)", state: includeUppercase, setter: setIncludeUppercase },
-                  { label: "Lowercase (a-z)", state: includeLowercase, setter: setIncludeLowercase },
-                  { label: "Numbers (0-9)", state: includeNumbersRandom, setter: setIncludeNumbersRandom },
-                  { label: "Symbols (!@#$%)", state: includeSymbols, setter: setIncludeSymbols },
+                  { label: "Uppercase", state: includeUppercase, setter: setIncludeUppercase },
+                  { label: "Lowercase", state: includeLowercase, setter: setIncludeLowercase },
+                  { label: "Numbers", state: includeNumbersRandom, setter: setIncludeNumbersRandom },
+                  { label: "Symbols", state: includeSymbols, setter: setIncludeSymbols },
                 ].map((option) => (
-                  <div key={option.label} className="flex items-center justify-between">
+                  <div key={option.label} className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{option.label}</label>
                     <button
                       onClick={() => {
@@ -415,7 +422,7 @@ const PasswordGenerator: React.FC = () => {
                         setTimeout(generatePassword, 100)
                       }}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-                        option.state ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
+                        option.state ? "bg-blue-500" : "bg-gray-300 dark:bg-gray-600"
                       }`}
                     >
                       <span
@@ -434,11 +441,11 @@ const PasswordGenerator: React.FC = () => {
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <button
               onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center justify-between w-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+              className="flex items-center justify-between w-full p-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Settings className="h-4 w-4" />
-                Advanced options
+                Advanced Options
               </div>
               <ChevronRight
                 className={`h-4 w-4 transition-transform duration-200 ${showAdvanced ? "rotate-90" : ""}`}
@@ -446,18 +453,18 @@ const PasswordGenerator: React.FC = () => {
             </button>
 
             {showAdvanced && (
-              <div className="mt-3 space-y-3">
+              <div className="mt-3 space-y-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
                 {passwordType === "memorable" && (
                   <>
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Include numbers</label>
+                    <div className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded-lg">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Include Numbers</label>
                       <button
                         onClick={() => {
                           setIncludeNumbers(!includeNumbers)
                           setTimeout(generatePassword, 100)
                         }}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-                          includeNumbers ? "bg-orange-600" : "bg-gray-300 dark:bg-gray-600"
+                          includeNumbers ? "bg-orange-500" : "bg-gray-300 dark:bg-gray-600"
                         }`}
                       >
                         <span
@@ -489,9 +496,9 @@ const PasswordGenerator: React.FC = () => {
                 )}
 
                 {passwordType === "random" && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded-lg">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Exclude similar characters
+                      Exclude Similar Characters
                     </label>
                     <button
                       onClick={() => {
@@ -499,7 +506,7 @@ const PasswordGenerator: React.FC = () => {
                         setTimeout(generatePassword, 100)
                       }}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-                        excludeSimilar ? "bg-orange-600" : "bg-gray-300 dark:bg-gray-600"
+                        excludeSimilar ? "bg-blue-500" : "bg-gray-300 dark:bg-gray-600"
                       }`}
                     >
                       <span
@@ -513,10 +520,10 @@ const PasswordGenerator: React.FC = () => {
 
                 <button
                   onClick={() => setShowAdvanced(false)}
-                  className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200"
+                  className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 flex items-center justify-center gap-1"
                 >
                   <X className="h-4 w-4" />
-                  Close advanced options
+                  Close Advanced Options
                 </button>
               </div>
             )}
@@ -524,12 +531,12 @@ const PasswordGenerator: React.FC = () => {
 
           {/* Password History */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-3">
               <button
                 onClick={() => setShowHistory(!showHistory)}
                 className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
               >
-                Password history
+                Password History
                 <ChevronRight
                   className={`h-4 w-4 transition-transform duration-200 ${showHistory ? "rotate-90" : ""}`}
                 />
@@ -537,9 +544,10 @@ const PasswordGenerator: React.FC = () => {
               {passwordHistory.length > 0 && (
                 <button
                   onClick={() => dispatch(clearPasswordHistory())}
-                  className="text-xs text-red-500 hover:text-red-700 transition-colors duration-200"
+                  className="text-xs text-red-500 hover:text-red-700 transition-colors duration-200 flex items-center gap-1"
                 >
-                  Clear all
+                  <Trash2 className="h-3 w-3" />
+                  Clear All
                 </button>
               )}
             </div>
@@ -552,7 +560,7 @@ const PasswordGenerator: React.FC = () => {
                   passwordHistory.map((entry) => (
                     <div
                       key={entry.id}
-                      className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                      className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-200"
                     >
                       <div
                         className="flex-1 min-w-0 cursor-pointer"
@@ -561,10 +569,12 @@ const PasswordGenerator: React.FC = () => {
                           dispatch(setPasswordStrength(entry.strength))
                         }}
                       >
-                        <div className="font-mono text-xs truncate">{entry.password}</div>
+                        <div className="font-mono text-sm truncate">{entry.password}</div>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-gray-500">{entry.type}</span>
-                          <span className={`text-xs ${getStrengthColor(entry.strength)}`}>{entry.strength}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{entry.type}</span>
+                          <span className={`text-xs font-medium ${getStrengthColor(entry.strength)}`}>
+                            {entry.strength}
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -573,18 +583,18 @@ const PasswordGenerator: React.FC = () => {
                             e.stopPropagation()
                             navigator.clipboard.writeText(entry.password)
                           }}
-                          className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors duration-200"
+                          className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200"
                         >
-                          <Copy className="h-3 w-3" />
+                          <Copy className="h-3.5 w-3.5" />
                         </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
                             dispatch(removeFromPasswordHistory(entry.id))
                           }}
-                          className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors duration-200 text-red-500"
+                          className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors duration-200 text-red-500"
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </div>
