@@ -37,6 +37,7 @@ const TaskList: React.FC<CommonTableProps> = ({
 }) => {
     // Safely handle undefined data
     const safeData = data || [];
+    console.log("safe data", safeData)
 
     const [pin, setPins] = useState(safeData.map(() => false));
     const [selected, setSelected] = useState(safeData.map(() => false));
@@ -45,7 +46,6 @@ const TaskList: React.FC<CommonTableProps> = ({
     const [dropdownPosition, setDropdownPosition] = useState<'above' | 'below'>('below');
     const [viewItem, setViewItem] = useState<TableItem | null>(null);
     const [editItem, setEditItem] = useState<TableItem | null>(null);
-
 
 
     // Ref for the dropdown menu
@@ -61,7 +61,7 @@ const TaskList: React.FC<CommonTableProps> = ({
     // Filter data based on selected type
     const filteredData = filterType === 'All Items'
         ? safeData
-        : safeData.filter(item => item.type === filterType);
+        : safeData.filter(item => item.type.toLowerCase() === filterType.toLowerCase());
 
     // Toggle pin for a specific item
     const togglePin = (index: number) => {
@@ -155,16 +155,16 @@ const TaskList: React.FC<CommonTableProps> = ({
     };
 
     // Handle bulk delete action
-  const handleBulkDelete = () => {
-  const selectedIds = safeData
-    .filter((_, index) => selected[index])
-    .map(item => item.id);
+    const handleBulkDelete = () => {
+        const selectedIds = safeData
+            .filter((_, index) => selected[index])
+            .map(item => item.id);
 
-  if (selectedIds.length > 0 && onBulkDelete) {
-    onBulkDelete(selectedIds);
-    setSelected(selected.map(() => false)); // clear selection after delete request
-  }
-};
+        if (selectedIds.length > 0 && onBulkDelete) {
+            onBulkDelete(selectedIds);
+            setSelected(selected.map(() => false)); // clear selection after delete request
+        }
+    };
 
     // Close dropdown if clicked outside
     const handleClickOutside = (e: MouseEvent) => {
@@ -256,13 +256,13 @@ const TaskList: React.FC<CommonTableProps> = ({
                                                         <th className='w-[23%]'>Title</th>
                                                         <th className='w-[23%]'>Type</th>
                                                         <th className='w-[10%]'>
-                                                          {someSelected || allSelected ? (
-  <button onClick={handleBulkDelete} className="flex items-center justify-center">
-    <FaTrash color="gray" />
-  </button>
-) : (
-  'Action'
-)}  
+                                                            {someSelected || allSelected ? (
+                                                                <button onClick={handleBulkDelete} className="flex items-center justify-center">
+                                                                    <FaTrash color="gray" />
+                                                                </button>
+                                                            ) : (
+                                                                'Action'
+                                                            )}
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -363,20 +363,14 @@ const TaskList: React.FC<CommonTableProps> = ({
                                 ✕
                             </button>
                         </div>
-
-                        {/* Conditionally render based on type */}
-                        {viewItem.type === 'Password' && (
-                            // <IdentityModalContent item={viewItem} />
-                            <>password</>
-                        )}
-                        {viewItem.type === 'Identity Card' && (
+                        {viewItem.type === 'identity' && (
                             <ViewIdentityModal item={viewItem} onClose={() => setViewItem(null)} />
                         )}
-                        {viewItem.type === 'Login' && (
+                        {viewItem.type === 'login' && (
                             <ViewLogInModal item={viewItem} onClose={() => setViewItem(null)} />
                         )}
 
-                        {viewItem.type === 'Card' && (
+                        {viewItem.type === 'card' && (
                             <ViewCardModal item={viewItem} onClose={() => setViewItem(null)} />
                         )}
                     </div>
@@ -389,23 +383,20 @@ const TaskList: React.FC<CommonTableProps> = ({
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
                         <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-lg font-semibold">Edit {editItem.type} Details</h2>
+                            <h2 className="text-lg font-semibold">Edit {editItem.type}  Details</h2>
                             <button onClick={() => setEditItem(null)} className="text-gray-500 hover:text-gray-800">
                                 ✕
                             </button>
                         </div>
 
                         {/* Conditionally render based on type */}
-                        {editItem.type === 'Password' && (
-                            <>Edit Password form</>
-                        )}
-                        {editItem.type === 'Identity Card' && (
+                        {editItem.type === 'identity' && (
                             <ViewIdentityModal item={editItem} onClose={() => setEditItem(null)} editMode />
                         )}
-                        {editItem.type === 'Login' && (
+                        {editItem.type === 'login' && (
                             <ViewLogInModal item={editItem} onClose={() => setEditItem(null)} editMode />
                         )}
-                        {editItem.type === 'Card' && (
+                        {editItem.type === 'card' && (
                             <ViewCardModal item={editItem} onClose={() => setEditItem(null)} editMode />
                         )}
                     </div>

@@ -26,9 +26,12 @@ import {
 } from "lucide-react"
 import VaultDropdown from "../Layouts/VaultDropdown"
 import { useVaults } from "@/useContext/VaultContext"
+import apiClient from "@/service/apiClient"
+import { fetchAlldata } from '../../store/Slices/TableSlice';
+import type { AppDispatch } from '@/store';
 
 const IdentityModalUIOnly = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const { vaults = [] } = useVaults()
   const {
     isModalOpen,
@@ -143,14 +146,21 @@ const IdentityModalUIOnly = () => {
       setWorkEmail(identity.workDetails?.workEmail || "")
       setWorkPhoneNumber(identity.workDetails?.workPhone || "")
       setDynamicFields(identity.dynamicFields || [])
-      
+
       if (identity.vaultKey && vaults.some(v => v.key === identity.vaultKey)) {
-       setSelectedTab(identity.vaultKey || (vaults[0]?.key ?? ""))
+        setSelectedTab(identity.vaultKey || (vaults[0]?.key ?? ""))
       }
     } else {
       resetForm()
     }
   }, [isEdit, identity, vaults])
+
+  const formatDateForBackend = (input: string) => {
+    if (!input) return null;
+    const [year, month, day] = input.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -162,61 +172,67 @@ const IdentityModalUIOnly = () => {
 
     setIsSubmitting(true)
 
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
     const selectedVault = vaults.find((v) => v.key === selectedTab) || vaults[0] || { key: "", name: "" }
 
+    // Map your form data to API fields
     const payload = {
-      title: title.trim(),
-      personalDetails: {
-        fullName,
-        email,
-        phoneNumber,
-        dateOfBirth,
-        gender,
-        nationality,
-      },
-      addressDetails: {
-        organization,
-        streetAddress,
-        zipCode,
-        city,
-        state,
-        country,
-      },
-      contactDetails: {
-        homePhone,
-        workPhone,
-        mobilePhone,
-        alternateEmail,
-        website,
-      },
-      workDetails: {
-        company,
-        jobTitle,
-        department,
-        workAddress,
-        workEmail,
-        workPhone: workPhoneNumber,
-      },
-      dynamicFields,
-      attachments: attachments.map((file) => file.name),
-      note,
+      title: title,
+      full_name: fullName || null,
+      email: email || null,
+      phone_number: phoneNumber || null,
+      dob: formatDateForBackend(dateOfBirth) || null,
+      organization: organization || null,
+      street_address: streetAddress || null,
+      po_box: null, // You can add this field if needed
+      zip_code: zipCode || null,
+      city: city || null,
+      state: state || null,
+      country: country || null,
+      home_phone: homePhone || null,
+      work_phone: workPhone || null,
+      mobile_phone: mobilePhone || null,
+      alt_phone: alternateEmail || null,
+      website: website || null,
+      company_name: company || null,
+      job_title: jobTitle || null,
+      department: department || null,
+      work_email: workEmail || null,
+      work_address: workAddress || null,
+      attachments: attachments.map(file => file.name) || [],
+      notes: note || null,
+      custom_sections: dynamicFields.reduce((acc, field) => {
+        acc[field.id] = { label: field.label, value: field.value, type: field.type, section: field.section }
+        return acc
+      }, {} as Record<string, any>),
+      is_personal: false,
+      is_pin: false,
+      is_trash: false,
+      // Add vault info if needed:
       vaultKey: selectedTab || selectedVault.key,
       vaultName: selectedVault?.name || "",
       vaultIcon: selectedVault?.icon || "",
       vaultColor: selectedVault?.color || "",
     }
 
-    if (isEdit && identity) {
-      dispatch(editIdentity({ id: identity.id, updates: payload }))
-    } else {
-      // dispatch(addIdentity(payload))
-    }
+    try {
+      const response = await apiClient.post("/api/identity/create", payload)
 
-    dispatch(closeIdentityModal())
-    resetForm()
+      if (!response) {
+        console.error("API error:")
+        setIsSubmitting(false)
+        return
+      }
+      const data = await response.data
+      console.log("Identity created:")
+      dispatch(closeIdentityModal())
+      resetForm()
+      dispatch(fetchAlldata());
+    } catch (error) {
+      console.error("Network or server error:", error)
+      setIsSubmitting(false)
+    }
   }
+
 
   const addDynamicField = (section: DynamicField["section"]) => {
     const newField: DynamicField = {
@@ -281,14 +297,14 @@ const IdentityModalUIOnly = () => {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <VaultDropdown
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
               vaults={vaults}
             />
-            
+
             <button
               onClick={() => dispatch(closeIdentityModal())}
               className="h-9 w-9 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors duration-200"
@@ -316,11 +332,10 @@ const IdentityModalUIOnly = () => {
                   setErrors({ ...errors, title: false })
                 }}
                 placeholder="Identity Title"
-                className={`w-full h-11 px-4 py-2 border rounded-xl text-sm bg-white dark:bg-gray-800 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.title
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
-                }`}
+                className={`w-full h-11 px-4 py-2 border rounded-xl text-sm bg-white dark:bg-gray-800 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                  }`}
               />
               {errors.title && (
                 <div className="flex items-center gap-2 text-sm text-red-600 mt-1">

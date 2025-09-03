@@ -13,13 +13,9 @@ export const filterConfig: Record<string, { label: string; icon: JSX.Element }> 
     label: 'Login',
     icon: <User size={16} color='red' />,
   },
-  'Identity Card': {
-    label: 'Identity Card',
+  'Identity': {
+    label: 'Identity',
     icon: <Shield size={16} />,
-  },
-  'Password': {
-    label: 'Password',
-    icon: <Lock size={16} />,
   },
   'Card': {
     label: 'Card',

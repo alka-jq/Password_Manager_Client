@@ -42,6 +42,7 @@ import tasksSlice from "./Slices/taskSlice"
 import cardSlice from "./Slices/cardSlice"
 import identitySlice from "./Slices/identitySlice"
 import passwordSlice from "./Slices/passwordSlice"
+import dataReducer from './Slices/TableSlice'
 
 
 
@@ -57,7 +58,7 @@ const rootReducer = combineReducers({
   card: cardSlice,
   identity: identitySlice,
   password: passwordSlice, // Added cardSlice to the root reducer
-  
+  data: dataReducer,  //for table data
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

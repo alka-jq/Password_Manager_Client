@@ -38,23 +38,23 @@ const Personal = () => {
     const [loading, setLoading] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
-    useEffect(() => {
-        const fetchData = async () => {
-            console.log('Personal data');
-            try {
-                setLoading(true);
-                const res = await getPersonaldata();
-                console.log('all data', res);
-                setItems(res.data);
-            } catch (err) {
-                console.log('backend error');
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         console.log('Personal data');
+    //         try {
+    //             setLoading(true);
+    //             const res = await getPersonaldata();
+    //             console.log('all data', res);
+    //             setItems(res.data);
+    //         } catch (err) {
+    //             console.log('backend error');
+    //             console.error(err);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+    //     fetchData();
+    // }, []);
 
     // Handler functions
    
@@ -102,7 +102,6 @@ const Personal = () => {
             {/* TaskList component */}
             <TaskList
                 data={items}
-                // filterOptions={['All Items', 'Login', 'Identity Card', 'Password']}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}
