@@ -216,7 +216,7 @@ const SidePanel = () => {
     }, [location.pathname, vaults]);
 
     const handleCreateVault = (vaultName: string, iconName: string, color: string) => {
-        const path = `/Cell/${vaultName.toLowerCase().replace(/\s+/g, '-')}`;
+        const path = `/vault/${vaultName.toLowerCase().replace(/\s+/g, '-')}`;
         const newVault: Vault = {
             id: Date.now().toString(),
             name: vaultName,
