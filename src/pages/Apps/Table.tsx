@@ -6,6 +6,8 @@ import ViewCardModal from './ViewCardModal';
 import ViewLogInModal from './ViewLogInModal';
 import ViewIdentityModal from './ViewIdentityModal';
 import FilterDropdown from './FilterDropdown';
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
 
 type TableItem = {
     id: string;
@@ -24,15 +26,13 @@ type CommonTableProps = {
 };
 const typeStyles: Record<string, string> = {
     login: 'text-blue-400 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
-    'identity card': 'text-green-400 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
+    identity: 'text-green-400 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
     card: 'text-orange-400 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
-    password: 'text-purple-400 bg-gradient-to-b from-purple-100 to-purple-50 border-purple-200',
     // add more types here if needed
 };
 const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDelete, onView, onClose, isLoading = false }) => {
     // Safely handle undefined data
     const safeData = data || [];
-    console.log("safe data", safeData)
 
     const [pin, setPins] = useState(safeData.map(() => false));
     const [selected, setSelected] = useState(safeData.map(() => false));
@@ -41,6 +41,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
     const [dropdownPosition, setDropdownPosition] = useState<'above' | 'below'>('below');
     const [viewItem, setViewItem] = useState<TableItem | null>(null);
     const [editItem, setEditItem] = useState<TableItem | null>(null);
+    const searchQuery = useSelector((state: RootState) => state.search.query.toLowerCase());
 
     // Ref for the dropdown menu
     const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -53,9 +54,11 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
     }, [safeData]);
 
     // Filter data based on selected type
-    const filteredData = filterType === 'All Items'
-        ? safeData
-        : safeData.filter(item => item.type.toLowerCase() === filterType.toLowerCase());
+    const filteredData = safeData
+        .filter(item =>
+            (filterType === 'All Items' || item.type.toLowerCase() === filterType.toLowerCase()) &&
+            (item.title.toLowerCase().includes(searchQuery)) // 🔍 Search filter
+        );
 
     // Toggle pin for a specific item
     const togglePin = (index: number) => {
@@ -201,7 +204,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                             {/* Table Container */}
                             <div className=" border-gray-300 overflow-hidden bg-white">
                                 {/* Table Header */}
-                                <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <div className="grid grid-cols-12 gap-4 px-6 py-3 border border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <div className="col-span-1 flex items-center">
                                         {safeData.length > 0 && (
                                             <input
@@ -232,31 +235,31 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
                                     <div className="col-span-2">Type</div>
 
-                                   <div className="col-span-2 flex justify-end items-center">
-    {(allSelected || someSelected) ? (
-        <button
-            className="text-gray-700 hover:text-red-600"
-            title="Delete Selected"
-            onClick={() => {
-                const selectedIds = safeData
-                    .filter((_, index) => selected[index])
-                    .map((item) => item.id);
+                                    <div className="col-span-2 flex justify-end items-center">
+                                        {(allSelected || someSelected) ? (
+                                            <button
+                                                className="text-gray-700 hover:text-red-600"
+                                                title="Delete Selected"
+                                                onClick={() => {
+                                                    const selectedIds = safeData
+                                                        .filter((_, index) => selected[index])
+                                                        .map((item) => item.id);
 
-                if (selectedIds.length > 0 && onBulkDelete) {
-                    onBulkDelete(selectedIds);
-                }
-            }}
-        >
-            <FaTrash size={16} />
-        </button>
-    ) : (
-        'Actions'
-    )}
-</div>
+                                                    if (selectedIds.length > 0 && onBulkDelete) {
+                                                        onBulkDelete(selectedIds);
+                                                    }
+                                                }}
+                                            >
+                                                <FaTrash size={16} />
+                                            </button>
+                                        ) : (
+                                            'Actions'
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Table Body */}
-                                <div className="divide-y divide-gray-200 overflow-y-auto max-h-[60vh]">
+                                <div className="divide-y divide-gray-200 overflow-y-auto max-h-[79vh]">
                                     {filteredData.map((item, index) => {
                                         const originalIndex = safeData.findIndex((d) => d.id === item.id);
                                         return (
@@ -288,11 +291,10 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
                                                 <div className="col-span-2 flex items-center">
                                                     <span
-                                                        className={`text-xs font-semibold px-3 py-1 rounded-full lowercase shadow-sm border ${
-                                                            typeStyles[item.type.toLowerCase()] || 'text-gray-600 bg-gray-100 border-gray-300'
-                                                        }`}
+                                                        className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm border ${typeStyles[item.type] || 'text-gray-600 bg-gray-100 border-gray-300'
+                                                            }`}
                                                     >
-                                                        {item.type.toLowerCase()}
+                                                        {item.type}
                                                     </span>
                                                 </div>
 
@@ -315,9 +317,8 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                                         {dropdownVisible === item.id && (
                                                             <div
                                                                 ref={dropdownRef}
-                                                                className={`absolute bg-white border border-gray-200 rounded-md shadow-md py-1 w-32 z-10 ${
-                                                                    dropdownPosition === 'above' ? 'bottom-full mb-1' : 'top-full mt-1'
-                                                                } right-0`}
+                                                                className={`absolute bg-white border border-gray-200 rounded-md shadow-md py-1 w-32 z-10 ${dropdownPosition === 'above' ? 'bottom-full mb-1' : 'top-full mt-1'
+                                                                    } right-0`}
                                                             >
                                                                 <button
                                                                     className="w-full px-4 py-2 text-left flex items-center space-x-2 text-sm text-gray-700 hover:bg-gray-100"

@@ -20,11 +20,14 @@ import {
 } from "lucide-react";
 import { useVaults } from "@/useContext/VaultContext";
 import VaultDropdown from "../Layouts/VaultDropdown";
+import { addLoginCredentials } from "@/service/TableDataService";
+import { fetchAlldata } from '../../store/Slices/TableSlice';
+import type { AppDispatch } from '@/store';
 
 const TaskModalUIOnly = () => {
   const { vaults: rawVaults } = useVaults();
   const vaults = rawVaults ?? [];
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>()
   const { isModalOpen, modalMode, editTask: task } = useSelector(
     (state: RootState) => state.task
   );
@@ -111,28 +114,59 @@ const TaskModalUIOnly = () => {
     try {
       const selectedVault = vaults.find((v) => v.key === selectedTab);
 
-      const payload = {
-        title: title.trim(),
-        email,
-        password,
-        totp,
-        websites: websites.filter((website) => website.trim() !== ""),
-        note,
-        attachments,
-        vaultKey: selectedTab,
-        vaultName: selectedTab === "" ? "Personal" : selectedVault?.name || "",
-        vaultIcon: selectedVault?.icon || "",
-        vaultColor: selectedVault?.color || "",
-      };
+      const formData = new FormData();
 
-      if (isEdit && task) {
-        dispatch(editTask({ id: task.id, updates: payload }));
-      } else {
-        dispatch(addTask(payload));
+      formData.append("title", title.trim());
+
+      if (attachments.length > 0) {
+        formData.append("attachment", attachments[0]); // API supports only 1 file
       }
 
+      if (email.trim()) {
+        formData.append("email", email.trim());
+      } else {
+        formData.append("username", email.trim()); // fallback to username if email is empty
+      }
+
+      formData.append("two_factor_secret", totp || "");
+      formData.append("password", password || "");
+      formData.append("websites", websites.filter(w => w.trim()).join(","));
+      formData.append("notes", note || "");
+
+      // Replace this with real cell/vault ID — assuming it's selectedTab
+      formData.append("cell_id", selectedTab || ""); // Provide default or handle null
+
+      const token = localStorage.getItem("token"); // Get token however your app stores it
+
+      if (!token) {
+        throw new Error("User token not found");
+      }
+
+      const response = await addLoginCredentials(formData, token);
+
+      console.log("Credential added:", response);
+
+      // You can optionally update Redux here:
+      // dispatch(addTask({
+      //   title,
+      //   email,
+      //   password,
+      //   totp,
+      //   websites,
+      //   note,
+      //   // vaultKey: selectedTab,
+      //   // vaultName: selectedTab === "" ? "Personal" : selectedVault?.name || "",
+      //   // vaultIcon: selectedVault?.icon || "",
+      //   // vaultColor: selectedVault?.color || "",
+      // }));
+
       dispatch(closeModal());
+      dispatch(fetchAlldata());
       resetForm();
+
+    } catch (error) {
+      console.error("Error adding credential:", error);
+      alert("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -201,7 +235,7 @@ const TaskModalUIOnly = () => {
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <FileText className="h-4 w-4 text-gray-500" />
-                Title Nishan
+                Title
                 <span className="text-xs text-red-500 ml-1">*</span>
               </label>
               <input
@@ -213,11 +247,10 @@ const TaskModalUIOnly = () => {
                   setErrors({ ...errors, title: false });
                 }}
                 placeholder="e.g., Gmail, GitHub..."
-                className={`w-full h-11 px-3.5 py-2.5 border rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.title
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-                }`}
+                className={`w-full h-11 px-3.5 py-2.5 border rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                  }`}
               />
               {errors.title && (
                 <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 mt-1">

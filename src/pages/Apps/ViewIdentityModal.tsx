@@ -11,6 +11,10 @@ import {
     Trash2,
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
+import { useDispatch, useSelector } from "react-redux"
+import { fetchAlldata } from '../../store/Slices/TableSlice';
+import type { AppDispatch } from '@/store';
+
 
 // ----------------------
 // Types
@@ -33,6 +37,7 @@ type Props = {
 // ----------------------
 
 const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
+    const dispatch = useDispatch<AppDispatch>()
     const modalRef = useRef<HTMLDivElement>(null);
     const [details, setDetails] = useState<any>(null);
     const [isOpen, setIsOpen] = useState(true);
@@ -120,11 +125,55 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [onClose]);
 
-    const handleSave = () => {
-        console.log('Saving item:', details);
-        // Implement your API save logic here
-        onClose();
+    const handleSave = async () => {
+        if (!details?.id) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            // Prepare the payload as needed by your API
+            const payload = {
+                title: details.title,
+                full_name: details.personalDetails.fullName,
+                dob: details.personalDetails.dateOfBirth,
+                street_address: details.addressDetails.street,
+                po_box: details.addressDetails.poBox,
+                zip_code: details.addressDetails.zip,
+                city: details.addressDetails.city,
+                state: details.addressDetails.state,
+                country: details.addressDetails.country,
+                email: details.contactDetails.email,
+                phone_number: details.contactDetails.phone,
+                alt_phone: details.contactDetails.altPhone,
+                home_phone: details.contactDetails.homePhone,
+                mobile_phone: details.contactDetails.mobilePhone,
+                work_phone: details.contactDetails.workPhone,
+                website: details.contactDetails.website,
+                company_name: details.workDetails.company,
+                job_title: details.workDetails.position,
+                department: details.workDetails.department,
+                work_email: details.workDetails.workEmail,
+                work_address: details.workDetails.workAddress,
+                custom_sections: details.dynamicFields,
+                attachments: details.attachments,
+                notes: details.notes,
+            };
+
+            // Make PUT request
+            await apiClient.put(`/api/identity/edit/${details.id}`, payload);
+
+            // Close modal or give feedback on success
+            onClose();
+            dispatch(fetchAlldata());
+        } catch (err: any) {
+            console.error("Failed to save identity:", err);
+            setError("Failed to save identity.");
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     const handleRemoveAttachment = (index: number) => {
         setDetails((prev: any) => {
@@ -157,7 +206,23 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                 {/* Header */}
                 <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
                     <h2 className="text-lg font-bold flex items-center gap-2 text-gray-800 dark:text-white">
-                        <User className="w-5 h-5" /> {details?.title || 'Untitled'}
+                        <User className="w-5 h-5" />
+                        {editMode ? (
+                            <input
+                                type="text"
+                                value={details?.title || ''}
+                                onChange={(e) =>
+                                    setDetails((prev: any) => ({
+                                        ...prev,
+                                        title: e.target.value,
+                                    }))
+                                }
+                                className="border-b border-gray-400 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 text-lg font-bold"
+                                autoFocus
+                            />
+                        ) : (
+                            details?.title || 'Untitled'
+                        )}
                     </h2>
                     <button onClick={onClose}>
                         <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />

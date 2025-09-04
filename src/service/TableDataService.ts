@@ -54,3 +54,23 @@ export const softDeleteItems = async (ids: string[]) => {
 
     return response.data;
 };
+
+// / Post API Call For Add Login Credentials
+
+export const addLoginCredentials = async (formData: FormData, token: string) => {
+    try {
+        const response = await apiClient.post(
+            '/api/login-credentials/add',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Failed to add login credentials:', error);
+        throw new Error('Failed to add login credentials');
+    }
+};

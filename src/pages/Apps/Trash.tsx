@@ -3,6 +3,8 @@ import { LuTrash2 } from "react-icons/lu";
 import { LuPin, LuPinOff } from 'react-icons/lu';
 import { getTrashdata } from '@/service/TableDataService';
 import { MdOutlineRestore } from "react-icons/md";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
 
 type TableItem = {
   id: string;
@@ -14,6 +16,17 @@ const TrashList: React.FC = () => {
   const [data, setData] = useState<TableItem[]>([]);
   const [selected, setSelected] = useState<boolean[]>([]);
   const [pins, setPins] = useState<boolean[]>([]);
+  const searchQuery = useSelector((state: RootState) => state.search.query.toLowerCase());
+
+  const filteredData = data
+    .filter(item =>
+      (item.title.toLowerCase().includes(searchQuery)) // 🔍 Search filter
+    );
+
+
+
+
+
 
 
   // Fetch trash items from API
@@ -32,7 +45,7 @@ const TrashList: React.FC = () => {
     };
 
     fetchTrashItems();
-  }, []); 
+  }, []);
 
 
 
@@ -91,7 +104,7 @@ const TrashList: React.FC = () => {
     }
   };
 
- 
+
 
 
 
@@ -141,7 +154,7 @@ const TrashList: React.FC = () => {
           <div className='overflow-y-auto h-[84vh]'>
             <table className='w-full'>
               <tbody>
-                {data.map((item, index) => (
+                {filteredData.map((item, index) => (
                   <tr
                     key={item.id}
                     className='flex justify-between px-4 py-2 bg-white hover:bg-gray-50 border-b'
@@ -164,7 +177,7 @@ const TrashList: React.FC = () => {
                       <button onClick={() => handleRestore(item.id)} title='Restore'>
                         <MdOutlineRestore />
                       </button>
-                  
+
                       <button
                         onClick={() => handlePermanentDelete(item.id)}
                       >

@@ -9,17 +9,17 @@ type Item = {
 };
 
 const Pin = () => {
-    const dummyData = [
-        { id: '1', title: 'This is Pin', type: 'Login' },
-        { id: '2', title: 'Office ID Card', type: 'Identity Card' },
-        { id: '3', title: 'Bank Password', type: 'Password' },
-        { id: '4', title: 'Social Media Account', type: 'Login' },
-        { id: '5', title: 'University ID', type: 'Identity Card' },
-        { id: '6', title: 'WiFi Password', type: 'Password' },
-    ];
+    // const dummyData = [
+    //     { id: '1', title: 'This is Pin', type: 'Login' },
+    //     { id: '2', title: 'Office ID Card', type: 'Identity Card' },
+    //     { id: '3', title: 'Bank Password', type: 'Password' },
+    //     { id: '4', title: 'Social Media Account', type: 'Login' },
+    //     { id: '5', title: 'University ID', type: 'Identity Card' },
+    //     { id: '6', title: 'WiFi Password', type: 'Password' },
+    // ];
 
-    const [items, setItems] = useState(dummyData);
-    // const [items, setItems] = useState<Item[]>([]);
+    // const [items, setItems] = useState(dummyData);
+    const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
@@ -83,7 +83,6 @@ const Pin = () => {
         <div>
             <TaskList
                 data={items}
-                // filterOptions={['All Items', 'Login', 'Identity Card', 'Password']}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}
