@@ -258,7 +258,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                 </div>
 
                                 {/* Table Body */}
-                                <div className="divide-y divide-gray-200 overflow-y-auto max-h-[79vh]">
+                                <div className="divide-y divide-gray-200 overflow-y-auto h-[79vh]">
                                     {filteredData.map((item, index) => {
                                         const originalIndex = safeData.findIndex((d) => d.id === item.id);
                                         return (

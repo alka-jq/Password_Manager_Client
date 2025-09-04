@@ -44,7 +44,8 @@ import identitySlice from "./Slices/identitySlice"
 import passwordSlice from "./Slices/passwordSlice"
 import dataReducer from './Slices/TableSlice'
 import searchReducer from './Slices/searchSlice'
-
+import cellReducer from './Slices/cellSlice'
+import countReducer from './Slices/countSlice';
 
 const persistConfig = {
   key: "root",
@@ -60,6 +61,8 @@ const rootReducer = combineReducers({
   password: passwordSlice, // Added cardSlice to the root reducer
   data: dataReducer,  //for table data
   search: searchReducer,
+  cells: cellReducer,
+  count: countReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

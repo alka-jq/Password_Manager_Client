@@ -24,7 +24,6 @@ import { HiDotsVertical } from 'react-icons/hi';
 import { GoPencil } from 'react-icons/go';
 
 import { FiUserPlus, FiLogIn } from 'react-icons/fi';
-import { getCardCountsByTab } from '@/store/selectors/cardSelectors';
 import { openAddModal as openCardAddModal } from '@/store/Slices/cardSlice';
 import {
     Home,
@@ -61,6 +60,24 @@ import { openAddModal as openIdentityAddModal } from '@/store/Slices/identitySli
 import { openPasswordGenerator } from '@/store/Slices/passwordSlice';
 import PasswordGenerator from '@/components/FormType/passwordgenerator';
 import { useVaults } from '@/useContext/VaultContext';
+// import { getCount } from '@/service/TableDataService';
+import type { RootState } from "@/store"
+import { fetchItemCount } from '@/store/Slices/countSlice';
+import type { AppDispatch } from '@/store';
+
+
+interface CountState {
+    count: {
+        all_items_count: number;
+        personal_count: number;
+        pin_count: number;
+        trash_count: number;
+    } | null;
+    loading: boolean;
+    error: string | null;
+}
+
+
 
 interface Vault {
     id: string;
@@ -144,10 +161,12 @@ const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose, items }) => 
 const SidePanel = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>()
     const { menuBarOpen, setMenuBarOpen } = useAuth();
     const [isEdit, setIsEdit] = useState(false);
-    const counts = useSelector(getCombinedItemCountsByTab);
+
+    const { count, loading, error } = useSelector((state: RootState) => state.count);
+    console.log("check ount", count)
     const [selectedTab, setSelectedTab] = useState(() => {
         return localStorage.getItem('selectedTab') || 'inbox';
     });
@@ -255,12 +274,12 @@ const SidePanel = () => {
             vaults.map((v) =>
                 v.id === vaultId
                     ? {
-                          ...v,
-                          name,
-                          icon,
-                          color,
-                          path: `/vault/${name.toLowerCase().replace(/\s+/g, '-')}`,
-                      }
+                        ...v,
+                        name,
+                        icon,
+                        color,
+                        path: `/vault/${name.toLowerCase().replace(/\s+/g, '-')}`,
+                    }
                     : v
             )
         );
@@ -301,17 +320,22 @@ const SidePanel = () => {
         }
     };
 
+
     useEffect(() => {
         localStorage.setItem(VAULTS_STORAGE_KEY, JSON.stringify(vaults));
     }, [vaults]);
 
-    const tabs = [
-        { label: 'All Items', path: '/all_items', icon: MdMoveToInbox, key: 'inbox', count: counts.inbox },
-        { label: 'Personal', path: '/personal', icon: CircleUserRound, key: 'done', count: counts.done },
-        { label: 'Pin', path: '/pin', icon: Pin, key: 'important', count: counts.important },
-        { label: 'Trash', path: '/trash', icon: RiDeleteBinLine, key: 'trash', count: counts.trash },
-    ];
 
+    useEffect(() => {
+        dispatch(fetchItemCount());
+    }, [dispatch]);
+
+    const tabs = [
+        { label: 'All Items', path: '/all_items', icon: MdMoveToInbox, key: 'inbox', count: count?.all_items_count || 0, },
+        { label: 'Personal', path: '/personal', icon: CircleUserRound, key: 'done', count: count?.personal_count || 0, },
+        { label: 'Pin', path: '/pin', icon: Pin, key: 'important', count: count?.pin_count || 0 },
+        { label: 'Trash', path: '/trash', icon: RiDeleteBinLine, key: 'trash', count: count?.trash_count || 0, },
+    ];
     const baseClasses =
         'mb-0.5 w-full flex justify-between blue:hover:text-white blue:text-black blue:hover:bg-[#4e96ca59] items-center px-3 py-2 rounded-md font-medium ' +
         'classic:hover:bg-[#a8c7fa] classic:hover:text-black ' +
@@ -382,9 +406,8 @@ const SidePanel = () => {
             <div className="lg:flex lg:relative h-full text-[#fff] lightmint:bg-[#629e7c]">
                 <div className={`overlay bg-black/60 z-[5] w-full h-full fixed inset-0 xl:!hidden ${menuBarOpen ? 'block' : 'hidden'}`} onClick={() => setMenuBarOpen(false)}></div>
                 <div
-                    className={`  lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${
-                        menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtr:right-0' : ''
-                    }`}
+                    className={`  lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtr:right-0' : ''
+                        }`}
                 >
                     <div className="lightmint:bg-[#629e7c]">
                         <div className="py-3 px-5 blue:bg-[#64b5f6]">
@@ -459,9 +482,8 @@ const SidePanel = () => {
                                                 <div key={vault.id} className="relative group">
                                                     <Tippy content={vault.name} placement="right">
                                                         <div
-                                                            className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${
-                                                                selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''
-                                                            }`}
+                                                            className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''
+                                                                }`}
                                                             onClick={() => handleVaultClick(vault)}
                                                         >
                                                             {/* Left Icon and Name */}
@@ -486,9 +508,8 @@ const SidePanel = () => {
                                                                                             e.stopPropagation();
                                                                                             handleEditVault(vault);
                                                                                         }}
-                                                                                        className={`${
-                                                                                            active ? 'bg-gray-100 dark:bg-gray-700' : ''
-                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium`}
+                                                                                        className={`${active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                                                                            } flex items-center w-full px-4 py-2 text-sm font-medium`}
                                                                                     >
                                                                                         <GoPencil className="mr-2 w-4 h-4" />
                                                                                         Edit Cell
@@ -503,9 +524,8 @@ const SidePanel = () => {
                                                                                             e.stopPropagation();
                                                                                             handleShareVault(vault);
                                                                                         }}
-                                                                                        className={`${
-                                                                                            active ? 'bg-gray-100 dark:bg-gray-700' : ''
-                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium`}
+                                                                                        className={`${active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                                                                            } flex items-center w-full px-4 py-2 text-sm font-medium`}
                                                                                     >
                                                                                         <FiUserPlus className="mr-2 w-4 h-4" />
                                                                                         Share Cell
@@ -520,9 +540,8 @@ const SidePanel = () => {
                                                                                             e.stopPropagation();
                                                                                             handleDeleteClick(vault);
                                                                                         }}
-                                                                                        className={`${
-                                                                                            active ? 'bg-red-100 dark:bg-red-900/30' : ''
-                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`}
+                                                                                        className={`${active ? 'bg-red-100 dark:bg-red-900/30' : ''
+                                                                                            } flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`}
                                                                                     >
                                                                                         <FaRegTrashAlt className="mr-2 w-4 h-4" />
                                                                                         Delete Cell
@@ -540,8 +559,8 @@ const SidePanel = () => {
                                         </div>
                                     )}
                                 </div>
-                                    
-                                         <DeleteConfirmationModal
+
+                                <DeleteConfirmationModal
                                     open={deleteModalOpen}
                                     onClose={handleCancelDelete}
                                     onConfirm={handleConfirmDelete}
@@ -571,7 +590,7 @@ const SidePanel = () => {
                 </div>
             </div>
 
-     
+
         </>
     );
 };

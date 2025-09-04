@@ -4,6 +4,8 @@ import { LuPin, LuPinOff } from 'react-icons/lu';
 import { MdOutlineRestore } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
+import { fetchItemCount } from '@/store/Slices/countSlice';
+
 
 import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
 import { bulkDeletePasswords, deletePasswordById, getTrashdata } from '@/service/TableDataService';
@@ -15,25 +17,12 @@ type TableItem = {
 
 const typeStyles: Record<string, string> = {
   login: 'text-blue-600 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
-  'identity card': 'text-green-600 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
+  identity: 'text-green-600 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
   card: 'text-orange-600 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
-  password: 'text-purple-600 bg-gradient-to-b from-purple-100 to-purple-50 border-purple-200',
-  // add more types here if needed
 };
 
 const TrashList: React.FC = () => {
-  // Dummy data
-  // const dummyData = [
-  //   { id: '1', title: 'Email Login', type: 'Login' },
-  //   { id: '2', title: 'Office ID Card', type: 'Identity Card' },
-  //   { id: '3', title: 'Bank Password', type: 'Password' },
-  //   { id: '4', title: 'Social Media Account', type: 'Login' },
-  //   { id: '5', title: 'University ID', type: 'Identity Card' },
-  //   { id: '6', title: 'WiFi Password', type: 'Password' },
-  //   { id: '7', title: 'WiFi Password', type: 'Card' }
-  // ];
-
-  // const [data, setData] = useState(dummyData);
+  const dispatch = useDispatch<AppDispatch>()
   const [data, setData] = useState<TableItem[]>([]);
   const [selected, setSelected] = useState<boolean[]>([]);
   const [pins, setPins] = useState<boolean[]>([]);
@@ -133,6 +122,7 @@ const TrashList: React.FC = () => {
       setSelected(prevSelected =>
         prevSelected.filter((_, index) => !deleteTargetIds.includes(data[index]?.id))
       );
+      dispatch(fetchItemCount());
     } catch (error) {
       console.error('Error during permanent delete:', error);
       alert('Failed to delete. Please try again.');
@@ -141,7 +131,6 @@ const TrashList: React.FC = () => {
       setShowDeleteModal(false);
     }
   };
-
 
   return (
     <div className="">

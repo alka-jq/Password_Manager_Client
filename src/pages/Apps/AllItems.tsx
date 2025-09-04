@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import { softDeleteItems } from '@/service/TableDataService';
+import { fetchItemCount } from '@/store/Slices/countSlice';
 
 const AllItems = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,6 +31,7 @@ const AllItems = () => {
       setDeleteModalOpen(false);
       setIdsToDelete([]);
       dispatch(fetchAlldata());
+      dispatch(fetchItemCount());
     } catch (error) {
       console.error('Soft delete failed:', error);
     }
