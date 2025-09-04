@@ -9,12 +9,14 @@ import {
     Paperclip,
     LinkIcon,
     Trash2,
+    Save,
+    Edit3,
+    Eye
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
-
 
 // ----------------------
 // Types
@@ -43,6 +45,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
     const [isOpen, setIsOpen] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState(!editMode);
 
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
         personal: true,
@@ -174,7 +177,6 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
         }
     };
 
-
     const handleRemoveAttachment = (index: number) => {
         setDetails((prev: any) => {
             if (!prev) return prev;
@@ -195,50 +197,88 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
         }
     };
 
+    const toggleViewMode = () => {
+        setViewMode(!viewMode);
+    };
+
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/60 flex justify-center items-center">
+        <div className="fixed inset-0 z-50 bg-black/60 flex justify-center items-center p-4">
             <div
                 ref={modalRef}
-                className="bg-white dark:bg-[#1e1f24] rounded-xl shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto"
+                className="bg-white dark:bg-[#1e1f24] rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             >
                 {/* Header */}
-                <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-                    <h2 className="text-lg font-bold flex items-center gap-2 text-gray-800 dark:text-white">
-                        <User className="w-5 h-5" />
-                        {editMode ? (
-                            <input
-                                type="text"
-                                value={details?.title || ''}
-                                onChange={(e) =>
-                                    setDetails((prev: any) => ({
-                                        ...prev,
-                                        title: e.target.value,
-                                    }))
-                                }
-                                className="border-b border-gray-400 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 text-lg font-bold"
-                                autoFocus
-                            />
-                        ) : (
-                            details?.title || 'Untitled'
-                        )}
-                    </h2>
-                    <button onClick={onClose}>
-                        <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                    </button>
+                <div className="flex justify-between items-center p-6 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-xl">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                            <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                            {viewMode ? (
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                                    {details?.title || 'Untitled'}
+                                </h2>
+                            ) : (
+                                <input
+                                    type="text"
+                                    value={details?.title || ''}
+                                    onChange={(e) =>
+                                        setDetails((prev: any) => ({
+                                            ...prev,
+                                            title: e.target.value,
+                                        }))
+                                    }
+                                    className="text-xl font-bold bg-transparent border-b-2 border-blue-500 focus:outline-none focus:border-blue-600 text-gray-800 dark:text-white"
+                                    autoFocus
+                                    placeholder="Enter title"
+                                />
+                            )}
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                Last updated: {details?.updatedAt ? new Date(details.updatedAt).toLocaleDateString() : 'N/A'}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={toggleViewMode}
+                            className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                            title={viewMode ? "Edit" : "Preview"}
+                        >
+                            {viewMode ? (
+                                <Edit3 className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                            ) : (
+                                <Eye className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                            )}
+                        </button>
+                        <button 
+                            onClick={onClose}
+                            className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                        >
+                            <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Body */}
-                <div className="p-4 space-y-4 text-sm">
+                <div className="p-6 space-y-6">
+                    {error && (
+                        <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm">
+                            {error}
+                        </div>
+                    )}
+
                     {/* Personal Details */}
                     <Section
                         title="Personal Details"
                         icon={<User className="w-4 h-4" />}
                         expanded={expandedSections.personal}
-                        onToggle={() => toggleSection('personal')}
+                        onToggle={() => setExpandedSections(prev => ({...prev, personal: !prev.personal}))}
+                        viewMode={viewMode}
                     >
-                        {renderFields(details?.personalDetails, 'personalDetails')}
+                        {renderFields(details?.personalDetails, 'personalDetails', viewMode)}
                     </Section>
 
                     {/* Address Details */}
@@ -246,9 +286,10 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                         title="Address Details"
                         icon={<MapPin className="w-4 h-4" />}
                         expanded={expandedSections.address}
-                        onToggle={() => toggleSection('address')}
+                        onToggle={() => setExpandedSections(prev => ({...prev, address: !prev.address}))}
+                        viewMode={viewMode}
                     >
-                        {renderFields(details?.addressDetails, 'addressDetails')}
+                        {renderFields(details?.addressDetails, 'addressDetails', viewMode)}
                     </Section>
 
                     {/* Contact Details */}
@@ -256,9 +297,10 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                         title="Contact Details"
                         icon={<Phone className="w-4 h-4" />}
                         expanded={expandedSections.contact}
-                        onToggle={() => toggleSection('contact')}
+                        onToggle={() => setExpandedSections(prev => ({...prev, contact: !prev.contact}))}
+                        viewMode={viewMode}
                     >
-                        {renderFields(details?.contactDetails, 'contactDetails')}
+                        {renderFields(details?.contactDetails, 'contactDetails', viewMode)}
                     </Section>
 
                     {/* Work Details */}
@@ -266,9 +308,10 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                         title="Work Details"
                         icon={<Briefcase className="w-4 h-4" />}
                         expanded={expandedSections.work}
-                        onToggle={() => toggleSection('work')}
+                        onToggle={() => setExpandedSections(prev => ({...prev, work: !prev.work}))}
+                        viewMode={viewMode}
                     >
-                        {renderFields(details?.workDetails, 'workDetails')}
+                        {renderFields(details?.workDetails, 'workDetails', viewMode)}
                     </Section>
 
                     {/* Dynamic Fields */}
@@ -277,14 +320,15 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                             title="Additional Fields"
                             icon={<Info className="w-4 h-4" />}
                             expanded={expandedSections.additional}
-                            onToggle={() => toggleSection('additional')}
+                            onToggle={() => setExpandedSections(prev => ({...prev, additional: !prev.additional}))}
+                            viewMode={viewMode}
                         >
                             {details.dynamicFields.map((field: any, idx: number) => (
                                 <Field
                                     key={idx}
                                     label={field.id}
                                     value={field.value}
-                                    editMode={editMode}
+                                    viewMode={viewMode}
                                     onChange={(newVal) =>
                                         setDetails((prev: any) => {
                                             const newFields = [...prev.dynamicFields];
@@ -303,21 +347,22 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                             title={`Attachments (${details.attachments.length})`}
                             icon={<Paperclip className="w-4 h-4" />}
                             expanded={expandedSections.attachments}
-                            onToggle={() => toggleSection('attachments')}
+                            onToggle={() => setExpandedSections(prev => ({...prev, attachments: !prev.attachments}))}
+                            viewMode={viewMode}
                         >
                             {details.attachments.map((file: string, idx: number) => (
                                 <div
                                     key={idx}
-                                    className="flex items-center justify-between text-xs text-blue-600 hover:underline"
+                                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                 >
-                                    <div className="flex items-center gap-2">
-                                        <LinkIcon className="w-3 h-3" />
-                                        {file}
+                                    <div className="flex items-center gap-3 text-blue-600 dark:text-blue-400">
+                                        <Paperclip className="w-4 h-4" />
+                                        <span className="text-sm">{file}</span>
                                     </div>
-                                    {editMode && (
+                                    {!viewMode && (
                                         <button
                                             onClick={() => handleRemoveAttachment(idx)}
-                                            className="text-red-600 hover:text-red-800 p-1 rounded-md"
+                                            className="p-1 text-red-600 hover:text-red-800 dark:hover:text-red-400 rounded-md transition-colors"
                                             title="Remove attachment"
                                         >
                                             <Trash2 className="w-4 h-4" />
@@ -327,16 +372,19 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                             ))}
 
                             {/* Add Attachment Input (visible in editMode) */}
-                            {editMode && (
-                                <div className="mt-3">
-                                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                        Add Attachment
+                            {!viewMode && (
+                                <div className="mt-4">
+                                    <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
+                                        <Paperclip className="w-5 h-5 text-gray-400 mb-2" />
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                                            Click to add attachments or drag and drop
+                                        </span>
+                                        <input
+                                            type="file"
+                                            onChange={handleAddAttachment}
+                                            className="hidden"
+                                        />
                                     </label>
-                                    <input
-                                        type="file"
-                                        onChange={handleAddAttachment}
-                                        className="block w-full text-xs text-gray-700 dark:text-white file:mr-3 file:py-1 file:px-2 file:rounded file:border file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                    />
                                 </div>
                             )}
                         </Section>
@@ -345,43 +393,43 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t text-xs text-gray-500 dark:text-gray-400 dark:border-gray-700 flex justify-between items-center">
-                    <div>Last updated: {new Date(details?.updatedAt).toLocaleDateString()}</div>
-                    <div className="flex gap-2">
-                        {editMode && (
+                {!viewMode && (
+                    <div className="p-6 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-b-xl">
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={onClose}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                                disabled={loading}
+                            >
+                                Cancel
+                            </button>
                             <button
                                 onClick={handleSave}
-                                className="px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded-md"
+                                disabled={loading}
+                                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
                             >
-                                Save
+                                {loading ? (
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                ) : (
+                                    <Save className="w-4 h-4" />
+                                )}
+                                Save Changes
                             </button>
-                        )}
-                        <button
-                            onClick={onClose}
-                            className="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-                        >
-                            Close
-                        </button>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
 
     // ----------------------
-    // Helpers
+    // Helper Functions
     // ----------------------
-
-    function toggleSection(key: string) {
-        setExpandedSections((prev) => ({
-            ...prev,
-            [key]: !prev[key],
-        }));
-    }
 
     function renderFields(
         obj?: Record<string, string>,
-        sectionKey?: string
+        sectionKey?: string,
+        viewMode?: boolean
     ) {
         if (!obj) return null;
         return Object.entries(obj).map(([key, value], index) => (
@@ -389,7 +437,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                 key={index}
                 label={key}
                 value={value}
-                editMode={editMode}
+                viewMode={viewMode}
                 onChange={(newVal) =>
                     setDetails((prev: any) => ({
                         ...prev,
@@ -414,28 +462,32 @@ function Section({
     icon,
     expanded,
     onToggle,
+    viewMode,
 }: {
     title: string;
     children: React.ReactNode;
     icon: React.ReactNode;
     expanded: boolean;
     onToggle: () => void;
+    viewMode?: boolean;
 }) {
     const hasContent = React.Children.count(children) > 0;
 
     return (
-        <div className="border rounded-md dark:border-gray-700">
+        <div className="border rounded-lg dark:border-gray-700 overflow-hidden">
             <button
                 onClick={onToggle}
-                className="w-full flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="w-full flex justify-between items-center p-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
             >
-                <div className="flex items-center gap-2 text-gray-800 dark:text-gray-100">
-                    {icon}
+                <div className="flex items-center gap-3 text-gray-800 dark:text-gray-100">
+                    <div className="p-2 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                        {icon}
+                    </div>
                     <span className="font-medium">{title}</span>
                 </div>
                 {hasContent && (
                     <svg
-                        className={`w-4 h-4 transform transition-transform ${expanded ? 'rotate-180' : ''}`}
+                        className={`w-5 h-5 text-gray-400 transform transition-transform ${expanded ? 'rotate-180' : ''}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -445,11 +497,15 @@ function Section({
                 )}
             </button>
 
-            {expanded && hasContent && <div className="p-2 space-y-2">{children}</div>}
+            {expanded && hasContent && (
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 space-y-4">
+                    {children}
+                </div>
+            )}
 
-            {!hasContent && (
-                <div className="p-2 text-gray-400 dark:text-gray-500 text-sm">
-                    No {title.toLowerCase()} provided.
+            {!hasContent && !viewMode && (
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 text-sm">
+                    No {title.toLowerCase()} provided. {!viewMode && "Click to add."}
                 </div>
             )}
         </div>
@@ -463,31 +519,32 @@ function Section({
 function Field({
     label,
     value,
-    editMode,
+    viewMode,
     onChange,
 }: {
     label: string;
     value?: string;
-    editMode?: boolean;
+    viewMode?: boolean;
     onChange?: (val: string) => void;
 }) {
     return (
-        <div className="flex flex-col sm:flex-row sm:items-start">
-            <label className="text-xs font-medium text-gray-500 uppercase sm:w-1/3">
+        <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                 {formatLabel(label)}
             </label>
-            <div className="sm:w-2/3 break-words text-gray-800 dark:text-gray-200">
-                {editMode ? (
-                    <input
-                        type="text"
-                        value={value || ''}
-                        onChange={(e) => onChange?.(e.target.value)}
-                        className="w-full p-2 mt-1 rounded border dark:bg-gray-900 dark:text-white text-sm"
-                    />
-                ) : (
-                    <span>{value?.trim() || 'Not provided'}</span>
-                )}
-            </div>
+            {viewMode ? (
+                <div className="text-gray-800 dark:text-gray-200 py-2">
+                    {value?.trim() || <span className="text-gray-400 dark:text-gray-500">Not provided</span>}
+                </div>
+            ) : (
+                <input
+                    type="text"
+                    value={value || ''}
+                    onChange={(e) => onChange?.(e.target.value)}
+                    className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder={`Enter ${formatLabel(label).toLowerCase()}`}
+                />
+            )}
         </div>
     );
 }

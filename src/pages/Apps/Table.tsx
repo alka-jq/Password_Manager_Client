@@ -10,10 +10,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 
 import Loader from '../Components/Loader';
+import { togglePinStatus } from '@/service/TableDataService';
+
 type TableItem = {
     id: string;
     title: string;
     type: string;
+    isPinned?: boolean; // Add isPinned property to TableItem
 };
 
 type CommonTableProps = {
@@ -25,17 +28,20 @@ type CommonTableProps = {
     onClose?: () => void;
     isLoading?: boolean;
 };
+
 const typeStyles: Record<string, string> = {
     login: 'text-blue-400 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
     identity: 'text-green-400 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
     card: 'text-orange-400 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
     // add more types here if needed
 };
+
 const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDelete, onView, onClose, isLoading = false }) => {
     // Safely handle undefined data
     const safeData = data || [];
 
-    const [pin, setPins] = useState(safeData.map(() => false));
+    // Initialize pin state from data
+    const [pinState, setPinState] = useState<Record<string, boolean>>({});
     const [selected, setSelected] = useState(safeData.map(() => false));
     const [dropdownVisible, setDropdownVisible] = useState<string | null>(null);
     const [filterType, setFilterType] = useState('All Items');
@@ -48,9 +54,13 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
     const dropdownRef = useRef<HTMLDivElement | null>(null);
     const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
-    // Update pin and selected states when data changes
+    // Initialize pin state from data when it changes
     useEffect(() => {
-        setPins(safeData.map(() => false));
+        const initialPinState: Record<string, boolean> = {};
+        safeData.forEach(item => {
+            initialPinState[item.id] = item.isPinned || false;
+        });
+        setPinState(initialPinState);
         setSelected(safeData.map(() => false));
     }, [safeData]);
 
@@ -62,12 +72,18 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
         );
 
     // Toggle pin for a specific item
-    const togglePin = (index: number) => {
-        setPins((prevPins) => {
-            const newPins = [...prevPins];
-            newPins[index] = !newPins[index];
-            return newPins;
-        });
+    const togglePin = async (id: string) => {
+        const newPinState = !pinState[id];
+
+        try {
+            await togglePinStatus([id], newPinState);
+            setPinState(prev => ({
+                ...prev,
+                [id]: newPinState
+            }));
+        } catch (error) {
+            console.error('Failed to toggle pin:', error);
+        }
     };
 
     // Toggle selection for a specific item
@@ -132,24 +148,30 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
     };
 
     // Handle bulk pin action
-    const handleBulkPin = () => {
-        setPins((prevPins) => {
-            const newPins = [...prevPins];
+    const handleBulkPin = async () => {
+        const selectedItems = safeData.filter((_, index) => selected[index]);
+        if (selectedItems.length === 0) return;
 
-            // Check if ALL selected items are already pinned
-            const allSelectedPinned = selected.every((isSelected, index) => {
-                return !isSelected || newPins[index]; // Either not selected or already pinned
+        // Determine if all selected items are pinned or not
+        const allSelectedPinned = selectedItems.every(item => pinState[item.id]);
+        const newPinState = !allSelectedPinned;
+
+        const idsToUpdate = selectedItems.map(item => item.id);
+
+        try {
+            await togglePinStatus(idsToUpdate, newPinState);
+            
+            // Update pin state for all selected items
+            setPinState(prev => {
+                const updated = { ...prev };
+                idsToUpdate.forEach(id => {
+                    updated[id] = newPinState;
+                });
+                return updated;
             });
-
-            // Toggle pin state for all selected items
-            selected.forEach((isSelected, index) => {
-                if (isSelected) {
-                    newPins[index] = !allSelectedPinned;
-                }
-            });
-
-            return newPins;
-        });
+        } catch (error) {
+            console.error('Bulk pin/unpin failed:', error);
+        }
     };
 
     // Handle bulk delete action
@@ -222,8 +244,16 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
                                     <div className="col-span-1 flex items-center">
                                         {allSelected || someSelected ? (
-                                            <button className="text-gray-700 hover:text-blue-600" title="Pin Selected">
-                                                <LuPin size={18} />
+                                            <button 
+                                                className="text-gray-700 hover:text-blue-600" 
+                                                title={safeData.some((_, index) => selected[index] && !pinState[safeData[index].id]) ? "Pin Selected" : "Unpin Selected"}
+                                                onClick={handleBulkPin}
+                                            >
+                                                {safeData.some((_, index) => selected[index] && !pinState[safeData[index].id]) ? (
+                                                    <LuPin size={18} />
+                                                ) : (
+                                                    <LuPinOff size={18} />
+                                                )}
                                             </button>
                                         ) : (
                                             'Pin'
@@ -239,15 +269,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                             <button
                                                 className="text-gray-700 hover:text-red-600"
                                                 title="Delete Selected"
-                                                onClick={() => {
-                                                    const selectedIds = safeData
-                                                        .filter((_, index) => selected[index])
-                                                        .map((item) => item.id);
-
-                                                    if (selectedIds.length > 0 && onBulkDelete) {
-                                                        onBulkDelete(selectedIds);
-                                                    }
-                                                }}
+                                                onClick={handleBulkDelete}
                                             >
                                                 <FaTrash size={16} />
                                             </button>
@@ -259,8 +281,10 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
                                 {/* Table Body */}
                                 <div className="divide-y divide-gray-200 overflow-y-auto h-[100vh]">
-                                    {filteredData.map((item, index) => {
+                                    {filteredData.map((item) => {
                                         const originalIndex = safeData.findIndex((d) => d.id === item.id);
+                                        const isPinned = pinState[item.id] || false;
+                                        
                                         return (
                                             <div key={item.id} className="grid grid-cols-12 gap-4 px-6 py-3 hover:bg-gray-50 items-center">
                                                 <div className="col-span-1 flex items-center">
@@ -273,12 +297,12 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                                 </div>
 
                                                 <div className="col-span-1 flex items-center">
-                                                    {pin[originalIndex] ? (
-                                                        <button onClick={() => togglePin(originalIndex)} className="text-blue-500 hover:text-blue-700" title="Unpin">
+                                                    {isPinned ? (
+                                                        <button onClick={() => togglePin(item.id)} className="text-blue-500 hover:text-blue-700" title="Unpin">
                                                             <LuPin size={18} />
                                                         </button>
                                                     ) : (
-                                                        <button onClick={() => togglePin(originalIndex)} className="text-gray-400 hover:text-gray-600" title="Pin">
+                                                        <button onClick={() => togglePin(item.id)} className="text-gray-400 hover:text-gray-600" title="Pin">
                                                             <LuPinOff size={18} />
                                                         </button>
                                                     )}
@@ -347,17 +371,21 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
                             {/* Bulk Actions Bar */}
                             {(someSelected || allSelected) && (
-                               
+                                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-3 shadow-md">
                                     <div className="flex items-center space-x-3">
                                         <span className="text-sm text-gray-700">{selected.filter(Boolean).length} selected</span>
                                         <button onClick={handleBulkPin} className="text-gray-700 hover:text-blue-600 p-1" title="Toggle Pin for Selected">
-                                            <LuPin size={18} />
+                                            {safeData.some((_, index) => selected[index] && !pinState[safeData[index].id]) ? (
+                                                <LuPin size={18} />
+                                            ) : (
+                                                <LuPinOff size={18} />
+                                            )}
                                         </button>
                                         <button onClick={handleBulkDelete} className="text-gray-700 hover:text-red-600 p-1" title="Delete Selected">
                                             <FaTrash size={16} />
                                         </button>
-                                    </div>                                    
-                                
+                                    </div>
+                                </div>
                             )}
                         </>
                     )}

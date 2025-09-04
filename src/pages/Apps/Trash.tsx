@@ -13,14 +13,6 @@ type TableItem = {
   type: string;
 };
 
-// Map item types to style classes
-const typeStyles: Record<string, string> = {
-  login: 'text-blue-600 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
-  'identity card': 'text-green-600 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
-  card: 'text-orange-600 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
-  password: 'text-purple-600 bg-gradient-to-b from-purple-100 to-purple-50 border-purple-200',
-  // add more types here if needed
-};
 
 const TrashList: React.FC = () => {
   const [data, setData] = useState<TableItem[]>([]);
