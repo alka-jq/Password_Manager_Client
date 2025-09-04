@@ -74,14 +74,6 @@ const TrashList: React.FC = () => {
   const someSelected = selected.some(Boolean) && !allSelected;
 
 const handleRestore = async (id: string) => {
-  if (!window.confirm('Restore this item?')) return;
-
-  const token = localStorage.getItem('authToken');
-  if (!token) {
-    alert('No authentication token found');
-    return;
-  }
-
   try {
     await restorePasswords([id]); 
     setData(data.filter(item => item.id !== id));
@@ -100,15 +92,6 @@ const handleRestore = async (id: string) => {
 const handleBulkRestore = async () => {
   const ids = data.filter((_, i) => selected[i]).map(item => item.id);
   if (ids.length === 0) return;
-
-  if (!window.confirm(`Restore ${ids.length} items?`)) return;
-
-  const token = localStorage.getItem('authToken');
-  if (!token) {
-    alert('No authentication token found');
-    return;
-  }
-
   try {
     await restorePasswords(ids);
     setData(data.filter(item => !ids.includes(item.id)));

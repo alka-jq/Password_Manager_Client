@@ -127,7 +127,7 @@ export const softDeleteItems = async (ids: string[]) => {
 //Restore API Call for both by ID and by all 
 export const restorePasswords = async (ids: string[]) => {
   try {
-    const response = await apiClient.post(
+    const response = await apiClient.patch(
       '/api/password/restore', // Adjust the path if needed
       { ids }
     );
