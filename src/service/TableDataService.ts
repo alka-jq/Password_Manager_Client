@@ -45,3 +45,12 @@ export const getPindata = async () => {
         console.error(error)
     }
 }
+
+//Move to trash item 
+export const softDeleteItems = async (ids: string[]) => {
+    const response = await apiClient.patch('/api/password/item/softDelete', {
+        id: ids,
+    });
+
+    return response.data;
+};
