@@ -6,7 +6,7 @@ import ViewCardModal from './ViewCardModal';
 import ViewLogInModal from './ViewLogInModal';
 import ViewIdentityModal from './ViewIdentityModal';
 import FilterDropdown from './FilterDropdown';
-
+import Loader from '../Components/Loader';
 type TableItem = {
     id: string;
     title: string;
@@ -23,16 +23,16 @@ type CommonTableProps = {
     isLoading?: boolean;
 };
 const typeStyles: Record<string, string> = {
-    login: 'text-blue-400 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
-    'identity card': 'text-green-400 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
-    card: 'text-orange-400 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
-    password: 'text-purple-400 bg-gradient-to-b from-purple-100 to-purple-50 border-purple-200',
+    login: 'text-blue-600 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
+    identity: 'text-green-600 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
+    card: 'text-orange-600 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
+    password: 'text-purple-600 bg-gradient-to-b from-purple-100 to-purple-50 border-purple-200',
     // add more types here if needed
 };
 const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDelete, onView, onClose, isLoading = false }) => {
     // Safely handle undefined data
     const safeData = data || [];
-    console.log("safe data", safeData)
+    console.log('safe data', safeData);
 
     const [pin, setPins] = useState(safeData.map(() => false));
     const [selected, setSelected] = useState(safeData.map(() => false));
@@ -53,9 +53,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
     }, [safeData]);
 
     // Filter data based on selected type
-    const filteredData = filterType === 'All Items'
-        ? safeData
-        : safeData.filter(item => item.type.toLowerCase() === filterType.toLowerCase());
+    const filteredData = filterType === 'All Items' ? safeData : safeData.filter((item) => item.type.toLowerCase() === filterType.toLowerCase());
 
     // Toggle pin for a specific item
     const togglePin = (index: number) => {
@@ -150,9 +148,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
     // Handle bulk delete action
     const handleBulkDelete = () => {
-        const selectedIds = safeData
-            .filter((_, index) => selected[index])
-            .map(item => item.id);
+        const selectedIds = safeData.filter((_, index) => selected[index]).map((item) => item.id);
 
         if (selectedIds.length > 0 && onBulkDelete) {
             onBulkDelete(selectedIds);
@@ -181,7 +177,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
         <>
             {isLoading ? (
                 <div className="flex justify-center items-center w-full h-[100vh]">
-                    <h1 className="text-2xl">Loading...</h1>
+                    <Loader />
                 </div>
             ) : (
                 <div className="">
@@ -232,31 +228,29 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
                                     <div className="col-span-2">Type</div>
 
-                                   <div className="col-span-2 flex justify-end items-center">
-    {(allSelected || someSelected) ? (
-        <button
-            className="text-gray-700 hover:text-red-600"
-            title="Delete Selected"
-            onClick={() => {
-                const selectedIds = safeData
-                    .filter((_, index) => selected[index])
-                    .map((item) => item.id);
+                                    <div className="col-span-2 flex justify-end items-center">
+                                        {allSelected || someSelected ? (
+                                            <button
+                                                className="text-gray-700 hover:text-red-600"
+                                                title="Delete Selected"
+                                                onClick={() => {
+                                                    const selectedIds = safeData.filter((_, index) => selected[index]).map((item) => item.id);
 
-                if (selectedIds.length > 0 && onBulkDelete) {
-                    onBulkDelete(selectedIds);
-                }
-            }}
-        >
-            <FaTrash size={16} />
-        </button>
-    ) : (
-        'Actions'
-    )}
-</div>
+                                                    if (selectedIds.length > 0 && onBulkDelete) {
+                                                        onBulkDelete(selectedIds);
+                                                    }
+                                                }}
+                                            >
+                                                <FaTrash size={16} />
+                                            </button>
+                                        ) : (
+                                            'Actions'
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Table Body */}
-                                <div className="divide-y divide-gray-200 overflow-y-auto max-h-[60vh]">
+                                <div className="divide-y divide-gray-200 overflow-y-auto">
                                     {filteredData.map((item, index) => {
                                         const originalIndex = safeData.findIndex((d) => d.id === item.id);
                                         return (
@@ -377,16 +371,10 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                 ✕
                             </button>
                         </div>
-                        {viewItem.type === 'identity' && (
-                            <ViewIdentityModal item={viewItem} onClose={() => setViewItem(null)} />
-                        )}
-                        {viewItem.type === 'login' && (
-                            <ViewLogInModal item={viewItem} onClose={() => setViewItem(null)} />
-                        )}
+                        {viewItem.type === 'identity' && <ViewIdentityModal item={viewItem} onClose={() => setViewItem(null)} />}
+                        {viewItem.type === 'login' && <ViewLogInModal item={viewItem} onClose={() => setViewItem(null)} />}
 
-                        {viewItem.type === 'card' && (
-                            <ViewCardModal item={viewItem} onClose={() => setViewItem(null)} />
-                        )}
+                        {viewItem.type === 'card' && <ViewCardModal item={viewItem} onClose={() => setViewItem(null)} />}
                     </div>
                 </div>
             )}
@@ -403,15 +391,9 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                         </div>
 
                         {/* Conditionally render based on type */}
-                        {editItem.type === 'identity' && (
-                            <ViewIdentityModal item={editItem} onClose={() => setEditItem(null)} editMode />
-                        )}
-                        {editItem.type === 'login' && (
-                            <ViewLogInModal item={editItem} onClose={() => setEditItem(null)} editMode />
-                        )}
-                        {editItem.type === 'card' && (
-                            <ViewCardModal item={editItem} onClose={() => setEditItem(null)} editMode />
-                        )}
+                        {editItem.type === 'identity' && <ViewIdentityModal item={editItem} onClose={() => setEditItem(null)} editMode />}
+                        {editItem.type === 'login' && <ViewLogInModal item={editItem} onClose={() => setEditItem(null)} editMode />}
+                        {editItem.type === 'card' && <ViewCardModal item={editItem} onClose={() => setEditItem(null)} editMode />}
                     </div>
                 </div>
             )}

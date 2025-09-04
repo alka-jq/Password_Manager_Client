@@ -1,7 +1,6 @@
 import {
   CreditCard,
   User,
-  Lock,
   Shield,
   Folder,
 } from 'lucide-react';
@@ -12,7 +11,7 @@ const iconColorVariants = {
   all: 'text-blue-500',
   login: 'text-red-500',
   id: 'text-yellow-500',
-  password: 'text-purple-500',
+  identity: 'text-yellow-500',
   card: 'text-green-500',
   
 };
@@ -31,7 +30,7 @@ export const filterConfig: Record<
   },
   'Identity': {
     label: 'Identity',
-    icon: <Shield size={16} />,
+    icon: <Shield className={`${iconBaseClass} ${iconColorVariants.identity}`} />,
   },
   'Card': {
     label: 'Card',

@@ -1,6 +1,5 @@
 const plugin = require('tailwindcss/plugin');
 
-
 // Custom plugin: rotateY
 const rotateX = plugin(function ({ addUtilities }) {
     addUtilities({
@@ -9,7 +8,6 @@ const rotateX = plugin(function ({ addUtilities }) {
         },
     });
 });
-
 
 // Custom theme variants
 const blueVariant = plugin(function ({ addVariant }) {
@@ -131,20 +129,30 @@ module.exports = {
                     },
                 },
             }),
+
+            // ✅ Loader animation added
+            keyframes: {
+                flyRight: {
+                    '0%': { left: '-10%', transform: 'scale(0)', opacity: '0' },
+                    '50%': { left: '45%', transform: 'scale(1.2)', opacity: '1' },
+                    '100%': { left: '100%', transform: 'scale(0)', opacity: '0' },
+                },
+            },
+            animation: {
+                flyRight: 'flyRight 3s ease-in-out infinite',
+            },
         },
     },
-   plugins: [
-    require('@tailwindcss/forms')({ strategy: 'class' }),
-    require('@tailwindcss/typography'),
-    require('@tailwindcss/line-clamp'), 
-    rotateX,
-    blueVariant,
-    peachVariant,
-    softAzureVariant,
-    lightMintGreenVariant,
-    cornflowerBlueVariant,
-    salmonpinkVariant,
-    systemVariant,
-]
-
+    plugins: [
+        require('@tailwindcss/forms')({ strategy: 'class' }),
+        require('@tailwindcss/typography'),
+        rotateX,
+        blueVariant,
+        peachVariant,
+        softAzureVariant,
+        lightMintGreenVariant,
+        cornflowerBlueVariant,
+        salmonpinkVariant,
+        systemVariant, // ✅ Corrected plugin name
+    ],
 };

@@ -1,9 +1,15 @@
-import { FiCreditCard, FiKey, FiLogIn, FiUser } from 'react-icons/fi';
+import {
+  FiCreditCard,
+  FiKey,
+  FiLogIn,
+  FiUser,
+  // FiDownload // Uncomment if needed
+} from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
 import { openAddModal } from '@/store/Slices/taskSlice';
 import { openAddModal as openCardAddModal } from '@/store/Slices/cardSlice';
-import {openAddModal as openIdentityAddModal } from '@/store/Slices/identitySlice';
-import { openPasswordGenerator } from '@/store/Slices/passwordSlice'; // adjust imports to your actual paths
+import { openAddModal as openIdentityAddModal } from '@/store/Slices/identitySlice';
+import { openPasswordGenerator } from '@/store/Slices/passwordSlice';
 
 export type ItemType =
   | 'login'
@@ -27,79 +33,79 @@ export const EmptyVaultState: React.FC<EmptyVaultStateProps> = ({
   const createOptions = [
     {
       id: 'login',
-      label: 'Create a login',
-      icon: <FiLogIn className="w-5 h-5" />,
-      bgColor: 'bg-purple-100 text-purple-800',
-      action: () => {
-        // onCreateItem('login');
-        dispatch(openAddModal());
-      },
+      label: 'Login',
+      description: 'Store usernames and passwords safely',
+      icon: <FiLogIn className="w-6 h-6 text-purple-600" />,
+      action: () => dispatch(openAddModal()),
     },
     {
       id: 'card',
-      label: 'Create a credit card',
-      icon: <FiCreditCard className="w-5 h-5" />,
-      bgColor: 'bg-green-100 text-green-800',
-      action: () => {
-        // onCreateItem('credit-card');
-        dispatch(openCardAddModal());
-      },
+      label: 'Credit Card',
+      description: 'Securely store card numbers and CVV',
+      icon: <FiCreditCard className="w-6 h-6 text-green-600" />,
+      action: () => dispatch(openCardAddModal()),
     },
     {
       id: 'identity',
-      label: 'Create an Identity',
-      icon: <FiUser className="w-5 h-5" />,
-      bgColor: 'bg-indigo-100 text-indigo-800',
-      action: () => {
-        // onCreateItem('identity');
-        dispatch(openIdentityAddModal());
-      },
+      label: 'Identity',
+      description: 'Keep ID cards and personal info',
+      icon: <FiUser className="w-6 h-6 text-indigo-600" />,
+      action: () => dispatch(openIdentityAddModal()),
     },
     {
       id: 'password',
-      label: 'Create a Password Generator',
-      icon: <FiKey className="w-5 h-5" />,
-      bgColor: 'bg-gray-100 text-gray-800',
-      action: () => {
-        // onCreateItem('custom'); 
-        dispatch(openPasswordGenerator());
-      },
+      label: 'Password Generator',
+      description: 'Generate strong, secure passwords',
+      icon: <FiKey className="w-6 h-6 text-gray-600" />,
+      action: () => dispatch(openPasswordGenerator()),
     },
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-md mx-auto">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-          Your cell is empty
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-          Switch to another cell or create an item in this cell
+    <div className="flex items-center justify-center min-h-[70vh] p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="w-full max-w-3xl text-center">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          🗝️ Your cell is empty
+        </h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-8">
+          Start by adding an item to this vault. Everything you store here is encrypted and secure.
         </p>
 
-        <div className="grid grid-cols-1 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           {createOptions.map((option) => (
             <button
               key={option.id}
               onClick={option.action}
-              className={`flex items-center justify-between px-4 py-2 rounded-full font-medium ${option.bgColor} transition-all duration-200 hover:opacity-90`}
+              className="group relative overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg p-4 text-left shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200"
             >
-              <div className="flex items-center gap-2">
-                {option.icon}
-                <span className="text-sm">{option.label}</span>
+              <div className="flex items-center gap-4">
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-full p-2">
+                  {option.icon}
+                </div>
+                <div>
+                  <h4 className="text-md font-semibold text-gray-800 dark:text-white">
+                    {option.label}
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {option.description}
+                  </p>
+                </div>
               </div>
+              <div className="absolute right-3 top-3 w-2 h-2 bg-green-500 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
           ))}
         </div>
 
-        {/* Uncomment if needed */}
-        {/* <button
+        {/* Optional Import Button */}
+        {/* 
+        <button
           onClick={onImport}
-          className="flex items-center justify-center w-full px-4 py-2 border border-gray-300 rounded-full text-sm text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+          className="inline-flex items-center justify-center px-5 py-2 text-sm font-medium text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
         >
           <FiDownload className="w-4 h-4 mr-2" />
           Import passwords
-        </button> */}
+        </button> 
+        */}
       </div>
     </div>
   );

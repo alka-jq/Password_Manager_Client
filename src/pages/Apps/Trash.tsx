@@ -3,7 +3,7 @@ import { LuTrash2 } from "react-icons/lu";
 import { LuPin, LuPinOff } from 'react-icons/lu';
 import { MdOutlineRestore } from "react-icons/md";
 import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
-
+import { bulkDeletePasswords, deletePasswordById, getTrashdata } from '@/service/TableDataService';
 type TableItem = {
   id: string;
   title: string;
@@ -20,15 +20,15 @@ const typeStyles: Record<string, string> = {
 
 const TrashList: React.FC = () => {
   // Dummy data
-  const dummyData = [
-    { id: '1', title: 'Email Login', type: 'Login' },
-    { id: '2', title: 'Office ID Card', type: 'Identity Card' },
-    { id: '3', title: 'Bank Password', type: 'Password' },
-    { id: '4', title: 'Social Media Account', type: 'Login' },
-    { id: '5', title: 'University ID', type: 'Identity Card' },
-    { id: '6', title: 'WiFi Password', type: 'Password' },
-    { id: '7', title: 'WiFi Password', type: 'Card' }
-  ];
+  // const dummyData = [
+  //   { id: '1', title: 'Email Login', type: 'Login' },
+  //   { id: '2', title: 'Office ID Card', type: 'Identity Card' },
+  //   { id: '3', title: 'Bank Password', type: 'Password' },
+  //   { id: '4', title: 'Social Media Account', type: 'Login' },
+  //   { id: '5', title: 'University ID', type: 'Identity Card' },
+  //   { id: '6', title: 'WiFi Password', type: 'Password' },
+  //   { id: '7', title: 'WiFi Password', type: 'Card' }
+  // ];
 
   // const [data, setData] = useState(dummyData);
   const [data, setData] = useState<TableItem[]>([]);
@@ -41,28 +41,28 @@ const TrashList: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTargetIds, setDeleteTargetIds] = useState<string[]>([]);
   // Fetch trash items from API
-  // useEffect(() => {
-  //   const fetchTrashItems = async () => {
-  //     console.log("Fetching trash data...");
-  //     try {
-  //       const res = await getTrashdata();
-  //       console.log("Response:", res.data);
-  //       setData(res.data);
-  //       setSelected(res.data.map(() => false));
-  //       setPins(res.data.map(() => false));
-  //     } catch (err) {
-  //       console.error('Error fetching trash data:', err);
-  //     }
-  //   };
-
-  //   fetchTrashItems();
-  // }, []); // <-- empty array ensures effect runs only once
-
   useEffect(() => {
-    setData(dummyData);
-    setSelected(dummyData.map(() => false));
-    setPins(dummyData.map(() => false));
-  }, []);
+    const fetchTrashItems = async () => {
+      console.log("Fetching trash data...");
+      try {
+        const res = await getTrashdata();
+        console.log("Response:", res.data);
+        setData(res.data);
+        setSelected(res.data.map(() => false));
+        setPins(res.data.map(() => false));
+      } catch (err) {
+        console.error('Error fetching trash data:', err);
+      }
+    };
+
+    fetchTrashItems();
+  }, []); // <-- empty array ensures effect runs only once
+
+  // useEffect(() => {
+  //   setData(dummyData);
+  //   setSelected(dummyData.map(() => false));
+  //   setPins(dummyData.map(() => false));
+  // }, []);
 
 
 
@@ -140,14 +140,37 @@ const handleBulkDelete = () => {
     }
   };
 
-  const confirmPermanentDelete = () => {
-  setData(prevData => prevData.filter(item => !deleteTargetIds.includes(item.id)));
-  setSelected(prevSelected =>
-    prevSelected.filter((_, index) => !deleteTargetIds.includes(data[index]?.id))
-  );
-  setDeleteTargetIds([]);
-  setShowDeleteModal(false);
+const confirmPermanentDelete = async () => {
+  const token = localStorage.getItem('authToken'); // Adjust based on how you store token
+
+  if (!token) {
+    console.error('No auth token found');
+    return;
+  }
+
+  try {
+    if (deleteTargetIds.length === 1) {
+      // Single delete
+      await deletePasswordById(deleteTargetIds[0], token);
+    } else if (deleteTargetIds.length > 1) {
+      // Bulk delete
+      await bulkDeletePasswords(deleteTargetIds, token);
+    }
+
+    // Update UI after successful deletion
+    setData(prevData => prevData.filter(item => !deleteTargetIds.includes(item.id)));
+    setSelected(prevSelected =>
+      prevSelected.filter((_, index) => !deleteTargetIds.includes(data[index]?.id))
+    );
+  } catch (error) {
+    console.error('Error during permanent delete:', error);
+    alert('Failed to delete. Please try again.');
+  } finally {
+    setDeleteTargetIds([]);
+    setShowDeleteModal(false);
+  }
 };
+
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
@@ -267,3 +290,4 @@ return (
 };
 
 export default TrashList;
+

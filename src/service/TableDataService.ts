@@ -45,3 +45,101 @@ export const getPindata = async () => {
         console.error(error)
     }
 }
+
+// Post API Call For Add Login Credentials 
+
+export const addLoginCredentials = async (formData: FormData, token: string) => {
+    try {
+        const response = await apiClient.post(
+            '/api/login-credentials/add',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Failed to add login credentials:', error);
+        throw new Error('Failed to add login credentials');
+    }
+};
+
+
+// POST API for password Generator 
+
+export const generatePasswordAPI = async (
+  type: "advanced" | "memorable" | "random" = "advanced",
+  length: number = 20
+) => {
+  try {
+    const token = localStorage.getItem("authToken") // or however you're storing it
+
+    if (!token) {
+      throw new Error("Authentication token not found");
+    }
+
+    const response = await apiClient.post(
+      "/api/password/generate",
+      {
+        type,
+        options: {
+          length,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    // Print the actual server response if available
+    if (error.response) {
+      console.error("API Error Response:", error.response.data);
+    } else {
+      console.error("Error:", error.message || error);
+    }
+
+    throw new Error("Password generation failed");
+  }
+};
+
+
+// DELETE API for Permanent Delete by ID and Bulk Delete
+
+export const deletePasswordById = async (id: string, token: string) => {
+  try {
+    const response = await apiClient.delete(`/api/password/delete/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error(`Failed to delete password with ID ${id}:`, error.response?.data || error.message);
+    throw new Error('Permanent delete by ID failed');
+  }
+};
+
+export const bulkDeletePasswords = async (ids: string[], token: string) => {
+  try {
+    const response = await apiClient.post(
+      '/api/password/delete-multiple',
+      { ids }, // assuming API expects { ids: [...] }
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Bulk delete failed:', error.response?.data || error.message);
+    throw new Error('Bulk delete failed');
+  }
+};
