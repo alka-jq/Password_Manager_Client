@@ -5,6 +5,8 @@ import { getTrashdata ,bulkDeletePasswords, deletePasswordById, restorePasswords
 import { MdOutlineRestore } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
+import { fetchItemCount } from '@/store/Slices/countSlice';
+
 
 import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
 type TableItem = {
@@ -15,6 +17,7 @@ type TableItem = {
 
 
 const TrashList: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>()
   const [data, setData] = useState<TableItem[]>([]);
   const [selected, setSelected] = useState<boolean[]>([]);
   const [pins, setPins] = useState<boolean[]>([]);
@@ -140,6 +143,7 @@ const handleBulkRestore = async () => {
       setSelected(prevSelected =>
         prevSelected.filter((_, index) => !deleteTargetIds.includes(data[index]?.id))
       );
+      dispatch(fetchItemCount());
     } catch (error) {
       console.error('Error during permanent delete:', error);
       alert('Failed to delete. Please try again.');
@@ -148,7 +152,6 @@ const handleBulkRestore = async () => {
       setShowDeleteModal(false);
     }
   };
-
 
   return (
     <div className="">
