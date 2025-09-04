@@ -93,7 +93,8 @@ export const addLoginCredentials = async (formData: FormData, token: string) => 
 
 export const deletePasswordById = async (id: string,) => {
   try {
-    const response = await apiClient.delete(`/api/password/delete/${id}`)
+    const response = await apiClient.delete(`/api/password/delete/${id}`, {
+      });
     return response.data;
   } catch (error: any) {
     console.error(`Failed to delete password with ID ${id}:`, error.response?.data || error.message);
@@ -136,4 +137,3 @@ export const restorePasswords = async (ids: string[]) => {
     throw new Error('Failed to restore passwords');
   }
 };
-

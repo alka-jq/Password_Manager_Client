@@ -203,7 +203,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                             {/* Table Container */}
                             <div className=" border-gray-300 overflow-hidden bg-white">
                                 {/* Table Header */}
-                                <div className="grid grid-cols-12 gap-4 px-6 py-3 border border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
                                     <div className="col-span-1 flex items-center">
                                         {safeData.length > 0 && (
                                             <input
@@ -230,12 +230,12 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                         )}
                                     </div>
 
-                                    <div className="col-span-6">Title</div>
+                                    <div className="col-span-5">Title</div>
 
-                                    <div className="col-span-2">Type</div>
+                                    <div className="col-span-3">Type</div>
 
-                                    <div className="col-span-2 flex justify-end items-center">
-                                        {(allSelected || someSelected) ? (
+                                    <div className="col-span-2  flex justify-end items-center">
+                                        {allSelected || someSelected ? (
                                             <button
                                                 className="text-gray-700 hover:text-red-600"
                                                 title="Delete Selected"
@@ -284,11 +284,11 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                                     )}
                                                 </div>
 
-                                                <div className="col-span-6 flex items-center">
+                                                <div className="col-span-5 flex items-center">
                                                     <span className="text-sm text-gray-900 truncate">{item.title}</span>
                                                 </div>
 
-                                                <div className="col-span-2 flex items-center">
+                                                <div className="col-span-3 flex items-center">
                                                     <span
                                                         className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm border ${typeStyles[item.type] || 'text-gray-600 bg-gray-100 border-gray-300'
                                                             }`}
@@ -347,7 +347,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
                             {/* Bulk Actions Bar */}
                             {(someSelected || allSelected) && (
-                                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 shadow-md p-3 flex items-center justify-between">
+                               
                                     <div className="flex items-center space-x-3">
                                         <span className="text-sm text-gray-700">{selected.filter(Boolean).length} selected</span>
                                         <button onClick={handleBulkPin} className="text-gray-700 hover:text-blue-600 p-1" title="Toggle Pin for Selected">
@@ -356,11 +356,8 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                         <button onClick={handleBulkDelete} className="text-gray-700 hover:text-red-600 p-1" title="Delete Selected">
                                             <FaTrash size={16} />
                                         </button>
-                                    </div>
-                                    <button onClick={() => setSelected(selected.map(() => false))} className="text-sm text-blue-600 hover:text-blue-800">
-                                        Cancel
-                                    </button>
-                                </div>
+                                    </div>                                    
+                                
                             )}
                         </>
                     )}

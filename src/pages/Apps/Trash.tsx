@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LuTrash2 } from "react-icons/lu";
 import { LuPin, LuPinOff } from 'react-icons/lu';
+import { getTrashdata ,bulkDeletePasswords, deletePasswordById, restorePasswords} from '@/service/TableDataService';
 import { MdOutlineRestore } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
@@ -8,13 +9,13 @@ import { fetchItemCount } from '@/store/Slices/countSlice';
 
 
 import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
-import { bulkDeletePasswords, deletePasswordById, getTrashdata } from '@/service/TableDataService';
 type TableItem = {
   id: string;
   title: string;
   type: string;
 };
 
+// Map item types to style classes
 const typeStyles: Record<string, string> = {
   login: 'text-blue-600 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
   identity: 'text-green-600 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
@@ -36,6 +37,7 @@ const TrashList: React.FC = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTargetIds, setDeleteTargetIds] = useState<string[]>([]);
+
   // Fetch trash items from API
   useEffect(() => {
     const fetchTrashItems = async () => {
@@ -52,7 +54,7 @@ const TrashList: React.FC = () => {
     };
 
     fetchTrashItems();
-  }, []);
+  }, []); 
 
 
 
@@ -77,27 +79,52 @@ const TrashList: React.FC = () => {
   const allSelected = selected.length > 0 && selected.every(Boolean);
   const someSelected = selected.some(Boolean) && !allSelected;
 
-  const handleRestore = (id: string) => {
-    if (window.confirm('Restore this item?')) {
-      setData(data.filter(item => item.id !== id));
-      // Hit your API here
-      console.log('Restoring:', id);
-    }
-  };
+const handleRestore = async (id: string) => {
+  if (!window.confirm('Restore this item?')) return;
+
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    alert('No authentication token found');
+    return;
+  }
+
+  try {
+    await restorePasswords([id]); 
+    setData(data.filter(item => item.id !== id));
+  } catch (error) {
+    console.error('Failed to restore item:', error);
+    alert('Failed to restore item');
+  }
+};
+
 
   const handlePermanentDelete = (id: string) => {
     setDeleteTargetIds([id]);
     setShowDeleteModal(true);
   };
 
-  const handleBulkRestore = () => {
-    const ids = data.filter((_, i) => selected[i]).map(item => item.id);
-    if (window.confirm(`Restore ${ids.length} items?`)) {
-      setData(data.filter((_, i) => !selected[i]));
-      setSelected(data.map(() => false));
-      console.log('Bulk restoring:', ids);
-    }
-  };
+const handleBulkRestore = async () => {
+  const ids = data.filter((_, i) => selected[i]).map(item => item.id);
+  if (ids.length === 0) return;
+
+  if (!window.confirm(`Restore ${ids.length} items?`)) return;
+
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    alert('No authentication token found');
+    return;
+  }
+
+  try {
+    await restorePasswords(ids);
+    setData(data.filter(item => !ids.includes(item.id)));
+    setSelected(data.map(() => false));
+  } catch (error) {
+    console.error('Bulk restore failed:', error);
+    alert('Failed to restore selected items');
+  }
+};
+
 
   const handleBulkDelete = () => {
     const ids = data.filter((_, i) => selected[i]).map(item => item.id);
@@ -244,4 +271,3 @@ const TrashList: React.FC = () => {
 };
 
 export default TrashList;
-
