@@ -3,6 +3,9 @@ import { LuTrash2 } from "react-icons/lu";
 import { LuPin, LuPinOff } from 'react-icons/lu';
 import { getTrashdata ,bulkDeletePasswords, deletePasswordById, restorePasswords} from '@/service/TableDataService';
 import { MdOutlineRestore } from "react-icons/md";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+
 import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
 type TableItem = {
   id: string;
@@ -12,18 +15,26 @@ type TableItem = {
 
 // Map item types to style classes
 const typeStyles: Record<string, string> = {
-    login: 'text-blue-600 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
-    'identity card': 'text-green-600 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
-    card: 'text-orange-600 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
-    password: 'text-purple-600 bg-gradient-to-b from-purple-100 to-purple-50 border-purple-200',
-    // add more types here if needed
+  login: 'text-blue-600 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
+  'identity card': 'text-green-600 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
+  card: 'text-orange-600 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
+  password: 'text-purple-600 bg-gradient-to-b from-purple-100 to-purple-50 border-purple-200',
+  // add more types here if needed
 };
 
 const TrashList: React.FC = () => {
   const [data, setData] = useState<TableItem[]>([]);
   const [selected, setSelected] = useState<boolean[]>([]);
   const [pins, setPins] = useState<boolean[]>([]);
-const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const searchQuery = useSelector((state: RootState) => state.search.query.toLowerCase());
+
+  const filteredData = data
+    .filter(item =>
+      (item.title.toLowerCase().includes(searchQuery)) // 🔍 Search filter
+    );
+
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTargetIds, setDeleteTargetIds] = useState<string[]>([]);
 
   // Fetch trash items from API
@@ -77,7 +88,7 @@ const handleRestore = async (id: string) => {
   }
 
   try {
-    await restorePasswords([id], token); // wrap single id in array
+    await restorePasswords([id]); 
     setData(data.filter(item => item.id !== id));
   } catch (error) {
     console.error('Failed to restore item:', error);
@@ -86,10 +97,10 @@ const handleRestore = async (id: string) => {
 };
 
 
-const handlePermanentDelete = (id: string) => {
-  setDeleteTargetIds([id]);
-  setShowDeleteModal(true);
-};
+  const handlePermanentDelete = (id: string) => {
+    setDeleteTargetIds([id]);
+    setShowDeleteModal(true);
+  };
 
 const handleBulkRestore = async () => {
   const ids = data.filter((_, i) => selected[i]).map(item => item.id);
@@ -104,7 +115,7 @@ const handleBulkRestore = async () => {
   }
 
   try {
-    await restorePasswords(ids, token);
+    await restorePasswords(ids);
     setData(data.filter(item => !ids.includes(item.id)));
     setSelected(data.map(() => false));
   } catch (error) {
@@ -114,14 +125,16 @@ const handleBulkRestore = async () => {
 };
 
 
-const handleBulkDelete = () => {
-  const ids = data.filter((_, i) => selected[i]).map(item => item.id);
-  if (ids.length === 0) return;
-  setDeleteTargetIds(ids);
-  setShowDeleteModal(true);
-};
+  const handleBulkDelete = () => {
+    const ids = data.filter((_, i) => selected[i]).map(item => item.id);
+    if (ids.length === 0) return;
+    setDeleteTargetIds(ids);
+    setShowDeleteModal(true);
+  };
 
-const confirmPermanentDelete = async () => {
+
+
+  const confirmPermanentDelete = async () => {
     try {
       if (deleteTargetIds.length === 1) {
         // Single delete
@@ -191,13 +204,12 @@ const confirmPermanentDelete = async () => {
           </div>
 
           {/* Body */}
-          <div className="overflow-y-auto max-h-[90vh]">
+          <div className="overflow-y-auto max-h-[86vh]">
             {data.map((item, index) => (
               <div
                 key={item.id}
-                className={`flex items-center px-6 py-3 text-sm transition-colors border-b border-gray-100 ${
-                  selected[index] ? 'bg-blue-50' : 'bg-white hover:bg-gray-50'
-                }`}
+                className={`flex items-center px-6 py-3 text-sm transition-colors border-b border-gray-100 ${selected[index] ? 'bg-blue-50' : 'bg-white hover:bg-gray-50'
+                  }`}
               >
                 <div className="w-[5%] flex justify-center">
                   <input
@@ -218,11 +230,9 @@ const confirmPermanentDelete = async () => {
                 </div>
                 <div className="w-[30%] truncate font-medium text-gray-800">{item.title}</div>
                 <div className="w-[30%]">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-  item.type ? typeStyles[item.type.toLowerCase()] || 'bg-gray-100 text-gray-600' : 'bg-gray-100 text-gray-600'
-}`}>
-  {item.type ? item.type.toLowerCase() : 'unknown'}
-</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${item.type || 'bg-gray-100 text-gray-600'}`}>
+                    {item.type}
+                  </span>
                 </div>
                 <div className="w-[15%] flex justify-end gap-3 pr-3">
                   <button

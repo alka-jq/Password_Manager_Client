@@ -29,12 +29,9 @@ const AllItems = () => {
       await softDeleteItems(idsToDelete);
       setDeleteModalOpen(false);
       setIdsToDelete([]);
-
-      // 🔄 Refresh data
       dispatch(fetchAlldata());
     } catch (error) {
       console.error('Soft delete failed:', error);
-      // Optionally show toast/snackbar error
     }
   };
 

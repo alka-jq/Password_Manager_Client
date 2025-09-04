@@ -4,6 +4,9 @@ import {
   X, Eye, EyeOff, Copy, CheckCircle, Trash,
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
+import { useDispatch, useSelector } from "react-redux"
+import { fetchAlldata } from '../../store/Slices/TableSlice';
+import type { AppDispatch } from '@/store';
 
 type TableItem = {
   id: string;
@@ -31,6 +34,7 @@ interface LoginDetails {
 }
 
 const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
+  const dispatch = useDispatch<AppDispatch>()
   const [details, setDetails] = useState<LoginDetails | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -44,7 +48,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
     const fetchLoginDetails = async () => {
       setLoading(true);
       try {
-        const res = await apiClient.get(`https://password-api.jqmail.me/api/password/items/${item.id}`);
+        const res = await apiClient.get(`/api/password/items/${item.id}`);
         const apiItem = res.data.item;
 
         const formattedData: LoginDetails = {
@@ -100,11 +104,41 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const handleSave = () => {
-    console.log("Saving item:", details);
-    // Here, you would typically call an API to update the item
-    onClose(); // Close after saving
+  const handleSave = async () => {
+    if (!details) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const payload = {
+        title: details.title,
+        email: details.email,
+        username: details.username,
+        password: details.password,
+        two_factor_secret: details.totp,
+        websites: details.websites,
+        notes: details.note,
+        attachments: details.attachments,
+        is_personal: false, // If needed, change based on your UI
+        is_pin: false,
+        is_trash: false,
+        type: 'login',
+      };
+
+      const response = await apiClient.put(`/api/login-credentials/edit/${details.id}`, payload);
+
+      console.log("Save successful:", response.data.message);
+      onClose();
+      dispatch(fetchAlldata());
+    } catch (err) {
+      console.error("Failed to save:", err);
+      setError("Failed to update login credential.");
+    } finally {
+      setLoading(false);
+    }
   };
+
 
 
 
@@ -120,7 +154,25 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-[#2a2b30] dark:to-[#23242a] rounded-t-xl">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{details?.title || item.title}</h2>
+            <h2 className="text-lg font-bold flex items-center gap-2 text-gray-800 dark:text-white">
+              <User className="w-5 h-5" />
+              {editMode ? (
+                <input
+                  type="text"
+                  value={details?.title || ''}
+                  onChange={(e) =>
+                    setDetails((prev: any) => ({
+                      ...prev,
+                      title: e.target.value,
+                    }))
+                  }
+                  className="border-b border-gray-400 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 text-lg font-bold"
+                  autoFocus
+                />
+              ) : (
+                details?.title || 'Untitled'
+              )}
+            </h2>
             <span
               className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
             >

@@ -28,6 +28,7 @@ import Dropdown from '../Dropdown';
 import IconMenu from '../Icon/IconMenu';
 import { useSettings } from '@/useContext/useSettings';
 import { BiSupport } from "react-icons/bi";
+import { setSearchQuery } from "../../store/Slices/searchSlice"; //(nishan)
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -92,6 +93,17 @@ const Header = () => {
         first_name: '',
         email: '',
     });
+    //Seacrh state (by nishan)
+    const [query, setQuery] = useState("");
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setQuery(value);
+        dispatch(setSearchQuery(value));
+    };
+
+
+
     const navigate = useNavigate();
     const themeConfig = useSelector((state: RootState) => state.themeConfig);
     const isRtl = useSelector((state: RootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -249,7 +261,7 @@ const Header = () => {
             this.ref('id');
             this.field('subject');
             this.field('plain_text');
-            this.field('from_email'); 
+            this.field('from_email');
 
             emails.forEach((email) => {
                 this.add({
@@ -350,29 +362,28 @@ const Header = () => {
                                 <div className="flex items-center gap-2   lg:w-[540px] relative">
                                     <input
                                         type="text"
-                                        value={searchTerm}
-                                        onClick={() => dispatch(setSearchingData(true))}
-                                        onChange={handleChange}
+                                        placeholder="Search notes..."
+                                        value={query}
+                                        onChange={handleSearch}
                                         className="textMedium py-2 ltr:pl-10 w-full placeholder: rounded-xl border peach:bg-gray-200 classic:bg-gray-100 lightmint:bg-green-50 blue:bg-[#e0edf7]  border-gray-300 bg-[#fbfbfb] dark:bg-[#2F2F2F] dark:border-[#2F2F2F]  dark:text-white dark:placeholder:text-white focus:outline-none focus:shadow-md transition peer"
-                                        placeholder="Search items..."
                                     />
                                     <button type="button" className="absolute dark:text-white w-8 h-full flex items-center justify-center ml-1 inset-0 ltr:right-auto rtl:left-auto">
                                         <IoIosSearch size={20} className="mx-auto" />
                                     </button>
-                                    
-                          
+
+
                                 </div>
 
-                                {openSearch && (
+                                {/* {openSearch && (
                                     <div ref={popupRef} className="absolute top-0 left-0 w-[540px] bg-white dark:bg-[#202127] z-50 shadow-xl rounded-xl max-h-[80vh] flex flex-col">
                                         <SearchPopup openSearch={openSearch} setOpenSearch={setOpenSearch} emails={emails} />
                                     </div>
-                                )}
+                                )} */}
                             </form>
 
-                            <button type="button" onClick={() => setSearch(!search)} className="search_btn sm:hidden text-black dark:bg-dark/40 mt-1 dark:hover:bg-dark/60">
+                            {/* <button type="button" onClick={() => setSearch(!search)} className="search_btn sm:hidden text-black dark:bg-dark/40 mt-1 dark:hover:bg-dark/60">
                                 <IoIosSearch className="w-5 h-5 mx-auto dark:text-white" />
-                            </button>
+                            </button> */}
                         </div>
                         <div
 

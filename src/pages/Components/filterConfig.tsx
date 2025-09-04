@@ -28,7 +28,7 @@ export const filterConfig: Record<
     label: 'Login',
     icon: <User className={`${iconBaseClass} ${iconColorVariants.login}`} />,
   },
-  'Identity': {
+  'identity': {
     label: 'Identity',
     icon: <Shield className={`${iconBaseClass} ${iconColorVariants.identity}`} />,
   },

@@ -4,6 +4,9 @@ import {
   FileText, Info, Paperclip, LinkIcon, X, User
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
+import { useDispatch, useSelector } from "react-redux"
+import { fetchAlldata } from '../../store/Slices/TableSlice';
+import type { AppDispatch } from '@/store';
 
 type TableItem = {
   id: string;
@@ -18,6 +21,7 @@ type Props = {
 };
 
 const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
+  const dispatch = useDispatch<AppDispatch>()
   const [details, setDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +35,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await apiClient.get(`https://password-api.jqmail.me/api/password/items/${item.id}`);
+        const response = await apiClient.get(`/api/password/items/${item.id}`);
         const data = await response.data;
 
         if (response && data.item) {
@@ -74,11 +78,51 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
     }
   }, [item]);
 
-  const handleSave = () => {
-    console.log("Saving item:", details);
-    // Here, you would typically call an API to update the item
-    onClose(); // Close after saving
+  const handleSave = async () => {
+    if (!details) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Format expiration date to ISO string if it's in MM/YY format
+      let formattedExpirationDate = '';
+      if (details.expirationDate) {
+        const [month, year] = details.expirationDate.split('/');
+        const fullYear = parseInt(year.length === 2 ? `20${year}` : year);
+        formattedExpirationDate = new Date(fullYear, parseInt(month) - 1, 1).toISOString();
+      }
+
+      const payload = {
+        title: details.title,
+        name_on_card: details.nameOnCard,
+        card_number: details.cardNumber,
+        expiration_date: formattedExpirationDate,
+        security_code: details.securityCode,
+        pin: details.pin,
+        attachments: details.attachments || [],
+        two_factor_secret: null,
+        hidden: false,
+        note: details.note || '',
+        is_personal: false,
+        is_pin: false,
+        is_trash: false,
+        type: 'card',
+      };
+
+      const response = await apiClient.put(`/api/card/edit/${item.id}`, payload);
+
+      console.log("Card updated successfully:", response.data.message);
+      onClose(); // Close modal on success
+      dispatch(fetchAlldata());
+    } catch (err: any) {
+      console.error("Error updating card:", err);
+      setError("Failed to update card.");
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   if (!details) return <p className="text-center p-4">Loading card details...</p>;
 
@@ -95,7 +139,25 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
               <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{details.title || "Untitled Card"}</h2>
+              <h2 className="text-lg font-bold flex items-center gap-2 text-gray-800 dark:text-white">
+                <User className="w-5 h-5" />
+                {editMode ? (
+                  <input
+                    type="text"
+                    value={details?.title || ''}
+                    onChange={(e) =>
+                      setDetails((prev: any) => ({
+                        ...prev,
+                        title: e.target.value,
+                      }))
+                    }
+                    className="border-b border-gray-400 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 text-lg font-bold"
+                    autoFocus
+                  />
+                ) : (
+                  details?.title || 'Untitled'
+                )}
+              </h2>
               <span className="text-xs text-gray-500 dark:text-gray-400">{details.type}</span>
             </div>
           </div>
