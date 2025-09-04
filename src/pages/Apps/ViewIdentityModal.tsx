@@ -10,6 +10,7 @@ import {
     LinkIcon,
     Trash2,
 } from 'lucide-react';
+import apiClient from '@/service/apiClient';
 
 // ----------------------
 // Types
@@ -28,38 +29,6 @@ type Props = {
 };
 
 // ----------------------
-// Dummy Data
-// ----------------------
-
-const dummyData = {
-    id: '1',
-    title: 'John Doe',
-    personalDetails: {
-        firstName: 'John',
-        lastName: 'Doe',
-        dateOfBirth: '1990-05-15',
-    },
-    addressDetails: {
-        city: 'New York',
-        country: 'USA',
-    },
-    contactDetails: {
-        email: 'john@example.com',
-        phone: '123-456-7890',
-    },
-    workDetails: {
-        company: 'TechCorp',
-        position: 'Engineer',
-    },
-    dynamicFields: [
-        { id: 'passport', value: 'A123456' },
-        { id: 'driverLicense', value: 'D987654' },
-    ],
-    attachments: ['id-scan.pdf', 'license.jpg'],
-    updatedAt: new Date().toISOString(),
-};
-
-// ----------------------
 // Main Component
 // ----------------------
 
@@ -67,6 +36,9 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
     const modalRef = useRef<HTMLDivElement>(null);
     const [details, setDetails] = useState<any>(null);
     const [isOpen, setIsOpen] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
         personal: true,
         address: true,
@@ -76,14 +48,66 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
         attachments: true,
     });
 
+    // ----------------------
+    // Fetch identity from API
+    // ----------------------
     useEffect(() => {
-        if (item) {
-            setDetails({
-                ...dummyData,
-                id: item.id,
-                title: item.title,
-            });
-        }
+        if (!item?.id) return;
+
+        const fetchIdentity = async () => {
+            try {
+                setLoading(true);
+                const response = await apiClient.get(`/api/password/items/${item.id}`);
+
+                const apiItem = response.data.item;
+
+                const formattedData = {
+                    id: apiItem.id,
+                    title: apiItem.title,
+                    personalDetails: {
+                        fullName: apiItem.full_name,
+                        dateOfBirth: apiItem.dob,
+                    },
+                    addressDetails: {
+                        street: apiItem.street_address,
+                        poBox: apiItem.po_box,
+                        zip: apiItem.zip_code,
+                        city: apiItem.city,
+                        state: apiItem.state,
+                        country: apiItem.country,
+                    },
+                    contactDetails: {
+                        email: apiItem.email,
+                        phone: apiItem.phone_number,
+                        altPhone: apiItem.alt_phone,
+                        homePhone: apiItem.home_phone,
+                        mobilePhone: apiItem.mobile_phone,
+                        workPhone: apiItem.work_phone,
+                        website: apiItem.website,
+                    },
+                    workDetails: {
+                        company: apiItem.company_name,
+                        position: apiItem.job_title,
+                        department: apiItem.department,
+                        workEmail: apiItem.work_email,
+                        workAddress: apiItem.work_address,
+                    },
+                    dynamicFields: apiItem.custom_sections || [],
+                    attachments: apiItem.attachments || [],
+                    notes: apiItem.notes,
+                    updatedAt: apiItem.updated_at,
+                };
+
+                setDetails(formattedData);
+            } catch (err: any) {
+                console.error("Failed to fetch identity:", err);
+                setError("Failed to load identity.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchIdentity();
     }, [item]);
 
     useEffect(() => {

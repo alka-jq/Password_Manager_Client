@@ -3,6 +3,7 @@ import {
   User, Lock, Shield, Link as LinkIcon, FileText,
   X, Eye, EyeOff, Copy, CheckCircle, Trash,
 } from 'lucide-react';
+import apiClient from '@/service/apiClient';
 
 type TableItem = {
   id: string;
@@ -16,7 +17,6 @@ type Props = {
   editMode?: boolean;
 };
 
-// Dummy data structure for login items
 interface LoginDetails {
   id: string;
   title: string;
@@ -27,39 +27,49 @@ interface LoginDetails {
   websites?: string[];
   note?: string;
   lastUpdated: string;
-  file?: string[]
+  attachments?: string[];
 }
 
 const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
   const [details, setDetails] = useState<LoginDetails | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Dummy data for demonstration
-  const dummyLoginData: LoginDetails = {
-    id: item?.id || '1',
-    title: item?.title || 'Sample Login',
-    email: 'user@example.com',
-    username: 'johndoe123',
-    password: 'SecurePassword123!',
-    totp: 'JBSWY3DPEHPK3PXP',
-    websites: [
-      'https://example.com/login',
-      'https://app.example.com'
-    ],
-    note: 'This is a sample login entry with multi-factor authentication enabled.',
-    file: ['document.pdf'],
-    lastUpdated: new Date().toISOString()
-  };
-
   useEffect(() => {
-    // Simulate API fetch with timeout
-    const timer = setTimeout(() => {
-      setDetails(dummyLoginData);
-    }, 500);
+    if (!item?.id) return;
 
-    return () => clearTimeout(timer);
+    const fetchLoginDetails = async () => {
+      setLoading(true);
+      try {
+        const res = await apiClient.get(`https://password-api.jqmail.me/api/password/items/${item.id}`);
+        const apiItem = res.data.item;
+
+        const formattedData: LoginDetails = {
+          id: apiItem.id,
+          title: apiItem.title,
+          email: apiItem.email || '',
+          username: apiItem.username || '',
+          password: apiItem.password || '',
+          totp: apiItem.two_factor_secret || '',
+          websites: apiItem.websites || [],
+          note: apiItem.notes || '',
+          attachments: apiItem.attachments || [],
+          lastUpdated: apiItem.updated_at,
+        };
+
+        setDetails(formattedData);
+      } catch (err) {
+        console.error('Error fetching login item:', err);
+        setError('Failed to load login item.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLoginDetails();
   }, [item]);
 
   useEffect(() => {
@@ -406,7 +416,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wide">
               <FileText className="w-4 h-4" />
-              File{details?.file && details.file.length !== 1 ? 's' : ''}
+              File{details?.attachments && details.attachments.length !== 1 ? 's' : ''}
             </div>
 
             {editMode ? (
@@ -426,9 +436,9 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
           file:bg-blue-50 file:text-blue-700
           hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-white dark:hover:file:bg-gray-600"
                 />
-                {details?.file?.length ? (
+                {details?.attachments?.length ? (
                   <ul className="list-disc list-inside text-gray-800 dark:text-gray-200">
-                    {details.file.map((f, idx) => (
+                    {details.attachments.map((f, idx) => (
                       <li key={idx}>{f}</li>
                     ))}
                   </ul>
@@ -437,10 +447,10 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
                 )}
               </div>
             ) : (
-              <div className={`p-3 rounded-lg ${details?.file && details.file.length > 0 ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-gray-100/50 dark:bg-gray-800/30'}`}>
-                {details?.file && details.file.length > 0 ? (
+              <div className={`p-3 rounded-lg ${details?.attachments && details.attachments.length > 0 ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-gray-100/50 dark:bg-gray-800/30'}`}>
+                {details?.attachments && details.attachments.length > 0 ? (
                   <ul className="list-disc list-inside text-gray-800 dark:text-gray-200">
-                    {details.file.map((f, idx) => (
+                    {details.attachments.map((f, idx) => (
                       <li key={idx}>{f}</li>
                     ))}
                   </ul>

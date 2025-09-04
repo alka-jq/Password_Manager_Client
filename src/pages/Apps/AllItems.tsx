@@ -4,6 +4,7 @@ import DeleteModal from './DeleteModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../store';
 import { fetchAlldata } from '../../store/Slices/TableSlice';
+import { softDeleteItems } from '@/service/TableDataService';
 
 const AllItems = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,13 +24,20 @@ const AllItems = () => {
     setDeleteModalOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // This is placeholder logic (won’t work with Redux state)
-    // You’ll need to dispatch a delete action here in real scenario
-    // e.g., dispatch(deleteItems(idsToDelete))
-    setDeleteModalOpen(false);
-    setIdsToDelete([]);
+  const handleDeleteConfirm = async () => {
+    try {
+      await softDeleteItems(idsToDelete);
+      setDeleteModalOpen(false);
+      setIdsToDelete([]);
+
+      // 🔄 Refresh data
+      dispatch(fetchAlldata());
+    } catch (error) {
+      console.error('Soft delete failed:', error);
+      // Optionally show toast/snackbar error
+    }
   };
+
 
   const handleDeleteCancel = () => {
     setDeleteModalOpen(false);

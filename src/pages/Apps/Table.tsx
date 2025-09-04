@@ -365,14 +365,12 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             {viewItem && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-lg font-semibold">View {viewItem.type} Details</h2>
-                            <button onClick={() => setViewItem(null)} className="text-gray-500 hover:text-gray-800 text-xl">
-                                ✕
-                            </button>
-                        </div>
-                        {viewItem.type === 'identity' && <ViewIdentityModal item={viewItem} onClose={() => setViewItem(null)} />}
-                        {viewItem.type === 'login' && <ViewLogInModal item={viewItem} onClose={() => setViewItem(null)} />}
+                        {viewItem.type === 'identity' && (
+                            <ViewIdentityModal item={viewItem} onClose={() => setViewItem(null)} />
+                        )}
+                        {viewItem.type === 'login' && (
+                            <ViewLogInModal item={viewItem} onClose={() => setViewItem(null)} />
+                        )}
 
                         {viewItem.type === 'card' && <ViewCardModal item={viewItem} onClose={() => setViewItem(null)} />}
                     </div>
@@ -383,13 +381,6 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             {editItem && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-lg font-semibold">Edit {editItem.type} Details</h2>
-                            <button onClick={() => setEditItem(null)} className="text-gray-500 hover:text-gray-800 text-xl">
-                                ✕
-                            </button>
-                        </div>
-
                         {/* Conditionally render based on type */}
                         {editItem.type === 'identity' && <ViewIdentityModal item={editItem} onClose={() => setEditItem(null)} editMode />}
                         {editItem.type === 'login' && <ViewLogInModal item={editItem} onClose={() => setEditItem(null)} editMode />}
