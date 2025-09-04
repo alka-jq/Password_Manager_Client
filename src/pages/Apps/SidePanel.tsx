@@ -22,7 +22,7 @@ import { Box } from '@mui/material';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { HiDotsVertical } from 'react-icons/hi';
 import { GoPencil } from 'react-icons/go';
-
+import ShareModal from '@/components/FormType/ShareModal';
 import { FiUserPlus, FiLogIn } from 'react-icons/fi';
 import { getCardCountsByTab } from '@/store/selectors/cardSelectors';
 import { openAddModal as openCardAddModal } from '@/store/Slices/cardSlice';
@@ -157,8 +157,8 @@ const SidePanel = () => {
     const [isShareOpen, setIsShareOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [vaultToDelete, setVaultToDelete] = useState<Vault | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false); // Changed from isDropdownOpen
-
+    const [isModalOpen, setIsModalOpen] = useState(false); // Changed from isDropdownOpen   
+     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const iconComponents: Record<string, JSX.Element> = {
         Home: <Home size={16} />,
         Briefcase: <Briefcase size={16} />,
@@ -272,9 +272,14 @@ const SidePanel = () => {
         setIsDrawerOpen(true);
     };
 
-    const handleShareVault = (vault: Vault) => {
-        setIsShareOpen(true);
-    };
+     const handleShareVault = () => {
+    // You can also pass vault name or info if needed
+    setIsShareModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsShareModalOpen(false);
+  };
 
     const handleDeleteClick = (vault: Vault) => {
         setVaultToDelete(vault);
@@ -497,21 +502,22 @@ const SidePanel = () => {
                                                                             </Menu.Item>
 
                                                                             <Menu.Item>
-                                                                                {({ active }) => (
-                                                                                    <button
-                                                                                        onClick={(e) => {
-                                                                                            e.stopPropagation();
-                                                                                            handleShareVault(vault);
-                                                                                        }}
-                                                                                        className={`${
-                                                                                            active ? 'bg-gray-100 dark:bg-gray-700' : ''
-                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium`}
-                                                                                    >
-                                                                                        <FiUserPlus className="mr-2 w-4 h-4" />
-                                                                                        Share Cell
-                                                                                    </button>
-                                                                                )}
-                                                                            </Menu.Item>
+        {({ active }) => (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleShareVault(vault);
+            }}
+            className={`${
+              active ? "bg-gray-100 dark:bg-gray-700" : ""
+            } flex items-center w-full px-4 py-2 text-sm font-medium`}
+          >
+            <FiUserPlus className="mr-2 w-4 h-4" />
+            Share Cell
+          </button>
+        )}
+      </Menu.Item>
+
 
                                                                             <Menu.Item>
                                                                                 {({ active }) => (
@@ -548,7 +554,7 @@ const SidePanel = () => {
                                     vaultName={vaultToDelete?.name || ""}
                                 />
 
-
+ <ShareModal isOpen={isShareModalOpen} onClose={handleCloseModal} onConfirm={() => {}} vaultName={vaultToDelete?.name || ""} />
 
                                 <div className="h-px dark:border-[#1b2e4b]"></div>
                             </div>

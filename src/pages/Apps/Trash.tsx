@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LuTrash2 } from "react-icons/lu";
 import { LuPin, LuPinOff } from 'react-icons/lu';
+import { getTrashdata ,bulkDeletePasswords, deletePasswordById, restorePasswords} from '@/service/TableDataService';
 import { MdOutlineRestore } from "react-icons/md";
 import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
-import { bulkDeletePasswords, deletePasswordById, getTrashdata } from '@/service/TableDataService';
 type TableItem = {
   id: string;
   title: string;
   type: string;
 };
 
+// Map item types to style classes
 const typeStyles: Record<string, string> = {
     login: 'text-blue-600 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
     'identity card': 'text-green-600 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
@@ -19,27 +20,12 @@ const typeStyles: Record<string, string> = {
 };
 
 const TrashList: React.FC = () => {
-  // Dummy data
-  // const dummyData = [
-  //   { id: '1', title: 'Email Login', type: 'Login' },
-  //   { id: '2', title: 'Office ID Card', type: 'Identity Card' },
-  //   { id: '3', title: 'Bank Password', type: 'Password' },
-  //   { id: '4', title: 'Social Media Account', type: 'Login' },
-  //   { id: '5', title: 'University ID', type: 'Identity Card' },
-  //   { id: '6', title: 'WiFi Password', type: 'Password' },
-  //   { id: '7', title: 'WiFi Password', type: 'Card' }
-  // ];
-
-  // const [data, setData] = useState(dummyData);
   const [data, setData] = useState<TableItem[]>([]);
   const [selected, setSelected] = useState<boolean[]>([]);
   const [pins, setPins] = useState<boolean[]>([]);
-  const [dropdownVisible, setDropdownVisible] = useState<string | null>(null);
-  const [dropdownPosition, setDropdownPosition] = useState<'above' | 'below'>('below');
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTargetIds, setDeleteTargetIds] = useState<string[]>([]);
+
   // Fetch trash items from API
   useEffect(() => {
     const fetchTrashItems = async () => {
@@ -56,13 +42,7 @@ const TrashList: React.FC = () => {
     };
 
     fetchTrashItems();
-  }, []); // <-- empty array ensures effect runs only once
-
-  // useEffect(() => {
-  //   setData(dummyData);
-  //   setSelected(dummyData.map(() => false));
-  //   setPins(dummyData.map(() => false));
-  // }, []);
+  }, []); 
 
 
 
@@ -87,27 +67,52 @@ const TrashList: React.FC = () => {
   const allSelected = selected.length > 0 && selected.every(Boolean);
   const someSelected = selected.some(Boolean) && !allSelected;
 
-  const handleRestore = (id: string) => {
-    if (window.confirm('Restore this item?')) {
-      setData(data.filter(item => item.id !== id));
-      // Hit your API here
-      console.log('Restoring:', id);
-    }
-  };
+const handleRestore = async (id: string) => {
+  if (!window.confirm('Restore this item?')) return;
+
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    alert('No authentication token found');
+    return;
+  }
+
+  try {
+    await restorePasswords([id], token); // wrap single id in array
+    setData(data.filter(item => item.id !== id));
+  } catch (error) {
+    console.error('Failed to restore item:', error);
+    alert('Failed to restore item');
+  }
+};
+
 
 const handlePermanentDelete = (id: string) => {
   setDeleteTargetIds([id]);
   setShowDeleteModal(true);
 };
 
-  const handleBulkRestore = () => {
-    const ids = data.filter((_, i) => selected[i]).map(item => item.id);
-    if (window.confirm(`Restore ${ids.length} items?`)) {
-      setData(data.filter((_, i) => !selected[i]));
-      setSelected(data.map(() => false));
-      console.log('Bulk restoring:', ids);
-    }
-  };
+const handleBulkRestore = async () => {
+  const ids = data.filter((_, i) => selected[i]).map(item => item.id);
+  if (ids.length === 0) return;
+
+  if (!window.confirm(`Restore ${ids.length} items?`)) return;
+
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    alert('No authentication token found');
+    return;
+  }
+
+  try {
+    await restorePasswords(ids, token);
+    setData(data.filter(item => !ids.includes(item.id)));
+    setSelected(data.map(() => false));
+  } catch (error) {
+    console.error('Bulk restore failed:', error);
+    alert('Failed to restore selected items');
+  }
+};
+
 
 const handleBulkDelete = () => {
   const ids = data.filter((_, i) => selected[i]).map(item => item.id);
@@ -116,68 +121,31 @@ const handleBulkDelete = () => {
   setShowDeleteModal(true);
 };
 
-  const toggleDropdown = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const button = e.currentTarget as HTMLButtonElement;
-    const rect = button.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const dropdownHeight = 80;
-    setDropdownPosition(spaceBelow < dropdownHeight ? 'above' : 'below');
-    setDropdownVisible(dropdownVisible === id ? null : id);
-  };
-
-  const handleClickOutside = (e: MouseEvent) => {
-    const clickedOnButton = Object.values(buttonRefs.current).some(
-      ref => ref && ref.contains(e.target as Node)
-    );
-
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(e.target as Node) &&
-      !clickedOnButton
-    ) {
-      setDropdownVisible(null);
-    }
-  };
-
 const confirmPermanentDelete = async () => {
-  const token = localStorage.getItem('authToken'); // Adjust based on how you store token
-
-  if (!token) {
-    console.error('No auth token found');
-    return;
-  }
-
-  try {
-    if (deleteTargetIds.length === 1) {
-      // Single delete
-      await deletePasswordById(deleteTargetIds[0], token);
-    } else if (deleteTargetIds.length > 1) {
-      // Bulk delete
-      await bulkDeletePasswords(deleteTargetIds, token);
+    try {
+      if (deleteTargetIds.length === 1) {
+        // Single delete
+        await deletePasswordById(deleteTargetIds[0]);
+      } else if (deleteTargetIds.length > 1) {
+        // Bulk delete
+        await bulkDeletePasswords(deleteTargetIds);
+      }
+      // Update UI after successful deletion
+      setData(prevData => prevData.filter(item => !deleteTargetIds.includes(item.id)));
+      setSelected(prevSelected =>
+        prevSelected.filter((_, index) => !deleteTargetIds.includes(data[index]?.id))
+      );
+    } catch (error) {
+      console.error('Error during permanent delete:', error);
+      alert('Failed to delete. Please try again.');
+    } finally {
+      setDeleteTargetIds([]);
+      setShowDeleteModal(false);
     }
-
-    // Update UI after successful deletion
-    setData(prevData => prevData.filter(item => !deleteTargetIds.includes(item.id)));
-    setSelected(prevSelected =>
-      prevSelected.filter((_, index) => !deleteTargetIds.includes(data[index]?.id))
-    );
-  } catch (error) {
-    console.error('Error during permanent delete:', error);
-    alert('Failed to delete. Please try again.');
-  } finally {
-    setDeleteTargetIds([]);
-    setShowDeleteModal(false);
-  }
-};
+  };
 
 
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-return (
+  return (
     <div className="">
       {data.length === 0 ? (
         <div className="flex justify-center items-center h-[80vh]">
@@ -223,7 +191,7 @@ return (
           </div>
 
           {/* Body */}
-          <div className="overflow-y-auto max-h-[70vh]">
+          <div className="overflow-y-auto max-h-[90vh]">
             {data.map((item, index) => (
               <div
                 key={item.id}
@@ -250,9 +218,11 @@ return (
                 </div>
                 <div className="w-[30%] truncate font-medium text-gray-800">{item.title}</div>
                 <div className="w-[30%]">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${typeStyles[item.type.toLowerCase()] || 'bg-gray-100 text-gray-600'}`}>
-                    {item.type.toLowerCase()}
-                  </span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+  item.type ? typeStyles[item.type.toLowerCase()] || 'bg-gray-100 text-gray-600' : 'bg-gray-100 text-gray-600'
+}`}>
+  {item.type ? item.type.toLowerCase() : 'unknown'}
+</span>
                 </div>
                 <div className="w-[15%] flex justify-end gap-3 pr-3">
                   <button
@@ -290,4 +260,3 @@ return (
 };
 
 export default TrashList;
-

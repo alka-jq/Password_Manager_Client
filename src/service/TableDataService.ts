@@ -115,10 +115,7 @@ export const generatePasswordAPI = async (
 export const deletePasswordById = async (id: string, token: string) => {
   try {
     const response = await apiClient.delete(`/api/password/delete/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      });
     return response.data;
   } catch (error: any) {
     console.error(`Failed to delete password with ID ${id}:`, error.response?.data || error.message);
@@ -128,18 +125,38 @@ export const deletePasswordById = async (id: string, token: string) => {
 
 export const bulkDeletePasswords = async (ids: string[], token: string) => {
   try {
-    const response = await apiClient.post(
+    const response = await apiClient.delete(
       '/api/password/delete-multiple',
-      { ids }, // assuming API expects { ids: [...] }
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      { data: { ids } }, // send ids in the request body
     );
     return response.data;
   } catch (error: any) {
     console.error('Bulk delete failed:', error.response?.data || error.message);
     throw new Error('Bulk delete failed');
+  }
+};
+
+
+// Soft Delete API Call
+
+export const softDeleteItems = async (ids: string[]) => {
+const response = await apiClient.patch('/api/password/item/softDelete', {
+id: ids,
+});
+
+return response.data;
+}
+
+//Restore API Call for both by ID and by all 
+export const restorePasswords = async (ids: string[], token: string) => {
+  try {
+    const response = await apiClient.post(
+      '/api/password/restore', // Adjust the path if needed
+      { ids },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Restore failed:', error.response?.data || error.message);
+    throw new Error('Failed to restore passwords');
   }
 };
