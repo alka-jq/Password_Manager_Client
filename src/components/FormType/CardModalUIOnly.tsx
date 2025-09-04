@@ -516,7 +516,7 @@ const data = response.data
             </div>
 
             {/* Attachments Section */}
-            <div className="space-y-4 pt-2">
+            {/* <div className="space-y-4 pt-2">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Paperclip className="h-4 w-4 text-gray-500" />
                 Attachments
@@ -558,7 +558,7 @@ const data = response.data
                   ))}
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* Action Buttons */}
             <div className="flex justify-end flex-col-reverse sm:flex-row gap-3 pt-6 pb-2 border-t border-gray-200 dark:border-gray-700">

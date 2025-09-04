@@ -9,6 +9,7 @@ import FilterDropdown from './FilterDropdown';
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 
+import Loader from '../Components/Loader';
 type TableItem = {
     id: string;
     title: string;
@@ -153,9 +154,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
     // Handle bulk delete action
     const handleBulkDelete = () => {
-        const selectedIds = safeData
-            .filter((_, index) => selected[index])
-            .map(item => item.id);
+        const selectedIds = safeData.filter((_, index) => selected[index]).map((item) => item.id);
 
         if (selectedIds.length > 0 && onBulkDelete) {
             onBulkDelete(selectedIds);
@@ -184,7 +183,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
         <>
             {isLoading ? (
                 <div className="flex justify-center items-center w-full h-[100vh]">
-                    <h1 className="text-2xl">Loading...</h1>
+                    <Loader />
                 </div>
             ) : (
                 <div className="">
@@ -379,9 +378,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                             <ViewLogInModal item={viewItem} onClose={() => setViewItem(null)} />
                         )}
 
-                        {viewItem.type === 'card' && (
-                            <ViewCardModal item={viewItem} onClose={() => setViewItem(null)} />
-                        )}
+                        {viewItem.type === 'card' && <ViewCardModal item={viewItem} onClose={() => setViewItem(null)} />}
                     </div>
                 </div>
             )}
@@ -391,15 +388,9 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
                         {/* Conditionally render based on type */}
-                        {editItem.type === 'identity' && (
-                            <ViewIdentityModal item={editItem} onClose={() => setEditItem(null)} editMode />
-                        )}
-                        {editItem.type === 'login' && (
-                            <ViewLogInModal item={editItem} onClose={() => setEditItem(null)} editMode />
-                        )}
-                        {editItem.type === 'card' && (
-                            <ViewCardModal item={editItem} onClose={() => setEditItem(null)} editMode />
-                        )}
+                        {editItem.type === 'identity' && <ViewIdentityModal item={editItem} onClose={() => setEditItem(null)} editMode />}
+                        {editItem.type === 'login' && <ViewLogInModal item={editItem} onClose={() => setEditItem(null)} editMode />}
+                        {editItem.type === 'card' && <ViewCardModal item={editItem} onClose={() => setEditItem(null)} editMode />}
                     </div>
                 </div>
             )}

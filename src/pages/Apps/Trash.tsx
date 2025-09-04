@@ -1,18 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LuTrash2 } from "react-icons/lu";
 import { LuPin, LuPinOff } from 'react-icons/lu';
-import { getTrashdata } from '@/service/TableDataService';
 import { MdOutlineRestore } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 
+import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
+import { bulkDeletePasswords, deletePasswordById, getTrashdata } from '@/service/TableDataService';
 type TableItem = {
   id: string;
   title: string;
   type: string;
 };
 
+const typeStyles: Record<string, string> = {
+  login: 'text-blue-600 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
+  'identity card': 'text-green-600 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
+  card: 'text-orange-600 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
+  password: 'text-purple-600 bg-gradient-to-b from-purple-100 to-purple-50 border-purple-200',
+  // add more types here if needed
+};
+
 const TrashList: React.FC = () => {
+  // Dummy data
+  // const dummyData = [
+  //   { id: '1', title: 'Email Login', type: 'Login' },
+  //   { id: '2', title: 'Office ID Card', type: 'Identity Card' },
+  //   { id: '3', title: 'Bank Password', type: 'Password' },
+  //   { id: '4', title: 'Social Media Account', type: 'Login' },
+  //   { id: '5', title: 'University ID', type: 'Identity Card' },
+  //   { id: '6', title: 'WiFi Password', type: 'Password' },
+  //   { id: '7', title: 'WiFi Password', type: 'Card' }
+  // ];
+
+  // const [data, setData] = useState(dummyData);
   const [data, setData] = useState<TableItem[]>([]);
   const [selected, setSelected] = useState<boolean[]>([]);
   const [pins, setPins] = useState<boolean[]>([]);
@@ -24,11 +45,8 @@ const TrashList: React.FC = () => {
     );
 
 
-
-
-
-
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTargetIds, setDeleteTargetIds] = useState<string[]>([]);
   // Fetch trash items from API
   useEffect(() => {
     const fetchTrashItems = async () => {
@@ -79,11 +97,8 @@ const TrashList: React.FC = () => {
   };
 
   const handlePermanentDelete = (id: string) => {
-    if (window.confirm('Permanently delete this item?')) {
-      setData(data.filter(item => item.id !== id));
-      // Hit your API here
-      console.log('Deleting permanently:', id);
-    }
+    setDeleteTargetIds([id]);
+    setShowDeleteModal(true);
   };
 
   const handleBulkRestore = () => {
@@ -97,103 +112,147 @@ const TrashList: React.FC = () => {
 
   const handleBulkDelete = () => {
     const ids = data.filter((_, i) => selected[i]).map(item => item.id);
-    if (window.confirm(`Permanently delete ${ids.length} items?`)) {
-      setData(data.filter((_, i) => !selected[i]));
-      setSelected(data.map(() => false));
-      console.log('Bulk deleting:', ids);
-    }
+    if (ids.length === 0) return;
+    setDeleteTargetIds(ids);
+    setShowDeleteModal(true);
   };
 
 
 
+  const confirmPermanentDelete = async () => {
+    try {
+      if (deleteTargetIds.length === 1) {
+        // Single delete
+        await deletePasswordById(deleteTargetIds[0]);
+      } else if (deleteTargetIds.length > 1) {
+        // Bulk delete
+        await bulkDeletePasswords(deleteTargetIds);
+      }
+      // Update UI after successful deletion
+      setData(prevData => prevData.filter(item => !deleteTargetIds.includes(item.id)));
+      setSelected(prevSelected =>
+        prevSelected.filter((_, index) => !deleteTargetIds.includes(data[index]?.id))
+      );
+    } catch (error) {
+      console.error('Error during permanent delete:', error);
+      alert('Failed to delete. Please try again.');
+    } finally {
+      setDeleteTargetIds([]);
+      setShowDeleteModal(false);
+    }
+  };
 
 
   return (
-    <div>
+    <div className="">
       {data.length === 0 ? (
-        <div className='flex justify-center items-center h-[80vh]'>
-          <h1 className='text-xl'>Trash is empty</h1>
+        <div className="flex justify-center items-center h-[80vh]">
+          <h1 className="text-2xl font-medium text-gray-600">Trash is empty</h1>
         </div>
       ) : (
-        <div className='overflow-hidden '>
+        <div className="overflow-hidden bg-white rounded-md shadow-sm">
           {/* Header */}
-          <div className='bg-white sticky top-0 z-10'>
-            <table className='w-full'>
-              <thead>
-                <tr className='flex justify-between px-4 py-2 border-b'>
-                  <th>
-                    <input
-                      type='checkbox'
-                      checked={allSelected}
-                      ref={input => {
-                        if (input) input.indeterminate = someSelected;
-                      }}
-                      onChange={toggleSelectAll}
-                    />
-                  </th>
-                  <th className='w-[23%]'>
-                    {(someSelected || allSelected) ? (
-                      <button onClick={handleBulkRestore}><MdOutlineRestore size={20} /></button>
-                    ) : 'Pin'}
-                  </th>
-                  <th className='w-[23%]'>Title</th>
-                  <th className='w-[23%]'>Type</th>
-                  <th className='w-[10%]'>
-                    {(someSelected || allSelected) ? (
-                      <button onClick={handleBulkDelete}>
-                        <LuTrash2 color='red' size={20} />
-                      </button>
-                    ) : 'Action'}
-                  </th>
-                </tr>
-              </thead>
-            </table>
+          <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
+            <div className="flex items-center px-6 py-3 text-sm font-medium text-gray-500 select-none">
+              <div className="w-[5%] flex justify-center">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  ref={(input) => {
+                    if (input) input.indeterminate = someSelected;
+                  }}
+                  onChange={toggleSelectAll}
+                  className="accent-blue-500 w-4 h-4 cursor-pointer"
+                />
+              </div>
+              <div className="w-[20%] flex justify-center">
+                {(someSelected || allSelected) ? (
+                  <button onClick={handleBulkRestore} className="hover:text-blue-600 transition-colors" title="Restore Selected">
+                    <MdOutlineRestore size={20} />
+                  </button>
+                ) : (
+                  <span className="text-md font-normal opacity-70">Pin</span>
+                )}
+              </div>
+              <div className="w-[30%]">Title</div>
+              <div className="w-[30%]">Type</div>
+              <div className="w-[15%] text-right pr-3">
+                {(someSelected || allSelected) ? (
+                  <button onClick={handleBulkDelete} className="hover:text-red-600 transition-colors" title="Delete Selected">
+                    <LuTrash2 size={20} />
+                  </button>
+                ) : (
+                  <span className="text-md font-normal opacity-70">Action</span>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Body */}
-          <div className='overflow-y-auto h-[84vh]'>
-            <table className='w-full'>
-              <tbody>
-                {filteredData.map((item, index) => (
-                  <tr
-                    key={item.id}
-                    className='flex justify-between px-4 py-2 bg-white hover:bg-gray-50 border-b'
+          <div className="overflow-y-auto max-h-[86vh]">
+            {data.map((item, index) => (
+              <div
+                key={item.id}
+                className={`flex items-center px-6 py-3 text-sm transition-colors border-b border-gray-100 ${selected[index] ? 'bg-blue-50' : 'bg-white hover:bg-gray-50'
+                  }`}
+              >
+                <div className="w-[5%] flex justify-center">
+                  <input
+                    type="checkbox"
+                    checked={selected[index] || false}
+                    onChange={() => toggleSelect(index)}
+                    className="accent-blue-500 w-4 h-4 cursor-pointer"
+                  />
+                </div>
+                <div className="w-[20%] flex justify-center">
+                  <button
+                    onClick={() => togglePin(index)}
+                    className="hover:text-blue-500 transition-colors"
+                    title={pins[index] ? "Unpin" : "Pin"}
                   >
-                    <td>
-                      <input
-                        type='checkbox'
-                        checked={selected[index] || false}
-                        onChange={() => toggleSelect(index)}
-                      />
-                    </td>
-                    <td className='w-[23%]'>
-                      <button onClick={() => togglePin(index)}>
-                        {pins[index] ? <LuPin color='#3b82f6' /> : <LuPinOff />}
-                      </button>
-                    </td>
-                    <td className='w-[23%]'>{item.title}</td>
-                    <td className='w-[23%]'>{item.type}</td>
-                    <td className='w-[10%] relative flex gap-3'>
-                      <button onClick={() => handleRestore(item.id)} title='Restore'>
-                        <MdOutlineRestore />
-                      </button>
-
-                      <button
-                        onClick={() => handlePermanentDelete(item.id)}
-                      >
-                        <LuTrash2 color='gray' />
-                      </button>
-
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    {pins[index] ? <LuPin color="#3b82f6" /> : <LuPinOff />}
+                  </button>
+                </div>
+                <div className="w-[30%] truncate font-medium text-gray-800">{item.title}</div>
+                <div className="w-[30%]">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${item.type || 'bg-gray-100 text-gray-600'}`}>
+                    {item.type}
+                  </span>
+                </div>
+                <div className="w-[15%] flex justify-end gap-3 pr-3">
+                  <button
+                    onClick={() => handleRestore(item.id)}
+                    title="Restore"
+                    className="hover:text-green-600 transition-colors"
+                  >
+                    <MdOutlineRestore size={18} />
+                  </button>
+                  <button
+                    onClick={() => handlePermanentDelete(item.id)}
+                    title="Delete Permanently"
+                    className="hover:text-red-500 transition-colors"
+                  >
+                    <LuTrash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+      )}
+
+      {/* Modal */}
+      {showDeleteModal && (
+        <PermanentDeleteConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={confirmPermanentDelete}
+          itemCount={deleteTargetIds.length}
+        />
       )}
     </div>
   );
 };
 
 export default TrashList;
+

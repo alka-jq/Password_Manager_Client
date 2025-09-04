@@ -101,12 +101,25 @@ const TaskModalUIOnly = () => {
     setSelectedTab(""); // ✅ always blank (Personal)
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!title.trim()) {
-      setErrors({ ...errors, title: true });
-      return;
+  if (!title.trim()) {
+    setErrors({ ...errors, title: true });
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    const selectedVault = vaults.find((v) => v.key === selectedTab);
+
+    const formData = new FormData();
+
+    formData.append("title", title.trim());
+
+    if (attachments.length > 0) {
+      formData.append("attachment", attachments[0]); // API supports only 1 file
     }
 
     setIsSubmitting(true);
@@ -170,7 +183,49 @@ const TaskModalUIOnly = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
+
+    formData.append("two_factor_secret", totp || "");
+    formData.append("password", password || "");
+    formData.append("websites", websites.filter(w => w.trim()).join(","));
+    formData.append("notes", note || "");
+
+    // Replace this with real cell/vault ID — assuming it's selectedTab
+    formData.append("cell_id", selectedTab || ""); // Provide default or handle null
+
+    const token = localStorage.getItem("token"); // Get token however your app stores it
+
+    if (!token) {
+      throw new Error("User token not found");
+    }
+
+    const response = await addLoginCredentials(formData, token);
+
+    console.log("Credential added:", response);
+
+    // You can optionally update Redux here:
+    // dispatch(addTask({
+    //   title,
+    //   email,
+    //   password,
+    //   totp,
+    //   websites,
+    //   note,
+    //   // vaultKey: selectedTab,
+    //   // vaultName: selectedTab === "" ? "Personal" : selectedVault?.name || "",
+    //   // vaultIcon: selectedVault?.icon || "",
+    //   // vaultColor: selectedVault?.color || "",
+    // }));
+
+    dispatch(closeModal());
+    resetForm();
+
+  } catch (error) {
+    console.error("Error adding credential:", error);
+    alert("Something went wrong. Please try again.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const handleWebsiteChange = (index: number, value: string) => {
     const newWebsites = [...websites];

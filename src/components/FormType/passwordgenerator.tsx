@@ -14,8 +14,8 @@ import {
   removeFromPasswordHistory,
 } from "@/store/Slices/passwordSlice"
 import type { PasswordHistory } from "@/store/Slices/passwordSlice"
-import { RefreshCw, Copy, X, Settings, ChevronRight, Check, Eye, EyeOff, Trash2, Key, Sparkles } from "lucide-react"
-
+import { RefreshCw, Copy, X, Settings, ChevronRight, Check, Eye, EyeOff, Trash2, Key, Sparkles, Loader2 } from "lucide-react"
+import { generatePasswordAPI } from "@/service/TableDataService"
 const PasswordGenerator: React.FC = () => {
   const dispatch = useDispatch()
   const { isModalOpen, passwordHistory, currentPassword, passwordStrength } = useSelector(
@@ -42,7 +42,7 @@ const PasswordGenerator: React.FC = () => {
   const [includeNumbersRandom, setIncludeNumbersRandom] = useState(true)
   const [includeSymbols, setIncludeSymbols] = useState(true)
   const [excludeSimilar, setExcludeSimilar] = useState(false)
-
+  const [loading, setLoading] = useState(false)
   // Word lists for memorable passwords
   const adjectives = [
     "Legal", "Track", "Failing", "Unhealthy", "Crafty", "Silent", "Brave", "Quick", 
@@ -71,58 +71,6 @@ const PasswordGenerator: React.FC = () => {
     localStorage.setItem("standalonePasswordHistory", JSON.stringify(passwordHistory))
   }, [passwordHistory])
 
-  // Generate memorable password
-  const generateMemorablePassword = () => {
-    const words = []
-
-    for (let i = 0; i < wordCount; i++) {
-      let word
-      if (i % 2 === 0) {
-        word = adjectives[Math.floor(Math.random() * adjectives.length)]
-      } else {
-        word = nouns[Math.floor(Math.random() * nouns.length)]
-      }
-
-      if (capitalize) {
-        word = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-      } else {
-        word = word.toLowerCase()
-      }
-
-      words.push(word)
-    }
-
-    let password = words.join(separator)
-
-    if (includeNumbers) {
-      const randomNum = Math.floor(Math.random() * 100)
-      password += randomNum
-    }
-
-    return password
-  }
-
-  // Generate random password
-  const generateRandomPassword = () => {
-    let charset = ""
-
-    if (includeLowercase) charset += "abcdefghijklmnopqrstuvwxyz"
-    if (includeUppercase) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    if (includeNumbersRandom) charset += "0123456789"
-    if (includeSymbols) charset += "!@#$%^&*()_+-=[]{}|;:,.<>?"
-
-    if (excludeSimilar) {
-      charset = charset.replace(/[il1Lo0O]/g, "")
-    }
-
-    let password = ""
-    for (let i = 0; i < length; i++) {
-      password += charset.charAt(Math.floor(Math.random() * charset.length))
-    }
-
-    return password
-  }
-
   // Calculate password strength
   const calculateStrength = (password: string): "Weak" | "Fair" | "Good" | "Strong" => {
     let score = 0
@@ -139,26 +87,112 @@ const PasswordGenerator: React.FC = () => {
     if (score <= 4) return "Good"
     return "Strong"
   }
+// Generate memorable password
+  // const generateMemorablePassword = () => {
+  //   const words = []
 
+  //   for (let i = 0; i < wordCount; i++) {
+  //     let word
+  //     if (i % 2 === 0) {
+  //       word = adjectives[Math.floor(Math.random() * adjectives.length)]
+  //     } else {
+  //       word = nouns[Math.floor(Math.random() * nouns.length)]
+  //     }
+
+  //     if (capitalize) {
+  //       word = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  //     } else {
+  //       word = word.toLowerCase()
+  //     }
+
+  //     words.push(word)
+  //   }
+
+  //   let password = words.join(separator)
+
+  //   if (includeNumbers) {
+  //     const randomNum = Math.floor(Math.random() * 100)
+  //     password += randomNum
+  //   }
+
+  //   return password
+  // }
+
+  // Generate random password
+  // const generateRandomPassword = () => {
+  //   let charset = ""
+
+  //   if (includeLowercase) charset += "abcdefghijklmnopqrstuvwxyz"
+  //   if (includeUppercase) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  //   if (includeNumbersRandom) charset += "0123456789"
+  //   if (includeSymbols) charset += "!@#$%^&*()_+-=[]{}|;:,.<>?"
+
+  //   if (excludeSimilar) {
+  //     charset = charset.replace(/[il1Lo0O]/g, "")
+  //   }
+
+  //   let password = ""
+  //   for (let i = 0; i < length; i++) {
+  //     password += charset.charAt(Math.floor(Math.random() * charset.length))
+  //   }
+
+  //   return password
+  // }
+
+  // const generatePassword = () => {
+  //   const newPassword = passwordType === "memorable" ? generateMemorablePassword() : generateRandomPassword()
+  //   const strength = calculateStrength(newPassword)
+
+  //   dispatch(setCurrentPassword(newPassword))
+  //   dispatch(setPasswordStrength(strength))
+
+  //   // Add to history
+  //   const historyEntry: PasswordHistory = {
+  //     id: Date.now().toString(),
+  //     password: newPassword,
+  //     type: passwordType === "memorable" ? "Memorable Password" : "Random Password",
+  //     timestamp: new Date().toISOString(),
+  //     strength,
+  //   }
+
+  //   dispatch(addToPasswordHistory(historyEntry))
+  // }
   // Generate new password
-  const generatePassword = () => {
-    const newPassword = passwordType === "memorable" ? generateMemorablePassword() : generateRandomPassword()
-    const strength = calculateStrength(newPassword)
+  const generatePassword = async () => {
+    setLoading(true)
+  try {
+    let password = ""
+    const type = passwordType
 
-    dispatch(setCurrentPassword(newPassword))
+    if (type === "memorable") {
+      // Construct options for memorable password
+      password = await generatePasswordAPI("memorable", wordCount)
+    } else {
+      // Construct options for random password
+      password = await generatePasswordAPI("random", length)
+    }
+
+    const strength = calculateStrength(password)
+
+    dispatch(setCurrentPassword(password))
     dispatch(setPasswordStrength(strength))
 
-    // Add to history
     const historyEntry: PasswordHistory = {
       id: Date.now().toString(),
-      password: newPassword,
+      password,
       type: passwordType === "memorable" ? "Memorable Password" : "Random Password",
       timestamp: new Date().toISOString(),
       strength,
     }
 
     dispatch(addToPasswordHistory(historyEntry))
+  } catch (error) {
+    console.error("Failed to generate password:", error)
+  } finally {
+    setLoading(false)
   }
+}
+
 
   // Copy to clipboard
   const copyToClipboard = async () => {
@@ -290,9 +324,14 @@ const PasswordGenerator: React.FC = () => {
               </button>
               <button
                 onClick={generatePassword}
+                disabled={loading}
                 className="h-12 w-12 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow"
               >
-                <RefreshCw className="h-5 w-5" />
+                {loading ? (
+    <Loader2 className="h-5 w-5 animate-spin" />
+  ) : (
+    <RefreshCw className="h-5 w-5" />
+  )}
               </button>
             </div>
           </div>
