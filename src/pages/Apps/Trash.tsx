@@ -15,12 +15,6 @@ type TableItem = {
   type: string;
 };
 
-// Map item types to style classes
-const typeStyles: Record<string, string> = {
-  login: 'text-blue-600 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
-  identity: 'text-green-600 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
-  card: 'text-orange-600 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
-};
 
 const TrashList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -79,16 +73,15 @@ const TrashList: React.FC = () => {
   const allSelected = selected.length > 0 && selected.every(Boolean);
   const someSelected = selected.some(Boolean) && !allSelected;
 
-  const handleRestore = async (id: string) => {
-    if (!window.confirm('Restore this item?')) return;
-    try {
-      await restorePasswords([id]);
-      setData(data.filter(item => item.id !== id));
-    } catch (error) {
-      console.error('Failed to restore item:', error);
-      alert('Failed to restore item');
-    }
-  };
+const handleRestore = async (id: string) => {
+  try {
+    await restorePasswords([id]); 
+    setData(data.filter(item => item.id !== id));
+  } catch (error) {
+    console.error('Failed to restore item:', error);
+    alert('Failed to restore item');
+  }
+};
 
 
   const handlePermanentDelete = (id: string) => {
@@ -96,27 +89,18 @@ const TrashList: React.FC = () => {
     setShowDeleteModal(true);
   };
 
-  const handleBulkRestore = async () => {
-    const ids = data.filter((_, i) => selected[i]).map(item => item.id);
-    if (ids.length === 0) return;
-
-    if (!window.confirm(`Restore ${ids.length} items?`)) return;
-
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      alert('No authentication token found');
-      return;
-    }
-
-    try {
-      await restorePasswords(ids);
-      setData(data.filter(item => !ids.includes(item.id)));
-      setSelected(data.map(() => false));
-    } catch (error) {
-      console.error('Bulk restore failed:', error);
-      alert('Failed to restore selected items');
-    }
-  };
+const handleBulkRestore = async () => {
+  const ids = data.filter((_, i) => selected[i]).map(item => item.id);
+  if (ids.length === 0) return;
+  try {
+    await restorePasswords(ids);
+    setData(data.filter(item => !ids.includes(item.id)));
+    setSelected(data.map(() => false));
+  } catch (error) {
+    console.error('Bulk restore failed:', error);
+    alert('Failed to restore selected items');
+  }
+};
 
 
   const handleBulkDelete = () => {

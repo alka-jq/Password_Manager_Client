@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   User, Lock, Shield, Link as LinkIcon, FileText,
-  X, Eye, EyeOff, Copy, CheckCircle, Trash,
+  X, Eye, EyeOff, Copy, CheckCircle, Trash, Plus, Edit3,
+  Globe, Calendar, Save, RotateCcw
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
@@ -139,10 +140,6 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
     }
   };
 
-
-
-
-
   if (!item) return null;
 
   return (
@@ -166,8 +163,9 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
                       title: e.target.value,
                     }))
                   }
-                  className="border-b border-gray-400 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 text-lg font-bold"
+                  className="border-b border-gray-400 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 text-lg font-bold px-2 py-1 rounded-md focus:ring-2 focus:ring-blue-500/30"
                   autoFocus
+                  placeholder="Enter title"
                 />
               ) : (
                 details?.title || 'Untitled'
@@ -189,59 +187,79 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
 
         {/* Body */}
         <div className="px-6 py-5 space-y-5 text-sm overflow-y-auto flex-1">
+          {error && (
+            <div className="p-3 mb-4 rounded-lg bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 flex items-center justify-between">
+              <span>{error}</span>
+              <button onClick={() => setError(null)}>
+                <X size={16} />
+              </button>
+            </div>
+          )}
 
           {/* Email */}
-          <>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wide">
-                <User className="w-4 h-4" />
-                Email
-              </div>
-              {editMode ? (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wide">
+              <User className="w-4 h-4" />
+              Email
+            </div>
+            {editMode ? (
+              <div className="relative">
                 <input
                   type="email"
-                  className="w-full p-2 rounded border dark:bg-gray-900 dark:text-white"
+                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   value={details?.email || ''}
                   onChange={(e) =>
                     setDetails((prev) =>
                       prev ? { ...prev, email: e.target.value } : prev
                     )
                   }
+                  placeholder="Enter email address"
                 />
-              ) : (
-                <div
-                  className={`flex items-center justify-between p-3 rounded-lg ${details?.email
-                    ? 'bg-gray-50 dark:bg-gray-800/50'
-                    : 'bg-gray-100/50 dark:bg-gray-800/30'
+                {details?.email && (
+                  <button
+                    onClick={() => handleCopy(details.email!, 'email')}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                    title="Copy to clipboard"
+                  >
+                    {copiedField === 'email' ? (
+                      <CheckCircle size={16} className="text-green-500" />
+                    ) : (
+                      <Copy size={16} />
+                    )}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div
+                className={`flex items-center justify-between p-3 rounded-lg ${details?.email
+                  ? 'bg-gray-50 dark:bg-gray-800/50'
+                  : 'bg-gray-100/50 dark:bg-gray-800/30'
+                  }`}
+              >
+                <span
+                  className={`${details?.email
+                    ? 'text-gray-800 dark:text-gray-200'
+                    : 'text-gray-400 dark:text-gray-500 italic'
                     }`}
                 >
-                  <span
-                    className={`${details?.email
-                      ? 'text-gray-800 dark:text-gray-200'
-                      : 'text-gray-400 dark:text-gray-500 italic'
-                      }`}
+                  {details?.email || 'Not provided'}
+                </span>
+                {details?.email && (
+                  <button
+                    onClick={() => handleCopy(details.email!, 'email')}
+                    className="p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                    title="Copy to clipboard"
                   >
-                    {details?.email || 'Not provided'}
-                  </span>
-                  {details?.email && (
-                    <button
-                      onClick={() => handleCopy(details.email!, 'email')}
-                      className="p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
-                      title="Copy to clipboard"
-                    >
-                      {copiedField === 'email' ? (
-                        <CheckCircle size={16} className="text-green-500" />
-                      ) : (
-                        <Copy size={16} />
-                      )}
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          </>
-
-          {/* ----------------------------------------- */}
+                    {copiedField === 'email' ? (
+                      <CheckCircle size={16} className="text-green-500" />
+                    ) : (
+                      <Copy size={16} />
+                    )}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Password  */}
           <div className="space-y-2">
@@ -250,47 +268,65 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
               Password
             </div>
             {editMode ? (
-              <>
-                <input className="w-full p-2 rounded border dark:bg-gray-900 dark:text-white"
-                  type='text' value={details?.password || ''}
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-10"
+                  value={details?.password || ''}
                   onChange={(e) =>
                     setDetails((prev) =>
                       prev ? { ...prev, password: e.target.value } : prev
                     )
-                  } />
-              </>
-
-            ) : (
-              <>
-                <div className={`flex items-center justify-between p-3 rounded-lg ${details?.password ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-gray-100/50 dark:bg-gray-800/30'}`}>
-                  <span className={`${details?.password ? 'text-gray-800 dark:text-gray-200 font-mono' : 'text-gray-400 dark:text-gray-500 italic'}`}>
-                    {details?.password ? (showPassword ? details.password : '•'.repeat(12)) : 'Not provided'}
-                  </span>
-                  {details?.password ? (
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
-                        title={showPassword ? "Hide password" : "Show password"}
-                      >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                      <button
-                        onClick={() => handleCopy(details.password!, 'password')}
-                        className="p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
-                        title="Copy to clipboard"
-                      >
-                        {copiedField === 'password' ? <CheckCircle size={16} className="text-green-500" /> : <Copy size={16} />}
-                      </button>
-                    </div>
-                  ) : null}
+                  }
+                  placeholder="Enter password"
+                />
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+                  <button
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                  {details?.password && (
+                    <button
+                      onClick={() => handleCopy(details.password!, 'password')}
+                      className="p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                      title="Copy to clipboard"
+                    >
+                      {copiedField === 'password' ? <CheckCircle size={16} className="text-green-500" /> : <Copy size={16} />}
+                    </button>
+                  )}
                 </div>
-              </>
+              </div>
+            ) : (
+              <div className={`flex items-center justify-between p-3 rounded-lg ${details?.password ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-gray-100/50 dark:bg-gray-800/30'}`}>
+                <span className={`${details?.password ? 'text-gray-800 dark:text-gray-200 font-mono' : 'text-gray-400 dark:text-gray-500 italic'}`}>
+                  {details?.password ? (showPassword ? details.password : '•'.repeat(12)) : 'Not provided'}
+                </span>
+                {details?.password ? (
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                      title={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                    <button
+                      onClick={() => handleCopy(details.password!, 'password')}
+                      className="p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                      title="Copy to clipboard"
+                    >
+                      {copiedField === 'password' ? <CheckCircle size={16} className="text-green-500" /> : <Copy size={16} />}
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             )}
-
           </div>
 
-          {/* 2FA Secret (TOTP) - Always visible */}
+          {/* 2FA Secret (TOTP) */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wide">
               <Shield className="w-4 h-4" />
@@ -298,16 +334,28 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
             </div>
 
             {editMode ? (
-              <input
-                type="text"
-                className="w-full p-2 rounded border dark:bg-gray-900 dark:text-white font-mono"
-                value={details?.totp || ''}
-                onChange={(e) =>
-                  setDetails((prev) =>
-                    prev ? { ...prev, totp: e.target.value } : prev
-                  )
-                }
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
+                  value={details?.totp || ''}
+                  onChange={(e) =>
+                    setDetails((prev) =>
+                      prev ? { ...prev, totp: e.target.value } : prev
+                    )
+                  }
+                  placeholder="Enter 2FA secret key"
+                />
+                {details?.totp && (
+                  <button
+                    onClick={() => handleCopy(details.totp!, 'totp')}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                    title="Copy to clipboard"
+                  >
+                    {copiedField === 'totp' ? <CheckCircle size={16} className="text-green-500" /> : <Copy size={16} />}
+                  </button>
+                )}
+              </div>
             ) : (
               <div className={`flex items-center justify-between p-3 rounded-lg ${details?.totp ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-gray-100/50 dark:bg-gray-800/30'}`}>
                 <span className={`${details?.totp ? 'text-gray-800 dark:text-gray-200 font-mono' : 'text-gray-400 dark:text-gray-500 italic'}`}>
@@ -326,8 +374,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
             )}
           </div>
 
-
-          {/* Websites - Always visible */}
+          {/* Websites */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wide">
@@ -346,9 +393,10 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
                         : prev
                     )
                   }
-                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                  className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-2 py-1 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                 >
-                  + Add URL
+                  <Plus size={14} />
+                  Add URL
                 </button>
               )}
             </div>
@@ -357,23 +405,27 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
               <div className="space-y-2">
                 {(details?.websites || []).map((url, idx) => (
                   <div key={idx} className="flex items-center gap-2">
-                    <input
-                      type="url"
-                      value={url}
-                      className="flex-1 p-2 rounded border dark:bg-gray-900 dark:text-white"
-                      onChange={(e) =>
-                        setDetails((prev) =>
-                          prev
-                            ? {
-                              ...prev,
-                              websites: prev.websites?.map((u, i) =>
-                                i === idx ? e.target.value : u
-                              )
-                            }
-                            : prev
-                        )
-                      }
-                    />
+                    <div className="flex-1 relative">
+                      <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <input
+                        type="url"
+                        value={url}
+                        className="w-full pl-9 pr-8 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        onChange={(e) =>
+                          setDetails((prev) =>
+                            prev
+                              ? {
+                                ...prev,
+                                websites: prev.websites?.map((u, i) =>
+                                  i === idx ? e.target.value : u
+                                )
+                              }
+                              : prev
+                          )
+                        }
+                        placeholder="https://example.com"
+                      />
+                    </div>
                     <button
                       onClick={() =>
                         setDetails((prev) =>
@@ -385,13 +437,19 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
                             : prev
                         )
                       }
-                      className="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/30 rounded transition-colors"
+                      className="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/30 rounded-lg transition-colors"
                       title="Remove this website"
                     >
                       <Trash size={18} />
                     </button>
                   </div>
                 ))}
+                {(!details?.websites || details.websites.length === 0) && (
+                  <div className="text-center py-4 text-gray-400 dark:text-gray-500 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+                    <Globe className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p>No websites added yet</p>
+                  </div>
+                )}
               </div>
             ) : (
               <div
@@ -408,8 +466,9 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[70%]"
+                          className="text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[70%] flex items-center gap-1"
                         >
+                          <Globe size={14} />
                           {url}
                         </a>
                         <button
@@ -435,10 +494,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
             )}
           </div>
 
-
-
-
-          {/* Note - Always visible */}
+          {/* Note */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wide">
               <FileText className="w-4 h-4" />
@@ -446,15 +502,19 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
             </div>
 
             {editMode ? (
-              <textarea
-                className="w-full p-2 rounded border dark:bg-gray-900 dark:text-white resize-none min-h-[100px]"
-                value={details?.note || ''}
-                onChange={(e) =>
-                  setDetails((prev) =>
-                    prev ? { ...prev, note: e.target.value } : prev
-                  )
-                }
-              />
+              <div className="relative">
+                <textarea
+                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none min-h-[100px]"
+                  value={details?.note || ''}
+                  onChange={(e) =>
+                    setDetails((prev) =>
+                      prev ? { ...prev, note: e.target.value } : prev
+                    )
+                  }
+                  placeholder="Add your notes here..."
+                />
+                <Edit3 className="absolute right-3 top-3 text-gray-400 w-4 h-4" />
+              </div>
             ) : (
               <div className={`p-3 rounded-lg ${details?.note ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-gray-100/50 dark:bg-gray-800/30'}`}>
                 <p className={`${details?.note ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 italic'} whitespace-pre-line break-words`}>
@@ -472,30 +532,49 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
             </div>
 
             {editMode ? (
-              <div className="space-y-2">
-                <input
-                  type="file"
-                  multiple
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files || []).map(file => file.name);
-                    setDetails(prev =>
-                      prev ? { ...prev, file: files } : prev
-                    );
-                  }}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-          file:rounded-lg file:border-0
-          file:text-sm file:font-semibold
-          file:bg-blue-50 file:text-blue-700
-          hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-white dark:hover:file:bg-gray-600"
-                />
-                {details?.attachments?.length ? (
-                  <ul className="list-disc list-inside text-gray-800 dark:text-gray-200">
-                    {details.attachments.map((f, idx) => (
-                      <li key={idx}>{f}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-gray-400 dark:text-gray-500 italic">No files selected</p>
+              <div className="space-y-3">
+                <label className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-colors bg-gray-50 dark:bg-gray-900/50">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <FileText className="w-10 h-10 mb-3 text-gray-400" />
+                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Any file type (Max: 10MB)</p>
+                  </div>
+                  <input 
+                    type="file" 
+                    multiple 
+                    className="hidden" 
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []).map(file => file.name);
+                      setDetails(prev =>
+                        prev ? { ...prev, attachments: files } : prev
+                      );
+                    }}
+                  />
+                </label>
+                
+                {details?.attachments && details.attachments.length > 0 && (
+                  <div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-3">
+                    <h4 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Selected files:</h4>
+                    <ul className="space-y-2">
+                      {details.attachments.map((f, idx) => (
+                        <li key={idx} className="flex items-center justify-between bg-white dark:bg-gray-800 p-2 rounded-md">
+                          <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[70%]">{f}</span>
+                          <button
+                            onClick={() => setDetails(prev => 
+                              prev ? { 
+                                ...prev, 
+                                attachments: prev.attachments?.filter((_, i) => i !== idx) 
+                              } : prev
+                            )}
+                            className="p-1 text-red-500 hover:text-red-700 dark:hover:text-red-400 rounded-md hover:bg-red-100 dark:hover:bg-red-900/30"
+                            title="Remove file"
+                          >
+                            <Trash size={14} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
             ) : (
@@ -512,29 +591,46 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
               </div>
             )}
           </div>
-
-
         </div>
 
         {/* Footer */}
         <div className="flex justify-between items-center px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#2a2b30] rounded-b-xl">
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+            <Calendar size={14} />
             Last updated: {details?.lastUpdated ? new Date(details.lastUpdated).toLocaleDateString() : new Date().toLocaleDateString()}
           </div>
 
           {editMode ? (
             <div className="flex gap-2">
               <button
-                onClick={onClose} // ← Cancel edit mode (you must define this)
-                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 text-sm font-medium rounded-lg transition-all shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white dark:focus:ring-offset-gray-800"
+                onClick={onClose}
+                className="px-4 py-2.5 flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium rounded-lg transition-all shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white dark:focus:ring-offset-gray-800"
               >
+                <X size={16} />
                 Cancel
               </button>
               <button
-                onClick={handleSave} // ← Save changes (you must define this)
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                onClick={() => {
+                  // Reset to original values
+                  // This would need access to the original data
+                  console.log("Reset clicked");
+                }}
+                className="px-4 py-2.5 flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-all shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
               >
-                Save
+                <RotateCcw size={16} />
+                Reset
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={loading}
+                className="px-4 py-2.5 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <Save size={16} />
+                )}
+                {loading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           ) : (
@@ -546,8 +642,6 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
             </button>
           )}
         </div>
-
-
       </div>
     </div>
   );

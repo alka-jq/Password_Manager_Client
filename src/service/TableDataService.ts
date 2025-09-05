@@ -139,3 +139,18 @@ export const restorePasswords = async (ids: string[]) => {
     throw new Error('Failed to restore passwords');
   }
 };
+
+// Toggle Pin/Unpin API Call
+export const togglePinStatus = async (ids: string[], is_pin: boolean) => {
+  try {
+    const response = await apiClient.patch('/api/password/items/pin', {
+      ids,
+      is_pin,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('Toggle pin status failed:', error.response?.data || error.message);
+    throw new Error('Failed to toggle pin status');
+  }
+};
