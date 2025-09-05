@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import TaskList from './Table';
 import { getPersonaldata } from '@/service/TableDataService';
 import DeleteModal from './DeleteModal';
+import { softDeleteItems } from '@/service/TableDataService';
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import { fetchItemCount } from '@/store/Slices/countSlice';
 type Item = {
     id: string;
     title: string;
@@ -9,31 +13,7 @@ type Item = {
 };
 
 const Personal = () => {
-    // Dummy data
-    const dummyData = [
-        { id: '1', title: 'hello', type: 'Login' },
-        { id: '2', title: 'Office ID Card', type: 'Identity Card' },
-        { id: '3', title: 'Bank Password', type: 'Password' },
-        { id: '4', title: 'Social Media Account', type: 'Login' },
-        { id: '5', title: 'University ID', type: 'Identity Card' },
-        { id: '6', title: 'WiFi Password', type: 'Password' },
-        { id: '7', title: 'WiFi Password', type: 'Password' },
-        { id: '8', title: 'WiFi Password', type: 'Password' },
-        { id: '9', title: 'WiFi Password', type: 'Password' },
-        { id: '10', title: 'WiFi Password', type: 'Password' },
-        { id: '11', title: 'WiFi Password', type: 'Password' },
-        { id: '12', title: 'WiFi Password', type: 'Password' },
-        { id: '13', title: 'WiFi Password', type: 'Password' },
-        { id: '14', title: 'WiFi Password', type: 'Password' },
-        { id: '15', title: 'WiFi Password', type: 'Password' },
-        { id: '16', title: 'WiFi Password', type: 'Password' },
-        { id: '17', title: 'WiFi Password', type: 'Password' },
-        { id: '18', title: 'WiFi Password', type: 'Password' },
-        { id: '19', title: 'WiFi Password', type: 'Password' },
-        { id: '20', title: 'Nishan', type: 'Password' },
-    ];
-
-    // const [items, setItems] = useState(dummyData);
+    const dispatch = useDispatch<AppDispatch>()
     const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -85,10 +65,15 @@ const Personal = () => {
     };
 
     // Step 3.2: When user confirms in modal
-    const handleDeleteConfirm = () => {
-        setItems((prev) => prev.filter((item) => !idsToDelete.includes(item.id)));
-        setDeleteModalOpen(false);
-        setIdsToDelete([]);
+    const handleDeleteConfirm = async () => {
+        try {
+            await softDeleteItems(idsToDelete);
+            setDeleteModalOpen(false);
+            setIdsToDelete([]);
+            dispatch(fetchItemCount());
+        } catch (error) {
+            console.error('Soft delete failed:', error);
+        }
     };
 
     // Step 3.3: When user cancels modal

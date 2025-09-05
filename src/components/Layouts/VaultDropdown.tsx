@@ -87,7 +87,7 @@ const VaultDropdown: React.FC<Props> = ({
       <Menu.Items className="thin-scrollbar absolute z-50 mt-2 w-44 origin-top-right divide-y divide-gray-100 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none max-h-60 overflow-y-auto">
         <div className="px-1 py-1">
 
-          {/* ✅ Default Option (configurable) */}
+          {/*  Default Option (configurable) */}
           <Menu.Item key={defaultKey}>
             {({ active }) => (
               <button

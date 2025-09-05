@@ -45,6 +45,8 @@ export const getPindata = async () => {
     console.error(error)
   }
 }
+// -------------------------------------------------------------------------
+
 
 // POST API for password Generator 
 export const generatePasswordAPI = async (
@@ -128,7 +130,7 @@ export const softDeleteItems = async (ids: string[]) => {
 export const restorePasswords = async (ids: string[]) => {
   try {
     const response = await apiClient.post(
-      '/api/password/restore', // Adjust the path if needed
+      '/api/password/item/restore', // Adjust the path if needed
       { ids }
     );
     return response.data;

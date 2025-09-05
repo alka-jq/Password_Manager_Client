@@ -47,9 +47,7 @@ const TaskModalUIOnly = () => {
   const [attachments, setAttachments] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // ✅ Initialize selectedTab: default "" (Personal)
   const [selectedTab, setSelectedTab] = useState<string>(() => {
-    // if (isEdit && task?.vaultKey) return task.vaultKey;
     return "";
   });
 

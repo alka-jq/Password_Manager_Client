@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LuTrash2 } from "react-icons/lu";
 import { LuPin, LuPinOff } from 'react-icons/lu';
-import { getTrashdata ,bulkDeletePasswords, deletePasswordById, restorePasswords} from '@/service/TableDataService';
+import { getTrashdata, bulkDeletePasswords, deletePasswordById, restorePasswords } from '@/service/TableDataService';
 import { MdOutlineRestore } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
@@ -54,7 +54,7 @@ const TrashList: React.FC = () => {
     };
 
     fetchTrashItems();
-  }, []); 
+  }, []);
 
 
 
@@ -79,23 +79,16 @@ const TrashList: React.FC = () => {
   const allSelected = selected.length > 0 && selected.every(Boolean);
   const someSelected = selected.some(Boolean) && !allSelected;
 
-const handleRestore = async (id: string) => {
-  if (!window.confirm('Restore this item?')) return;
-
-  const token = localStorage.getItem('authToken');
-  if (!token) {
-    alert('No authentication token found');
-    return;
-  }
-
-  try {
-    await restorePasswords([id]); 
-    setData(data.filter(item => item.id !== id));
-  } catch (error) {
-    console.error('Failed to restore item:', error);
-    alert('Failed to restore item');
-  }
-};
+  const handleRestore = async (id: string) => {
+    if (!window.confirm('Restore this item?')) return;
+    try {
+      await restorePasswords([id]);
+      setData(data.filter(item => item.id !== id));
+    } catch (error) {
+      console.error('Failed to restore item:', error);
+      alert('Failed to restore item');
+    }
+  };
 
 
   const handlePermanentDelete = (id: string) => {
@@ -103,27 +96,27 @@ const handleRestore = async (id: string) => {
     setShowDeleteModal(true);
   };
 
-const handleBulkRestore = async () => {
-  const ids = data.filter((_, i) => selected[i]).map(item => item.id);
-  if (ids.length === 0) return;
+  const handleBulkRestore = async () => {
+    const ids = data.filter((_, i) => selected[i]).map(item => item.id);
+    if (ids.length === 0) return;
 
-  if (!window.confirm(`Restore ${ids.length} items?`)) return;
+    if (!window.confirm(`Restore ${ids.length} items?`)) return;
 
-  const token = localStorage.getItem('authToken');
-  if (!token) {
-    alert('No authentication token found');
-    return;
-  }
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      alert('No authentication token found');
+      return;
+    }
 
-  try {
-    await restorePasswords(ids);
-    setData(data.filter(item => !ids.includes(item.id)));
-    setSelected(data.map(() => false));
-  } catch (error) {
-    console.error('Bulk restore failed:', error);
-    alert('Failed to restore selected items');
-  }
-};
+    try {
+      await restorePasswords(ids);
+      setData(data.filter(item => !ids.includes(item.id)));
+      setSelected(data.map(() => false));
+    } catch (error) {
+      console.error('Bulk restore failed:', error);
+      alert('Failed to restore selected items');
+    }
+  };
 
 
   const handleBulkDelete = () => {
@@ -206,7 +199,7 @@ const handleBulkRestore = async () => {
 
           {/* Body */}
           <div className="overflow-y-auto max-h-[86vh]">
-            {data.map((item, index) => (
+            {filteredData.map((item, index) => (
               <div
                 key={item.id}
                 className={`flex items-center px-6 py-3 text-sm transition-colors border-b border-gray-100 ${selected[index] ? 'bg-blue-50' : 'bg-white hover:bg-gray-50'
@@ -271,3 +264,16 @@ const handleBulkRestore = async () => {
 };
 
 export default TrashList;
+
+// import React from 'react'
+// import CellPopup from '../Components/Cells/CellPopup'
+
+// const Trash = () => {
+//   return (
+//     <div>
+//       <CellPopup/>
+//     </div>
+//   )
+// }
+
+// export default Trash

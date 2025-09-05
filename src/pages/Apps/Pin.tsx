@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import TaskList from "./Table";
 import { getPindata } from '@/service/TableDataService';
 import DeleteModal from './DeleteModal';
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import { fetchItemCount } from '@/store/Slices/countSlice';
+import { softDeleteItems } from '@/service/TableDataService';
+
 type Item = {
     id: string;
     title: string;
@@ -9,38 +14,33 @@ type Item = {
 };
 
 const Pin = () => {
-    // const dummyData = [
-    //     { id: '1', title: 'This is Pin', type: 'Login' },
-    //     { id: '2', title: 'Office ID Card', type: 'Identity Card' },
-    //     { id: '3', title: 'Bank Password', type: 'Password' },
-    //     { id: '4', title: 'Social Media Account', type: 'Login' },
-    //     { id: '5', title: 'University ID', type: 'Identity Card' },
-    //     { id: '6', title: 'WiFi Password', type: 'Password' },
-    // ];
-
-    // const [items, setItems] = useState(dummyData);
+    const dispatch = useDispatch<AppDispatch>();
     const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
+
+
+
+    const fetchData = async () => {
+        console.log("pin data")
+        try {
+            setLoading(true)
+            const res = await getPindata();
+            console.log("all data", res);
+            setItems(res.data);
+        } catch (err) {
+            console.log("backend error")
+            console.error(err)
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     useEffect(() => {
-        const fetchData = async () => {
-            console.log("pin data")
-            try {
-                setLoading(true)
-                const res = await getPindata();
-                console.log("all data", res);
-                setItems(res.data);
-            } catch (err) {
-                console.log("backend error")
-                console.error(err)
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, []);
-
 
     // Handler functions
     const handleEdit = (id: string) => {
@@ -62,11 +62,19 @@ const Pin = () => {
     };
 
     // Step 3.2: When user confirms in modal
-    const handleDeleteConfirm = () => {
-        setItems((prev) => prev.filter((item) => !idsToDelete.includes(item.id)));
-        setDeleteModalOpen(false);
-        setIdsToDelete([]);
+
+    const handleDeleteConfirm = async () => {
+        try {
+            await softDeleteItems(idsToDelete);
+            setDeleteModalOpen(false);
+            setIdsToDelete([]);
+            fetchData()
+            dispatch(fetchItemCount());
+        } catch (error) {
+            console.error('Soft delete failed:', error);
+        }
     };
+
 
     // Step 3.3: When user cancels modal
     const handleDeleteCancel = () => {

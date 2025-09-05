@@ -111,7 +111,6 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                 setLoading(false);
             }
         };
-
         fetchIdentity();
     }, [item]);
 

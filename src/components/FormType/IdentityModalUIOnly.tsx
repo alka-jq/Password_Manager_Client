@@ -29,6 +29,7 @@ import { useVaults } from "@/useContext/VaultContext"
 import apiClient from "@/service/apiClient"
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
+import { fetchItemCount } from '@/store/Slices/countSlice';
 
 const IdentityModalUIOnly = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -204,7 +205,7 @@ const IdentityModalUIOnly = () => {
         acc[field.id] = { label: field.label, value: field.value, type: field.type, section: field.section }
         return acc
       }, {} as Record<string, any>),
-      is_personal: false,
+      is_personal: true,
       is_pin: false,
       is_trash: false,
       // Add vault info if needed:
@@ -227,6 +228,7 @@ const IdentityModalUIOnly = () => {
       dispatch(closeIdentityModal())
       resetForm()
       dispatch(fetchAlldata());
+      dispatch(fetchItemCount());
     } catch (error) {
       console.error("Network or server error:", error)
       setIsSubmitting(false)

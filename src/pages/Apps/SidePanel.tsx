@@ -133,9 +133,9 @@ const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose, items }) => 
                                     onClose();
                                 }}
                                 className="flex items-center w-full p-4 rounded-lg text-left transition-all duration-200
-                  bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20
-                  border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700
-                  hover:shadow-md group"
+                               bg-gray-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20
+                                  border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-700
+                                       hover:shadow-md group"
                             >
                                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40 mr-4">
                                     {item.icon}
@@ -291,7 +291,7 @@ const SidePanel = () => {
         setIsDrawerOpen(true);
     };
 
-    const handleShareVault = (vault:Vault) => {
+    const handleShareVault = (vault: Vault) => {
         // You can also pass vault name or info if needed
         setIsShareModalOpen(true);
     };

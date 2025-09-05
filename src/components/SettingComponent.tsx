@@ -35,7 +35,7 @@ const SettingComponent = () => {
     }, []);
 
     const themes = [
-        { key: 'Light', name: 'UB', color: 'bg-white', bgcolor: "bg-[#133466]", text: 'text-gray-800' },
+        { key: 'Light', name: 'JQ', color: 'bg-white', bgcolor: "bg-[#133466]", text: 'text-gray-800' },
         { key: 'Dark', name: 'Dark', color: 'bg-[#2F2F2F]', bgcolor: "bg-[#202127]", text: 'text-gray-900' },
         { key: 'Classic', name: 'Classic', color: 'bg-gray-300', bgcolor: "bg-[#F8FAFD]", text: 'text-gray-800' },
         { key: 'Blue', name: 'Pale Sky Blue', color: 'bg-[#ACD8FC]', bgcolor: "bg-[#64b5f6]", text: 'text-gray-800' },

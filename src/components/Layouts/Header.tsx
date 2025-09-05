@@ -244,7 +244,7 @@ const Header = () => {
     const nameSeed = userId?.first_name || userId?.email || 'guest';
     const bgColor = getColorFromString(nameSeed);
     const initial = nameSeed.charAt(0).toUpperCase();
-    const { setSettingOpen } = useSettings();
+    const { setSettingOpen } = useSettings(); 
 
     //-------------------search function  main----------------------//
     const { emails, loading } = useEmailSync();
