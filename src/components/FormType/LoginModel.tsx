@@ -23,6 +23,8 @@ import { addLoginCredentials } from "@/service/TableDataService";
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import CellDropDwon from "@/pages/Components/Cells/CellDropDwon"
+import apiClient from "@/service/apiClient";
+import { fetchItemCount } from '@/store/Slices/countSlice';
 
 const TaskModalUIOnly = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -105,7 +107,17 @@ const TaskModalUIOnly = () => {
     }
 
     setIsSubmitting(true);
-
+    const payload = {
+      title: title,
+      email: email,
+      password: password,
+      is_personal: personal,
+      two_factor_secret: totp || '',
+      websites: websites.filter(w => w.trim()).join(","),
+      notes: note || "",
+      cell_id: cellId,
+      attachments: attachments.map(file => file.name) || [],
+    }
 
     try {
 
@@ -142,10 +154,9 @@ const TaskModalUIOnly = () => {
       const response = await addLoginCredentials(formData);
       alert("add sucessfully")
       console.log("Credential added:", response);
-
-
       dispatch(closeModal());
       dispatch(fetchAlldata());
+      dispatch(fetchItemCount());
       resetForm();
 
     } catch (error) {

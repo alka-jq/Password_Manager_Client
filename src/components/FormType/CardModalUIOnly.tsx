@@ -426,7 +426,7 @@ const CardModalUIOnly = () => {
                         ))}
 
                         {/* Add More Section */}
-                        <div className="relative">
+                        {/* <div className="relative">
                             <button
                                 type="button"
                                 onClick={() => setShowDropdown(!showDropdown)}
@@ -451,7 +451,7 @@ const CardModalUIOnly = () => {
                                     ))}
                                 </div>
                             )}
-                        </div>
+                        </div> */}
 
                         {/* Attachments Section */}
                         {/* <div className="space-y-4 pt-2">

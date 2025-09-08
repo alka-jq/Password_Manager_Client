@@ -39,12 +39,6 @@ import {
     Infinity,
 } from 'lucide-react';
 
-interface CellData {
-    id?: string;
-    title?: string;
-    color?: string;
-    icon?: string;
-}
 
 const IdentityModalUIOnly = () => {
     const dispatch = useDispatch<AppDispatch>();
