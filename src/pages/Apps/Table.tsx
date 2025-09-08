@@ -8,6 +8,8 @@ import ViewIdentityModal from './ViewIdentityModal';
 import FilterDropdown from './FilterDropdown';
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
+import { fetchItemCount } from '@/store/Slices/countSlice';
+import { fetchAlldata } from '../../store/Slices/TableSlice';
 
 import Loader from '../Components/Loader';
 import { togglePinStatus } from '@/service/TableDataService';
@@ -39,7 +41,7 @@ const typeStyles: Record<string, string> = {
 const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDelete, onView, onClose, isLoading = false }) => {
     // Safely handle undefined data
     const safeData = data || [];
-
+    const dispatch = useDispatch<AppDispatch>();
     // Initialize pin state from data
     const [pinState, setPinState] = useState<Record<string, boolean>>({});
     const [selected, setSelected] = useState(safeData.map(() => false));
@@ -81,6 +83,8 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                 ...prev,
                 [id]: newPinState
             }));
+            dispatch(fetchAlldata());
+            dispatch(fetchItemCount());
         } catch (error) {
             console.error('Failed to toggle pin:', error);
         }
@@ -160,7 +164,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
         try {
             await togglePinStatus(idsToUpdate, newPinState);
-            
+
             // Update pin state for all selected items
             setPinState(prev => {
                 const updated = { ...prev };
@@ -244,8 +248,8 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
                                     <div className="col-span-1 flex items-center">
                                         {allSelected || someSelected ? (
-                                            <button 
-                                                className="text-gray-700 hover:text-blue-600" 
+                                            <button
+                                                className="text-gray-700 hover:text-blue-600"
                                                 title={safeData.some((_, index) => selected[index] && !pinState[safeData[index].id]) ? "Pin Selected" : "Unpin Selected"}
                                                 onClick={handleBulkPin}
                                             >
@@ -284,7 +288,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                     {filteredData.map((item) => {
                                         const originalIndex = safeData.findIndex((d) => d.id === item.id);
                                         const isPinned = pinState[item.id] || false;
-                                        
+
                                         return (
                                             <div key={item.id} className="grid grid-cols-12 gap-4 px-6 py-3 hover:bg-gray-50 items-center">
                                                 <div className="col-span-1 flex items-center">

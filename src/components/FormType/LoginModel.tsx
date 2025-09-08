@@ -19,14 +19,12 @@ import {
   Upload,
 } from "lucide-react";
 import { useVaults } from "@/useContext/VaultContext";
-import VaultDropdown from "../Layouts/VaultDropdown";
 import { addLoginCredentials } from "@/service/TableDataService";
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
+import CellDropDwon from "@/pages/Components/Cells/CellDropDwon"
 
 const TaskModalUIOnly = () => {
-  const { vaults: rawVaults } = useVaults();
-  const vaults = rawVaults ?? [];
   const dispatch = useDispatch<AppDispatch>()
   const { isModalOpen, modalMode, editTask: task } = useSelector(
     (state: RootState) => state.task
@@ -47,9 +45,9 @@ const TaskModalUIOnly = () => {
   const [attachments, setAttachments] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [selectedTab, setSelectedTab] = useState<string>(() => {
-    return "";
-  });
+  const [cellId, setCellId] = useState(String)
+  const [personal, setPersonal] = useState(Boolean)
+  console.log(personal)
 
   // Initialize form state when modal opens or task changes
   useEffect(() => {
@@ -96,34 +94,20 @@ const TaskModalUIOnly = () => {
     setErrors({ title: false });
     setIsSubmitting(false);
     setAttachments([]);
-    setSelectedTab(""); // ✅ always blank (Personal)
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!title.trim()) {
-    setErrors({ ...errors, title: true });
-    return;
-  }
-
-  setIsSubmitting(true);
-
-  try {
-    const selectedVault = vaults.find((v) => v.key === selectedTab);
-
-    const formData = new FormData();
-
-    formData.append("title", title.trim());
-
-    if (attachments.length > 0) {
-      formData.append("attachment", attachments[0]); // API supports only 1 file
+    if (!title.trim()) {
+      setErrors({ ...errors, title: true });
+      return;
     }
 
     setIsSubmitting(true);
 
+
     try {
-      const selectedVault = vaults.find((v) => v.key === selectedTab);
 
       const formData = new FormData();
 
@@ -143,9 +127,9 @@ const handleSubmit = async (e: React.FormEvent) => {
       formData.append("password", password || "");
       formData.append("websites", websites.filter(w => w.trim()).join(","));
       formData.append("notes", note || "");
+      formData.append("cell_id", cellId);
+      // formData.append("is_personal", true);
 
-      // Replace this with real cell/vault ID — assuming it's selectedTab
-      formData.append("cell_id", selectedTab || ""); // Provide default or handle null
 
       const token = localStorage.getItem("token"); // Get token however your app stores it
 
@@ -153,23 +137,10 @@ const handleSubmit = async (e: React.FormEvent) => {
         throw new Error("User token not found");
       }
 
-      const response = await addLoginCredentials(formData, token);
-
+      const response = await addLoginCredentials(formData);
+      alert("add sucessfully")
       console.log("Credential added:", response);
 
-      // You can optionally update Redux here:
-      // dispatch(addTask({
-      //   title,
-      //   email,
-      //   password,
-      //   totp,
-      //   websites,
-      //   note,
-      //   // vaultKey: selectedTab,
-      //   // vaultName: selectedTab === "" ? "Personal" : selectedVault?.name || "",
-      //   // vaultIcon: selectedVault?.icon || "",
-      //   // vaultColor: selectedVault?.color || "",
-      // }));
 
       dispatch(closeModal());
       dispatch(fetchAlldata());
@@ -182,48 +153,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       setIsSubmitting(false);
     }
 
-    formData.append("two_factor_secret", totp || "");
-    formData.append("password", password || "");
-    formData.append("websites", websites.filter(w => w.trim()).join(","));
-    formData.append("notes", note || "");
-
-    // Replace this with real cell/vault ID — assuming it's selectedTab
-    formData.append("cell_id", selectedTab || ""); // Provide default or handle null
-
-    const token = localStorage.getItem("token"); // Get token however your app stores it
-
-    if (!token) {
-      throw new Error("User token not found");
-    }
-
-    const response = await addLoginCredentials(formData, token);
-
-    console.log("Credential added:", response);
-
-    // You can optionally update Redux here:
-    // dispatch(addTask({
-    //   title,
-    //   email,
-    //   password,
-    //   totp,
-    //   websites,
-    //   note,
-    //   // vaultKey: selectedTab,
-    //   // vaultName: selectedTab === "" ? "Personal" : selectedVault?.name || "",
-    //   // vaultIcon: selectedVault?.icon || "",
-    //   // vaultColor: selectedVault?.color || "",
-    // }));
-
-    dispatch(closeModal());
-    resetForm();
-
-  } catch (error) {
-    console.error("Error adding credential:", error);
-    alert("Something went wrong. Please try again.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   const handleWebsiteChange = (index: number, value: string) => {
     const newWebsites = [...websites];
@@ -267,18 +197,15 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           </div>
 
-          {/* <div className="flex items-center gap-3">
-            <VaultDropdown
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-            />
+          <div className="flex items-center gap-3">
+            <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} />
             <button
               onClick={() => dispatch(closeModal())}
               className="h-9 w-9 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors duration-200 text-gray-500 dark:text-gray-400"
             >
               <X className="h-5 w-5" />
             </button>
-          </div> */}
+          </div>
         </div>
 
         {/* Form */}

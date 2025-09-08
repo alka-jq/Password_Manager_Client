@@ -82,7 +82,7 @@ export const generatePasswordAPI = async (
 }
 
 // / Post API Call For Add Login Credentials
-export const addLoginCredentials = async (formData: FormData, token: string) => {
+export const addLoginCredentials = async (formData: FormData) => {
   try {
     const response = await apiClient.post('/api/login-credentials/add', formData,);
     return response.data;

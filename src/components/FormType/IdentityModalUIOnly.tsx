@@ -24,16 +24,29 @@ import {
   Globe,
   Building,
 } from "lucide-react"
-import VaultDropdown from "../Layouts/VaultDropdown"
-import { useVaults } from "@/useContext/VaultContext"
 import apiClient from "@/service/apiClient"
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import { fetchItemCount } from '@/store/Slices/countSlice';
+import CellDropDwon from "@/pages/Components/Cells/CellDropDwon"
+import {
+  Home, Gift, Store, Heart, AlarmClock, AppWindow, Settings, Users, Ghost,
+  ShoppingCart, Leaf, Shield, Circle, CreditCard, Fish, Smile, Lock, UserCheck, Star,
+  Flame, Wallet, Bookmark, IceCream, Laptop, BookOpen, Infinity,
+} from 'lucide-react';
+
+
+interface CellData {
+  id?: string,
+  title?: string,
+  color?: string,
+  icon?: string,
+}
+
 
 const IdentityModalUIOnly = () => {
   const dispatch = useDispatch<AppDispatch>()
-  const { vaults = [] } = useVaults()
+
   const {
     isModalOpen,
     modalMode,
@@ -41,8 +54,8 @@ const IdentityModalUIOnly = () => {
     expandedSections,
   } = useSelector((state: RootState) => state.identity)
   const identities = useSelector((state: RootState) => state.identity.identities)
-
   const [selectedTab, setSelectedTab] = useState("")
+
   const isEdit = modalMode === "edit"
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -86,6 +99,12 @@ const IdentityModalUIOnly = () => {
   const [attachments, setAttachments] = useState<File[]>([])
   const [errors, setErrors] = useState({ title: false })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [cellId, setCellId] = useState<CellData>()
+  const [personal, setPersonal] = useState(false)
+
+
+console.log(cellId)
+console.log(personal)
 
   const resetForm = () => {
     setTitle("")
@@ -148,13 +167,10 @@ const IdentityModalUIOnly = () => {
       setWorkPhoneNumber(identity.workDetails?.workPhone || "")
       setDynamicFields(identity.dynamicFields || [])
 
-      if (identity.vaultKey && vaults.some(v => v.key === identity.vaultKey)) {
-        setSelectedTab(identity.vaultKey || (vaults[0]?.key ?? ""))
-      }
     } else {
       resetForm()
     }
-  }, [isEdit, identity, vaults])
+  }, [isEdit, identity])
 
   const formatDateForBackend = (input: string) => {
     if (!input) return null;
@@ -173,7 +189,6 @@ const IdentityModalUIOnly = () => {
 
     setIsSubmitting(true)
 
-    const selectedVault = vaults.find((v) => v.key === selectedTab) || vaults[0] || { key: "", name: "" }
 
     // Map your form data to API fields
     const payload = {
@@ -205,19 +220,14 @@ const IdentityModalUIOnly = () => {
         acc[field.id] = { label: field.label, value: field.value, type: field.type, section: field.section }
         return acc
       }, {} as Record<string, any>),
-      is_personal: true,
+      is_personal: personal,
       is_pin: false,
       is_trash: false,
-      // Add vault info if needed:
-      vaultKey: selectedTab || selectedVault.key,
-      vaultName: selectedVault?.name || "",
-      vaultIcon: selectedVault?.icon || "",
-      vaultColor: selectedVault?.color || "",
+      cell_id: cellId
     }
 
     try {
       const response = await apiClient.post("/api/identity/create", payload)
-
       if (!response) {
         console.error("API error:")
         setIsSubmitting(false)
@@ -278,6 +288,7 @@ const IdentityModalUIOnly = () => {
     dispatch(toggleSection(section))
   }
 
+
   if (!isModalOpen) return null
 
   return (
@@ -299,13 +310,10 @@ const IdentityModalUIOnly = () => {
               </p>
             </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            <VaultDropdown
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-              vaults={vaults}
-            />
+          {/* ==================================Cell DropDown===================================== */}
+          <div className="flex ">
+              <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} />
+            {/* ==================================----------------------------------------------------------- */}
 
             <button
               onClick={() => dispatch(closeIdentityModal())}
@@ -314,9 +322,11 @@ const IdentityModalUIOnly = () => {
               <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
             </button>
           </div>
-        </div>
 
-        <div className="overflow-y-auto max-h-[calc(90vh-80px)] thin-scrollbar">
+        
+        </div>
+        {/* ===========================Form Start here=================================== */}
+        <div className="overflow-y-auto h-[80vh] thin-scrollbar">
           <form onSubmit={handleSubmit} className="p-5 space-y-5">
             <div className="space-y-2">
               <label
