@@ -95,46 +95,7 @@ useEffect(() => {
                             </div>
                         </button>
                     </div>
-
-                <div>
-                    <button onClick={() => setcellDropdown(!celldropdown)}>
-                        <div className='flex justify-between w-[8vw] p-2 items-center'>
-                            <div className="flex items-center gap-2">
-                                <span style={{ color: selectedColor }}>
-                                    {iconComponents[selectedIcon]}
-                                </span>
-                                {celltype}
-                            </div>
-                            <div> {celldropdown ? <FaChevronUp /> : <FaChevronDown />}</div>
-                        </div>
-                    </button>
-                </div>
-
-                {celldropdown && (
-                    <div className="absolute top-[8.5vh] right-15 w-[8vw] bg-white border rounded px-4 py-2 space-y-2 max-h-[18vh] overflow-y-auto hide-scrollbar">
-                        <button onClick={(e) => {
-                            setPersonal(true),
-                                setcellDropdown(false),
-                                setCellId(null),
-                                setCellType("Personal"),
-                                setSelectedIcon("Personal"),
-                                setSelectedColor("")
-                        }}>
-                            <span className="flex gap-2"><User size={16} />Personal</span></button>
-                        {celldata.map((cell, index) => (
-                            <div className="font-sans" key={cell.id || index}>
-                                <button onClick={(e) => handleCell(cell)}>
-                                    <span className="flex items-center gap-2">
-                                        <span style={{ color: cell.color }}>
-                                            {iconComponents[cell.icon || "Home"]}
-                                        </span>
-                                        {cell.title}
-                                    </span>
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                               
             </div>
 
             {celldropdown && (
