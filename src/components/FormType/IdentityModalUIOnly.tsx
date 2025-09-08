@@ -36,13 +36,6 @@ import {
 } from 'lucide-react';
 
 
-interface CellData {
-  id?: string,
-  title?: string,
-  color?: string,
-  icon?: string,
-}
-
 
 const IdentityModalUIOnly = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -99,12 +92,10 @@ const IdentityModalUIOnly = () => {
   const [attachments, setAttachments] = useState<File[]>([])
   const [errors, setErrors] = useState({ title: false })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [cellId, setCellId] = useState<CellData>()
-  const [personal, setPersonal] = useState(false)
+  const [cellId, setCellId] = useState<string | null>(null)
+  const [personal, setPersonal] = useState(true)
 
 
-console.log(cellId)
-console.log(personal)
 
   const resetForm = () => {
     setTitle("")
@@ -312,7 +303,7 @@ console.log(personal)
           </div>
           {/* ==================================Cell DropDown===================================== */}
           <div className="flex ">
-              <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} />
+            <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} />
             {/* ==================================----------------------------------------------------------- */}
 
             <button
@@ -323,7 +314,7 @@ console.log(personal)
             </button>
           </div>
 
-        
+
         </div>
         {/* ===========================Form Start here=================================== */}
         <div className="overflow-y-auto h-[80vh] thin-scrollbar">

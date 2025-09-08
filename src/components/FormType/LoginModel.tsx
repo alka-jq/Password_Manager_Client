@@ -23,6 +23,8 @@ import { addLoginCredentials } from "@/service/TableDataService";
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import CellDropDwon from "@/pages/Components/Cells/CellDropDwon"
+import apiClient from "@/service/apiClient";
+import { fetchItemCount } from '@/store/Slices/countSlice';
 
 const TaskModalUIOnly = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -45,9 +47,9 @@ const TaskModalUIOnly = () => {
   const [attachments, setAttachments] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [cellId, setCellId] = useState(String)
-  const [personal, setPersonal] = useState(Boolean)
-  console.log(personal)
+  const [cellId, setCellId] = useState<string | null>(null)
+  const [personal, setPersonal] = useState(true)
+
 
   // Initialize form state when modal opens or task changes
   useEffect(() => {
@@ -105,45 +107,25 @@ const TaskModalUIOnly = () => {
     }
 
     setIsSubmitting(true);
-
+    const payload = {
+      title: title,
+      email: email,
+      password: password,
+      is_personal: personal,
+      two_factor_secret: totp || '',
+      websites: websites.filter(w => w.trim()).join(","),
+      notes: note || "",
+      cell_id: cellId,
+      attachments: attachments.map(file => file.name) || [],
+    }
 
     try {
-
-      const formData = new FormData();
-
-      formData.append("title", title.trim());
-
-      if (attachments.length > 0) {
-        formData.append("attachment", attachments[0]); // API supports only 1 file
-      }
-
-      if (email.trim()) {
-        formData.append("email", email.trim());
-      } else {
-        formData.append("username", email.trim()); // fallback to username if email is empty
-      }
-
-      formData.append("two_factor_secret", totp || "");
-      formData.append("password", password || "");
-      formData.append("websites", websites.filter(w => w.trim()).join(","));
-      formData.append("notes", note || "");
-      formData.append("cell_id", cellId);
-      // formData.append("is_personal", true);
-
-
-      const token = localStorage.getItem("token"); // Get token however your app stores it
-
-      if (!token) {
-        throw new Error("User token not found");
-      }
-
-      const response = await addLoginCredentials(formData);
+      const response = await apiClient.post("/api/login-credentials/add", payload)
       alert("add sucessfully")
       console.log("Credential added:", response);
-
-
       dispatch(closeModal());
       dispatch(fetchAlldata());
+      dispatch(fetchItemCount());
       resetForm();
 
     } catch (error) {
