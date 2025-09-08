@@ -3,11 +3,11 @@ import React, { useState } from "react";
 interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (recipient: string) => void;
   vaultName?: string;
 }
 
-const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose }) => {
+const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, onConfirm }) => {
   const [inputValue, setInputValue] = useState("");
 
   const handleShare = () => {
@@ -15,7 +15,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose }) => {
       alert("Please enter a link or email");
       return;
     }
-    alert(`File shared with: ${inputValue}`);
+    onConfirm(inputValue);
     setInputValue("");
     onClose();
   };

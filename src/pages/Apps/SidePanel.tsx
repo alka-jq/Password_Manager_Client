@@ -61,10 +61,10 @@ import { openPasswordGenerator } from '@/store/Slices/passwordSlice';
 import PasswordGenerator from '@/components/FormType/passwordgenerator';
 import { useVaults, Vault } from '@/useContext/VaultContext';
 // import { getCount } from '@/service/TableDataService';
-import type { RootState } from "@/store"
+import type { RootState } from '@/store';
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import type { AppDispatch } from '@/store';
-
+import { createCell, getAllCell, editCell, deletePasswordById, shareCell } from '@/service/TableDataService';
 
 interface CountState {
     count: {
@@ -76,8 +76,6 @@ interface CountState {
     loading: boolean;
     error: string | null;
 }
-
-
 
 // Removed local Vault interface to avoid import conflict
 const VAULTS_STORAGE_KEY = 'userVaults';
@@ -154,15 +152,16 @@ const CreateModal: React.FC<CreateModalProps> = ({ isOpen, onClose, items }) => 
 const SidePanel = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const dispatch = useDispatch<AppDispatch>()
+    const dispatch = useDispatch<AppDispatch>();
     const { menuBarOpen, setMenuBarOpen } = useAuth();
     const [isEdit, setIsEdit] = useState(false);
 
     const { count, loading, error } = useSelector((state: RootState) => state.count);
-    console.log("check ount", count)
+    console.log('check ount', count);
     const [selectedTab, setSelectedTab] = useState(() => {
         return localStorage.getItem('selectedTab') || 'inbox';
     });
+    const [deleteTargetIds, setDeleteTargetIds] = useState<string[]>([]);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const { vaults, setVaults } = useVaults();
     const [editingVault, setEditingVault] = useState<Vault | null>(null);
@@ -171,6 +170,7 @@ const SidePanel = () => {
     const [vaultToDelete, setVaultToDelete] = useState<Vault | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false); // Changed from isDropdownOpen
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [menuTop, setMenuTop] = useState<number>(0);
     const iconComponents: Record<string, JSX.Element> = {
         Home: <Home size={16} />,
         Briefcase: <Briefcase size={16} />,
@@ -201,7 +201,8 @@ const SidePanel = () => {
         Infinity: <Infinity size={16} />,
         FileText: <FileText size={16} />,
     };
-
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
+    const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
     // Update selectedTab based on current path
     useEffect(() => {
         const currentPath = location.pathname;
@@ -227,56 +228,59 @@ const SidePanel = () => {
         localStorage.setItem('selectedTab', 'inbox');
     }, [location.pathname, vaults]);
 
-    const handleCreateVault = (vaultName: string, iconName: string, color: string) => {
-        const path = `/vault/${vaultName.toLowerCase().replace(/\s+/g, '-')}`;
-        const newVault: Vault = {
-            id: Date.now().toString(),
-            name: vaultName,
-            path,
-            key: `vault-${Date.now()}`,
-            icon: iconName,
-            color: color,
-        };
-
-        // Completely safe update with multiple fallbacks
-        setVaults((prevVaults) => {
-            const currentVaults = Array.isArray(prevVaults) ? prevVaults : [];
-            const updatedVaults = [...currentVaults, newVault];
-
-            try {
-                localStorage.setItem('VAULTS_STORAGE_KEY', JSON.stringify(updatedVaults));
-            } catch (error) {
-                console.error('Failed to save vaults to localStorage', error);
-            }
-
-            return updatedVaults;
-        });
-
-        // Set the new vault as selected
-        setSelectedTab(newVault.key);
-        localStorage.setItem('selectedTab', newVault.key);
-        navigate(path);
+    
+    // When fetching vaults, map title to name for UI consistency
+    const handleCreateVault = async (vaultName: string, iconName: string, color: string) => {
+        try {
+            const formData = new FormData();
+            formData.append('title', vaultName);
+            formData.append('icon', iconName);
+            formData.append('color', color);
+            const response = await createCell(formData);
+            // Fetch updated cells from backend and update vaults state
+            const res = await getAllCell();
+            console.log('Created vault response:', res);
+            // Map API response to UI format
+            setVaults(
+                res.data.map((vault: any) => ({
+                    ...vault,
+                    name: vault.title, // map title to name for UI
+                    key: vault.id, // ensure key is set
+                    path: `/cell/${vault.id}`, // ensure path is set
+                }))
+            );
+        } catch (error) {
+            console.error('Failed to create cell via API', error);
+            return;
+        }
     };
 
     const openDrawer = () => {
         setIsDrawerOpen(true);
     };
 
-    const handleUpdateVault = (vaultId: string, name: string, icon: string, color: string) => {
-        setVaults(
-            vaults.map((v) =>
-                v.id === vaultId
-                    ? {
-                        ...v,
-                        name,
-                        icon,
-                        color,
-                        path: `/vault/${name.toLowerCase().replace(/\s+/g, '-')}`,
-                    }
-                    : v
-            )
-        );
-        setEditingVault(null);
+    const handleUpdateVault = async (vaultId: string, name: string, icon: string, color: string) => {
+        try {
+            const formData = new FormData();
+            formData.append('id', vaultId);
+            formData.append('title', name);
+            formData.append('icon', icon);
+            formData.append('color', color);
+            await editCell(vaultId, formData);
+            // Fetch updated vaults from backend
+            const res = await getAllCell();
+            setVaults(
+                res.data.map((vault: any) => ({
+                    ...vault,
+                    name: vault.title,
+                    key: vault.id,
+                    path: `/vault/${vault.id}`,
+                }))
+            );
+            setEditingVault(null);
+        } catch (error) {
+            console.error('Failed to update cell', error);
+        }
     };
 
     const handleEditVault = (vault: Vault) => {
@@ -284,9 +288,27 @@ const SidePanel = () => {
         setIsDrawerOpen(true);
     };
 
-    const handleShareVault = (vault: Vault) => {
-        // You can also pass vault name or info if needed
+    const [vaultToShare, setVaultToShare] = useState<Vault | null>(null);
+    const [shareRecipient, setShareRecipient] = useState<string>('');
+
+    const openShareModal = (vault: Vault) => {
+        setVaultToShare(vault);
         setIsShareModalOpen(true);
+    };
+
+    const handleShareVault = async () => {
+        if (!vaultToShare) return;
+        try {
+            const formData = new FormData();
+            formData.append('id', vaultToShare.id);
+            formData.append('recipient', shareRecipient);
+            await shareCell(vaultToShare.id, { recipient: shareRecipient }, formData);
+            setIsShareModalOpen(false);
+            setShareRecipient('');
+            setVaultToShare(null);
+        } catch (error) {
+            console.error('Failed to share cell', error);
+        }
     };
 
     const handleCloseModal = () => {
@@ -303,36 +325,47 @@ const SidePanel = () => {
         setVaultToDelete(null);
     };
 
-    const handleConfirmDelete = () => {
+    const handleConfirmDelete = async () => {
         if (vaultToDelete) {
-            setVaults(vaults.filter((v) => v.id !== vaultToDelete.id));
-            setDeleteModalOpen(false);
-            setVaultToDelete(null);
+            try {
+                await deletePasswordById(deleteTargetIds[0]);
+                // Fetch updated vaults from backend
+                const res = await getAllCell();
+                setVaults(
+                    res.data.map((vault: any) => ({
+                        ...vault,
+                        name: vault.title,
+                        key: vault.id,
+                        path: `/vault/${vault.id}`,
+                    }))
+                );
+                setDeleteModalOpen(false);
+                setDeleteTargetIds([]);
 
-            // If the deleted vault was selected, reset to inbox
-            if (selectedTab === vaultToDelete.key) {
-                setSelectedTab('inbox');
-                localStorage.setItem('selectedTab', 'inbox');
-                navigate('/all_items');
+                if (selectedTab === vaultToDelete.key) {
+                    setSelectedTab('inbox');
+                    localStorage.setItem('selectedTab', 'inbox');
+                    navigate('/all_items');
+                }
+            } catch (error) {
+                console.error('Failed to delete cell', error);
             }
         }
     };
 
-
     useEffect(() => {
         localStorage.setItem(VAULTS_STORAGE_KEY, JSON.stringify(vaults));
     }, [vaults]);
-
 
     useEffect(() => {
         dispatch(fetchItemCount());
     }, [dispatch]);
 
     const tabs = [
-        { label: 'All Items', path: '/all_items', icon: MdMoveToInbox, key: 'inbox', count: count?.all_items_count || 0, },
-        { label: 'Personal', path: '/personal', icon: CircleUserRound, key: 'done', count: count?.personal_count || 0, },
+        { label: 'All Items', path: '/all_items', icon: MdMoveToInbox, key: 'inbox', count: count?.all_items_count || 0 },
+        { label: 'Personal', path: '/personal', icon: CircleUserRound, key: 'done', count: count?.personal_count || 0 },
         { label: 'Pin', path: '/pin', icon: Pin, key: 'important', count: count?.pin_count || 0 },
-        { label: 'Trash', path: '/trash', icon: RiDeleteBinLine, key: 'trash', count: count?.trash_count || 0, },
+        { label: 'Trash', path: '/trash', icon: RiDeleteBinLine, key: 'trash', count: count?.trash_count || 0 },
     ];
     const baseClasses =
         'mb-0.5 w-full flex justify-between blue:hover:text-white blue:text-black blue:hover:bg-[#4e96ca59] items-center px-3 py-2 rounded-md font-medium ' +
@@ -404,8 +437,9 @@ const SidePanel = () => {
             <div className="lg:flex lg:relative h-full text-[#fff] lightmint:bg-[#629e7c]">
                 <div className={`overlay bg-black/60 z-[5] w-full h-full fixed inset-0 xl:!hidden ${menuBarOpen ? 'block' : 'hidden'}`} onClick={() => setMenuBarOpen(false)}></div>
                 <div
-                    className={`  lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtr:right-0' : ''
-                        }`}
+                    className={`overflow-hidden lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${
+                        menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtr:right-0' : ''
+                    }`}
                 >
                     <div className="lightmint:bg-[#629e7c]">
                         <div className="py-3 px-5 blue:bg-[#64b5f6]">
@@ -452,7 +486,7 @@ const SidePanel = () => {
 
                                 <div className="border-t border-gray-600 py-3 items-center px-2">
                                     <div className="flex justify-between items-center">
-                                        <div className="flex gap-1 items-center cursor-pointer " onClick={openDrawer}>
+                                        <div className="flex gap-1 items-center cursor-pointer ">
                                             <Tag className="h-4 cursor-pointer" />
                                             My Cells
                                         </div>
@@ -470,18 +504,27 @@ const SidePanel = () => {
                                     }}
                                     onCreate={handleCreateVault}
                                     onEdit={handleUpdateVault}
-                                    editVault={editingVault}
+                                    // Pass editVault with name property for UI
+                                    editVault={
+                                        editingVault
+                                            ? {
+                                                  ...editingVault,
+                                                  name: editingVault.title ?? editingVault.name,
+                                              }
+                                            : null
+                                    }
                                 />
 
-                                <div className="h-[50vh] overflow-hidden">
+                                <div className="h-[55vh] overflow-y-auto thin-scrollbar px-1">
                                     {vaults && vaults.length > 0 && (
                                         <div className="">
                                             {vaults.map((vault) => (
                                                 <div key={vault.id} className="relative group">
                                                     <Tippy content={vault.name} placement="right">
                                                         <div
-                                                            className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''
-                                                                }`}
+                                                            className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${
+                                                                selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''
+                                                            }`}
                                                             onClick={() => handleVaultClick(vault)}
                                                         >
                                                             {/* Left Icon and Name */}
@@ -493,11 +536,30 @@ const SidePanel = () => {
                                                             {/* Dots Dropdown */}
                                                             <div className="relative flex-shrink-0 z-50">
                                                                 <Menu as="div" className="relative inline-block text-left">
-                                                                    <Menu.Button className="rounded-full p-1 hover:bg-white/20 transition duration-150" onClick={(e) => e.stopPropagation()}>
+                                                                    <Menu.Button
+                                                                        className="rounded-full p-1 hover:bg-white/20 transition duration-150"
+                                                                        ref={(el) => (buttonRefs.current[vault.id] = el)}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            const button = buttonRefs.current[vault.id];
+                                                                            if (button) {
+                                                                                const rect = button.getBoundingClientRect();
+                                                                                const menuHeight = 120;
+                                                                                if (rect.top > window.innerHeight / 2) {
+                                                                                    setMenuTop(rect.top - menuHeight);
+                                                                                } else {
+                                                                                    setMenuTop(rect.top + rect.height);
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                    >
                                                                         <HiDotsVertical className="w-4 h-4 text-white" />
                                                                     </Menu.Button>
 
-                                                                    <Menu.Items className="fixed left-[200px] mt-1 w-44 rounded-md bg-white dark:bg-gray-900 shadow-lg ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 dark:divide-gray-700 focus:outline-none z-[100]">
+                                                                    <Menu.Items
+                                                                        className="fixed left-[200px] w-44 rounded-md bg-white dark:bg-gray-900 shadow-lg ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 dark:divide-gray-700 focus:outline-none z-[100]"
+                                                                        style={{ top: menuTop }}
+                                                                    >
                                                                         <div className="py-1 text-gray-900 dark:text-gray-100">
                                                                             <Menu.Item>
                                                                                 {({ active }) => (
@@ -506,8 +568,9 @@ const SidePanel = () => {
                                                                                             e.stopPropagation();
                                                                                             handleEditVault(vault);
                                                                                         }}
-                                                                                        className={`${active ? 'bg-gray-100 dark:bg-gray-700' : ''
-                                                                                            } flex items-center w-full px-4 py-2 text-sm font-medium`}
+                                                                                        className={`${
+                                                                                            active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium`}
                                                                                     >
                                                                                         <GoPencil className="mr-2 w-4 h-4" />
                                                                                         Edit Cell
@@ -520,10 +583,11 @@ const SidePanel = () => {
                                                                                     <button
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
-                                                                                            handleShareVault(vault);
+                                                                                            openShareModal(vault);
                                                                                         }}
-                                                                                        className={`${active ? "bg-gray-100 dark:bg-gray-700" : ""
-                                                                                            } flex items-center w-full px-4 py-2 text-sm font-medium`}
+                                                                                        className={`${
+                                                                                            active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium`}
                                                                                     >
                                                                                         <FiUserPlus className="mr-2 w-4 h-4" />
                                                                                         Share Cell
@@ -538,8 +602,9 @@ const SidePanel = () => {
                                                                                             e.stopPropagation();
                                                                                             handleDeleteClick(vault);
                                                                                         }}
-                                                                                        className={`${active ? 'bg-red-100 dark:bg-red-900/30' : ''
-                                                                                            } flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`}
+                                                                                        className={`${
+                                                                                            active ? 'bg-red-100 dark:bg-red-900/30' : ''
+                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`}
                                                                                     >
                                                                                         <FaRegTrashAlt className="mr-2 w-4 h-4" />
                                                                                         Delete Cell
@@ -558,24 +623,29 @@ const SidePanel = () => {
                                     )}
                                 </div>
 
-                                <DeleteConfirmationModal open={deleteModalOpen} onClose={handleCancelDelete} onConfirm={handleConfirmDelete} vaultName={vaultToDelete?.name || ''} />
-
-                                <ShareModal isOpen={isShareModalOpen} onClose={handleCloseModal} onConfirm={() => {}} vaultName={vaultToDelete?.name || ''} />
+                                <DeleteConfirmationModal open={deleteModalOpen} onClose={handleCancelDelete} onConfirm={handleConfirmDelete} vaultName={vaultToDelete?.name ?? ''} />
+                                <ShareModal
+                                    isOpen={isShareModalOpen}
+                                    onClose={handleCloseModal}
+                                    onConfirm={(recipient) => {
+                                        setShareRecipient(recipient);
+                                        handleShareVault();
+                                    }}
+                                    vaultName={vaultToShare?.title ?? vaultToShare?.name ?? ''}
+                                />
 
                                 <div className="h-px dark:border-[#1b2e4b]"></div>
                             </div>
 
-                            <div className="fixed classic:bg-[#F8FAFD] classic:text-gray-900 cornflower:bg-[#6BB8C5] peach:bg-[#1b2e4b] lightmint:bg-[#629e7c] dark:bg-[#202127] bottom-0 py-2 z-50 px-3 w-[250px] text-center salmonpink:bg-[#006d77] blue:bg-[#64b5f6] softazure:bg-[] blue:text-gray-900">
-                                <div className="flex flex-col justify-center items-center h-full">
-                                    <div className="h-1.5 bg-[#222222] flex w-full items-center rounded-full">
-                                        <div className="h-1 bg-white w-7 rounded-full"></div>
-                                    </div>
-                                    <div className="flex w-full pt-2 justify-between font-medium">
-                                        <span>
-                                            6.84 MB / <span className="font-light">500.00 MB</span>
-                                        </span>
-                                        <span className="ml-2">v6.0.65.5</span>
-                                    </div>
+                            <div className="fixed py-2 bottom-0 z-50 px-3 w-[250px] text-center bg-[#133466]">
+                                <div className="h-1.5 bg-[#222222] flex w-full items-center rounded-full">
+                                    <div className="h-1 bg-white w-7 rounded-full"></div>
+                                </div>
+                                <div className="flex w-full pt-2 justify-between font-medium text-white">
+                                    <span className="text-sm">
+                                        6.84 MB / <span className="font-light">500.00 MB</span>
+                                    </span>
+                                    <span className="ml-2 text-sm">v6.0.65.5</span>
                                 </div>
                             </div>
                         </div>

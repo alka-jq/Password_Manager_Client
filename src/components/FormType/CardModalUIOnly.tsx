@@ -104,7 +104,7 @@ const getInitialTab = useCallback(() => {
 
   
 
-  const selectedVault = vaults.find((v) => v.key === selectedTab)
+  // const selectedVault = vaults.find((v) => v.key === selectedTab)
 
   const fieldTypes = [
     { type: "text" as const, label: "Text", icon: FileText },

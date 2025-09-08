@@ -201,7 +201,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
 
                                     {!isIframe && rightSidePanel && (
                                         <div
-                                            className={`bg-white salmonpink:bg-[#006d77] peach:border-[#1b2e4b] cornflower:border-[#6BB8C5] classic:bg-[#F8FAFD] blue:bg-[#64b5f6] cornflower:bg-[#6BB8C5] lightmint:border-[#629e7c] lightmint:bg-[#629e7c] px-1 peach:bg-[#1b2e4b] py-5 dark:bg-[#202127] dark:border-[#202127] h-[100vh] flex flex-col justify-between border-l-[2px] border-gray-300  softazure:bg-[#9a8c98] softazure:border-none blue:border-none salmonpink:border-none `}
+                                            className={`bg-white overflow-hidden   salmonpink:bg-[#006d77] peach:border-[#1b2e4b] cornflower:border-[#6BB8C5] classic:bg-[#F8FAFD] blue:bg-[#64b5f6] cornflower:bg-[#6BB8C5] lightmint:border-[#629e7c] lightmint:bg-[#629e7c] px-1 peach:bg-[#1b2e4b] py-5 dark:bg-[#202127] dark:border-[#202127] h-[100vh] flex flex-col justify-between border-l-[2px] border-gray-300  softazure:bg-[#9a8c98] softazure:border-none blue:border-none salmonpink:border-none `}
                                         >
                                             <div className="text-primary ">
                                                 <div className="mb-2">

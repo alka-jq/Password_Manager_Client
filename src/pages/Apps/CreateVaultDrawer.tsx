@@ -46,19 +46,19 @@ const CreateVaultDrawer: React.FC<CreateVaultDrawerProps> = ({
   onEdit,
   editVault,
 }) => {
-  const [title, setTitle] = useState('');
-  const [selectedIcon, setSelectedIcon] = useState(editVault?.icon || 'Home');
-  const [selectedColor, setSelectedColor] = useState(editVault?.color || colorOptions[0]);
+  const [title, setTitle] = useState(editVault?.name ?? '');
+  const [selectedIcon, setSelectedIcon] = useState(editVault?.icon ?? 'Home');
+  const [selectedColor, setSelectedColor] = useState(editVault?.color ?? colorOptions[0]);
   const [isTouched, setIsTouched] = useState(false);
   const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
 
-  const isTitleValid = title.trim() !== '';
+  const isTitleValid = (title ?? '').trim() !== '';
 
   useEffect(() => {
     if (editVault) {
-      setTitle(editVault.name);
-      setSelectedIcon(editVault.icon);
-      setSelectedColor(editVault.color);
+      setTitle(editVault.name ?? '');
+      setSelectedIcon(editVault.icon ?? 'Home');
+      setSelectedColor(editVault.color ?? colorOptions[0]);
     } else {
       setTitle('');
       setSelectedIcon('Home');

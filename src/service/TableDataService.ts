@@ -154,3 +154,36 @@ export const togglePinStatus = async (ids: string[], is_pin: boolean) => {
     throw new Error('Failed to toggle pin status');
   }
 };
+
+// Create a Cell API call 
+
+export const createCell = async (FormData: FormData) =>{
+  try {
+    const response = await apiClient.post('/api/identity/cell/create', FormData)
+    return response.data
+  } catch (error) { 
+    console.error('Failed to create cell:', error)
+    throw new Error('Failed to create cell')
+  }
+}
+
+// Edit a cell API call 
+
+export const editCell = async (id: string, formData: FormData) =>{
+  try {
+    const response = await apiClient.put(`/api/identity/cell/edit/${id}`, formData)
+    return response.data
+  } catch (error) {
+    console.error('Failed to edit the cell:', error)
+    throw new Error('Failed to edit the cell')
+  }
+}
+// Share API Call 
+export const shareCell = async (id: string, shareData: { recipient: string; }, formData: FormData) =>{
+  try {
+    const response = await apiClient.post('/api/card/share', formData)
+  } catch (error) {
+    console.log("Fail to share the cell", error)
+    throw new Error("Failed to share the required cell")
+  }
+}

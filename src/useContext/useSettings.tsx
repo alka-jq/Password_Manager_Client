@@ -151,7 +151,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
         },
       });
 
@@ -203,8 +203,9 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(payloadToSend),
       });
 
