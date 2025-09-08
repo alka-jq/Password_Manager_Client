@@ -21,11 +21,11 @@ import {
   AlertCircle,
   Trash2,
 } from "lucide-react"
-import VaultDropdown from "../Layouts/VaultDropdown"
-import { useVaults } from "@/useContext/VaultContext"
 import apiClient from "@/service/apiClient"
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
+import CellDropDwon from "@/pages/Components/Cells/CellDropDwon"
+
 interface DynamicField {
   id: string
   type: "text" | "note" | "2fa" | "hidden" | "date"
@@ -33,10 +33,13 @@ interface DynamicField {
   value: string
 }
 
+interface Type {
+  peronal:Boolean
+}
+
+
 const CardModalUIOnly = () => {
     const dispatch = useDispatch<AppDispatch>()
-  const { vaults: rawVaults } = useVaults()
-  const vaults = rawVaults ?? []
   const { isModalOpen, modalMode, editCard: card } = useSelector(
     (state: RootState) => state.card
   )
@@ -58,9 +61,12 @@ const CardModalUIOnly = () => {
   const [showDropdown, setShowDropdown] = useState(false)
   const [showPin, setShowPin] = useState(false)
   const [showSecurityCode, setShowSecurityCode] = useState(false)
+  
 
-  // Initialize selectedTab with first vault's key or card's vaultKey
-  const [selectedTab, setSelectedTab] = useState<string>("")
+  const [cellId, setCellId] = useState("")
+  const [personal, setPersonal] = useState<Type>()
+  console.log(cellId)
+  console.log(personal)
 
 const getInitialTab = useCallback(() => {
   // if (isEdit && card?.vaultKey) return card.vaultKey;
@@ -80,7 +86,7 @@ const getInitialTab = useCallback(() => {
     setAttachments([])
     setErrors({ title: false })
     setIsSubmitting(false)
-    setSelectedTab(getInitialTab())
+
   }, [getInitialTab])
 
   // Initialize form when modal opens or edit mode changes
@@ -104,7 +110,6 @@ const getInitialTab = useCallback(() => {
 
   
 
-  // const selectedVault = vaults.find((v) => v.key === selectedTab)
 
   const fieldTypes = [
     { type: "text" as const, label: "Text", icon: FileText },
@@ -133,6 +138,8 @@ const getInitialTab = useCallback(() => {
     formData.append("security_code", securityCode)
     formData.append("pin", pin)
     formData.append("note", note)
+    formData.append("cell_id", cellId)
+    formData.append("is_personal", personal)
 
     // NEW: Add dynamic fields (as JSON string)
     if (dynamicFields.length > 0) {
@@ -250,11 +257,7 @@ const data = response.data
           </div>
           
           <div className="flex items-center gap-3">
-            <VaultDropdown
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-              vaults={vaults}
-            />
+           <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} />
             
             <button
               onClick={() => dispatch(closeCardModal())}

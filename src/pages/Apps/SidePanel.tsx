@@ -157,7 +157,6 @@ const SidePanel = () => {
     const [isEdit, setIsEdit] = useState(false);
 
     const { count, loading, error } = useSelector((state: RootState) => state.count);
-    console.log('check ount', count);
     const [selectedTab, setSelectedTab] = useState(() => {
         return localStorage.getItem('selectedTab') || 'inbox';
     });

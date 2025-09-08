@@ -249,6 +249,8 @@ const handleBulkRestore = async () => {
 
 export default TrashList;
 
+
+
 // import React from 'react'
 // import CellPopup from '../Components/Cells/CellPopup'
 
