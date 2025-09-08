@@ -100,7 +100,7 @@ const CellDropDwon: FunctionComponent<Props> = ({ cellId, setCellId, personal, s
                 </div>
 
                 {celldropdown && (
-                    <div className="absolute top-[8.5vh] right-10 w-[8vw] bg-white border rounded px-4 py-2 space-y-2 max-h-[18vh] overflow-y-auto hide-scrollbar">
+                    <div className="absolute top-[8.5vh] right-15 w-[8vw] bg-white border rounded px-4 py-2 space-y-2 max-h-[18vh] overflow-y-auto hide-scrollbar">
                         <button onClick={(e) => {
                             setPersonal(true),
                                 setcellDropdown(false),
