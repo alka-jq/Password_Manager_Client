@@ -45,8 +45,8 @@ const TaskModalUIOnly = () => {
   const [attachments, setAttachments] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [cellId, setCellId] = useState(String)
-  const [personal, setPersonal] = useState(Boolean)
+  const [cellId, setCellId] = useState<string | null>(null)
+  const [personal, setPersonal] = useState<boolean>(false)
   console.log(personal)
 
   // Initialize form state when modal opens or task changes
@@ -127,7 +127,9 @@ const TaskModalUIOnly = () => {
       formData.append("password", password || "");
       formData.append("websites", websites.filter(w => w.trim()).join(","));
       formData.append("notes", note || "");
-      formData.append("cell_id", cellId);
+      if (cellId) {
+        formData.append("cell_id", cellId);
+      }
       // formData.append("is_personal", true);
 
 

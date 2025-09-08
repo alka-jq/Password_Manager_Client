@@ -46,8 +46,10 @@ interface CellData {
     icon?: string,
 }
 interface Props {
-    id: string
-    personal: Boolean
+    cellId: string | null;
+    setCellId: (id: string | null) => void;
+    personal: boolean;
+    setPersonal: (p: boolean) => void;
 }
 
 
@@ -56,6 +58,8 @@ const CellDropDwon: FunctionComponent<Props> = ({ cellId, setCellId, personal, s
     const [celldata, setCellData] = useState<CellData[]>([]);
     const [celldropdown, setcellDropdown] = useState(false)
     const [celltype, setCellType] = useState("Personal")
+    const [selectedIcon, setSelectedIcon] = useState<string>("Personal")
+    const [selectedColor, setSelectedColor] = useState<string>("")
 
     const fetchCell = async () => {
         const res = await apiClient.get("/api/password/getCell")
@@ -65,10 +69,12 @@ const CellDropDwon: FunctionComponent<Props> = ({ cellId, setCellId, personal, s
         fetchCell()
     }, [])
 
-    const handleCell = async (cell) => {
+    const handleCell = async (cell: CellData) => {
         const id = cell.id
-        setCellId(id)
-        setCellType(cell.title)
+        setCellId(id || null)
+        setCellType(cell.title || "")
+        setSelectedIcon(cell.icon || "Home")
+        setSelectedColor(cell.color || "")
         setcellDropdown(false)
         setPersonal(false)
     };
@@ -79,22 +85,17 @@ const CellDropDwon: FunctionComponent<Props> = ({ cellId, setCellId, personal, s
                 <div className="relative rounded-xl overflow-hidden  border  flex items-center justify-between bg-white font-sans ">
 
                     <div>
-                        {celldropdown ? (
-                            <button onClick={() => setcellDropdown(false)}>
-                                <div className='flex justify-between w-[8vw] p-2 items-center'>
-                                    <div> {celltype}</div>
-                                    <div>  <FaChevronDown /></div>
+                        <button onClick={() => setcellDropdown(!celldropdown)}>
+                            <div className='flex justify-between w-[8vw] p-2 items-center'>
+                                <div className="flex items-center gap-2">
+                                    <span style={{ color: selectedColor }}>
+                                        {iconComponents[selectedIcon]}
+                                    </span>
+                                    {celltype}
                                 </div>
-
-                            </button>
-                        ) : (
-                            <button onClick={() => setcellDropdown(true)}>
-                                <div className='flex justify-between w-[8vw] p-2 items-center'>
-                                    <div> {celltype}</div>
-                                    <div>  <FaChevronUp /></div>
-                                </div>
-                            </button>
-                        )}
+                                <div> {celldropdown ? <FaChevronUp /> : <FaChevronDown />}</div>
+                            </div>
+                        </button>
                     </div>
 
                 </div>
@@ -105,15 +106,17 @@ const CellDropDwon: FunctionComponent<Props> = ({ cellId, setCellId, personal, s
                             setPersonal(true),
                                 setcellDropdown(false),
                                 setCellId(null),
-                                setCellType("personal")
+                                setCellType("Personal"),
+                                setSelectedIcon("Personal"),
+                                setSelectedColor("")
                         }}>
                             <span className="flex gap-2"><User size={16} />Personal</span></button>
                         {celldata.map((cell, index) => (
-                            <div className="font-sans">
+                            <div className="font-sans" key={cell.id || index}>
                                 <button onClick={(e) => handleCell(cell)}>
                                     <span className="flex items-center gap-2">
                                         <span style={{ color: cell.color }}>
-                                            {iconComponents[cell.icon]}
+                                            {iconComponents[cell.icon || "Home"]}
                                         </span>
                                         {cell.title}
                                     </span>
