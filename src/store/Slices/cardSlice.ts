@@ -347,6 +347,8 @@ export interface Card {
   attachments: string[]
   created_at: string
   date: string
+  cellId?:string|null
+  personal?:boolean
   // assigneeColor: string
   // Optional fields (keep if used elsewhere in your app)
   // description?: string
