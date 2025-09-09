@@ -44,8 +44,7 @@ const CardModalUIOnly = () => {
 
     const [cellId, setCellId] = useState<string | null>(null);
     const [personal, setPersonal] = useState<boolean>(false);
-    console.log(cellId);
-    console.log(personal);
+  
 
     const getInitialTab = useCallback(() => {
         // if (isEdit && card?.vaultKey) return card.vaultKey;
@@ -140,7 +139,6 @@ const CardModalUIOnly = () => {
             if (!response) {
                 throw new Error(data.message || 'Something went wrong.');
             }
-            console.log('Card added successfully:', data);
             dispatch(closeCardModal());
             dispatch(fetchAlldata());
             dispatch(fetchItemCount());

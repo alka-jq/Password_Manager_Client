@@ -3,7 +3,7 @@ import apiClient from '@/service/apiClient';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 interface CountData {
-    all_items_count: number;
+    all_count: number;
     personal_count: number;
     pin_count: number;
     trash_count: number;
