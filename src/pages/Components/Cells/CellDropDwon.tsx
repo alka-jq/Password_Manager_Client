@@ -50,9 +50,11 @@ interface Props {
     setCellId: (id: string | null) => void;
     personal: boolean;
     setPersonal: (p: boolean) => void;
+    initialCellId?: string | null;
+    initialPersonal?: boolean;
 }
 
-const CellDropDwon: FunctionComponent<Props> = ({ cellId, setCellId, personal, setPersonal }) => {
+const CellDropDwon: FunctionComponent<Props> = ({ cellId, setCellId, personal, setPersonal, initialCellId = null, initialPersonal = true }) => {
     const [celldata, setCellData] = useState<CellData[]>([]);
     const [celldropdown, setcellDropdown] = useState(false)
     const [celltype, setCellType] = useState("Personal")
@@ -66,6 +68,27 @@ const fetchCell = async () => {
 useEffect(() => {
     fetchCell()
 }, [])
+
+useEffect(() => {
+    if (celldata.length > 0) {
+        if (initialPersonal) {
+            setCellType("Personal")
+            setSelectedIcon("Personal")
+            setSelectedColor("")
+            setCellId(null)
+            setPersonal(true)
+        } else if (initialCellId) {
+            const cell = celldata.find(c => c.id === initialCellId)
+            if (cell) {
+                setCellType(cell.title || "")
+                setSelectedIcon(cell.icon || "Home")
+                setSelectedColor(cell.color || "")
+                setCellId(cell.id || null)
+                setPersonal(false)
+            }
+        }
+    }
+}, [celldata, initialCellId, initialPersonal, setCellId, setPersonal])
 
     const handleCell = async (cell: CellData) => {
         const id = cell.id
@@ -110,7 +133,7 @@ useEffect(() => {
                     }}>
                         <span className="flex gap-2"><User size={16} />Personal</span></button>
                     {celldata.map((cell, index) => (
-                        <div className="font-sans">
+                        <div className="font-sans" key={index}>
                             <button onClick={(e) => handleCell(cell)}>
                                 <span className="flex items-center gap-2">
                                     <span style={{ color: cell.color }}>

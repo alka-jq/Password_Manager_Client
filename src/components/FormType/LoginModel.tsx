@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { addTask, editTask, closeModal } from "@/store/Slices/taskSlice";
+import { useParams } from "react-router-dom";
 import {
   X,
   Eye,
@@ -31,6 +32,8 @@ const TaskModalUIOnly = () => {
   const { isModalOpen, modalMode, editTask: task } = useSelector(
     (state: RootState) => state.task
   );
+
+  const { vaultId } = useParams<{ vaultId: string }>();
 
   const isEdit = modalMode === "edit";
 
@@ -63,9 +66,11 @@ const TaskModalUIOnly = () => {
       // setSelectedTab(task.vaultKey || "");
     } else {
       resetForm();
+      setCellId(vaultId || null);
+      setPersonal(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isModalOpen, task, isEdit]);
+  }, [isModalOpen, task, isEdit, vaultId]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -107,28 +112,16 @@ const TaskModalUIOnly = () => {
     }
 
     setIsSubmitting(true);
-    const payload = {
-      title: title,
-      email: email,
-      password: password,
-      is_personal: personal,
-      two_factor_secret: totp || '',
-      websites: websites.filter(w => w.trim()).join(","),
-      notes: note || "",
-      cell_id: cellId,
-      attachments: attachments.map(file => file.name) || [],
-    }
 
     try {
-
       const formData = new FormData();
 
       formData.append("title", title.trim());
 
+       // Append all attachments to formData
       if (attachments.length > 0) {
         formData.append("attachment", attachments[0]); // API supports only 1 file
       }
-
       if (email.trim()) {
         formData.append("email", email.trim());
       } else {
@@ -139,10 +132,10 @@ const TaskModalUIOnly = () => {
       formData.append("password", password || "");
       formData.append("websites", websites.filter(w => w.trim()).join(","));
       formData.append("notes", note || "");
+      formData.append("is_personal", personal ? "true" : "false");
       if (cellId) {
         formData.append("cell_id", cellId);
       }
-      // formData.append("is_personal", true);
 
 
       const token = localStorage.getItem("token"); // Get token however your app stores it
@@ -187,12 +180,11 @@ const TaskModalUIOnly = () => {
 
   if (!isModalOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="fixed inset-0" onClick={() => dispatch(closeModal())} />
-
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-xl animate-in zoom-in-95 duration-300 border border-gray-200 dark:border-gray-800">
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="fixed inset-0 pointer-events-none" onClick={() => dispatch(closeModal())} />
         {/* Header */}
+            <div className="relative pointer-events-auto w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-xl animate-in zoom-in-95 duration-300 border border-gray-200 dark:border-gray-800">
         <div className="sticky top-0 z-10 flex items-center justify-between p-5 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
@@ -211,7 +203,7 @@ const TaskModalUIOnly = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} />
+            <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={cellId} initialPersonal={personal} />
             <button
               onClick={() => dispatch(closeModal())}
               className="h-9 w-9 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors duration-200 text-gray-500 dark:text-gray-400"

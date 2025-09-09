@@ -8,6 +8,7 @@ import { X, Plus, User, MapPin, Phone, Briefcase, ChevronDown, ChevronUp, Upload
 import apiClient from '@/service/apiClient';
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
+import { useParams } from 'react-router-dom'; 
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import CellDropDwon from '@/pages/Components/Cells/CellDropDwon';
 import {
@@ -46,7 +47,7 @@ const IdentityModalUIOnly = () => {
     const { isModalOpen, modalMode, editIdentity: identity, expandedSections } = useSelector((state: RootState) => state.identity);
     const identities = useSelector((state: RootState) => state.identity.identities);
     const [selectedTab, setSelectedTab] = useState('');
-
+const { vaultId } = useParams<{ vaultId: string }>();
     const isEdit = modalMode === 'edit';
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -159,7 +160,12 @@ const IdentityModalUIOnly = () => {
         } else {
             resetForm();
         }
-    }, [isEdit, identity]);
+
+         if (vaultId) {
+            setCellId(vaultId);
+            setPersonal(false);
+        }
+    }, [isEdit, identity, vaultId]);
 
     const formatDateForBackend = (input: string) => {
         if (!input) return null;

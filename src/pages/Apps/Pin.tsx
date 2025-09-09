@@ -11,6 +11,7 @@ type Item = {
     id: string;
     title: string;
     type: string;
+    isPinned?: boolean;
 };
 
 const Pin = () => {
@@ -28,7 +29,9 @@ const Pin = () => {
             setLoading(true)
             const res = await getPindata();
             console.log("all data", res);
-            setItems(res.data);
+            // Assume all items in Pin folder are pinned
+            const pinnedItems = res.data.map((item: Item) => ({ ...item, isPinned: true }));
+            setItems(pinnedItems);
         } catch (err) {
             console.log("backend error")
             console.error(err)
@@ -96,6 +99,7 @@ const Pin = () => {
                 onBulkDelete={handleBulkDelete}
                 onView={handleView}
                 isLoading={loading}
+                onPinToggle={fetchData}
             />
 
             <DeleteModal isOpen={deleteModalOpen} onClose={handleDeleteCancel} onConfirm={handleDeleteConfirm} bulk={idsToDelete.length > 1} />

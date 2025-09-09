@@ -6,7 +6,8 @@ import apiClient from '../../service/apiClient';
 export interface Item {
     id: string;
     title: string;
-    type:string
+    type: string;
+    isPinned?: boolean;
 
     // Add other fields based on your API response
 }

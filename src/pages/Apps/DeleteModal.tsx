@@ -41,17 +41,6 @@ const DeleteModals = ({ isOpen, onClose, onConfirm, itemType, bulk = false }: De
                             ? 'Aliases in trash will continue forwarding emails. If you want to stop receiving emails on this address, disable it instead.'
                             : 'Selected items will be moved to trash. You can restore them later from the trash.'}
                     </p>
-
-                    <div className="flex items-start mb-4">
-                        <input 
-                            type="checkbox" 
-                            id="dontRemind" 
-                            className="mt-1 mr-3 h-4 w-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700" 
-                        />
-                        <label htmlFor="dontRemind" className="text-sm text-gray-700 dark:text-gray-300">
-                            Don't show this message again
-                        </label>
-                    </div>
                 </div>
 
                 {/* Footer */}
