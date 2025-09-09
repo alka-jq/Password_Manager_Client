@@ -77,6 +77,7 @@ interface CountState {
     error: string | null;
 }
 
+
 // Removed local Vault interface to avoid import conflict
 const VAULTS_STORAGE_KEY = 'userVaults';
 
