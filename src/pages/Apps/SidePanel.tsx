@@ -68,7 +68,7 @@ import { createCell, getAllCell, editCell, deletePasswordById, shareCell } from 
 
 interface CountState {
     count: {
-        all_items_count: number;
+        all_count: number;
         personal_count: number;
         pin_count: number;
         trash_count: number;
@@ -299,9 +299,7 @@ const SidePanel = () => {
         if (!vaultToShare) return;
         try {
             const formData = new FormData();
-            formData.append('id', vaultToShare.id);
-            formData.append('recipient', shareRecipient);
-            await shareCell(vaultToShare.id, { recipient: shareRecipient }, formData);
+            await shareCell([vaultToShare.id], [shareRecipient], formData);
             setIsShareModalOpen(false);
             setShareRecipient('');
             setVaultToShare(null);
@@ -314,10 +312,11 @@ const SidePanel = () => {
         setIsShareModalOpen(false);
     };
 
-    const handleDeleteClick = (vault: Vault) => {
-        setVaultToDelete(vault);
-        setDeleteModalOpen(true);
-    };
+const handleDeleteClick = (vault: Vault) => {
+    setVaultToDelete(vault);
+    setDeleteTargetIds([vault.id]); // Set the ID here to avoid undefined error
+    setDeleteModalOpen(true);
+};
 
     const handleCancelDelete = () => {
         setDeleteModalOpen(false);
@@ -335,7 +334,7 @@ const SidePanel = () => {
                         ...vault,
                         name: vault.title,
                         key: vault.id,
-                        path: `/cell/${vault.id}`,
+                        path: `/vault/${vault.id}`,
                     }))
                 );
                 setDeleteModalOpen(false);
@@ -361,7 +360,7 @@ const SidePanel = () => {
     }, [dispatch]);
 
     const tabs = [
-        { label: 'All Items', path: '/all_items', icon: MdMoveToInbox, key: 'inbox', count: count?.all_items_count || 0 },
+        { label: 'All Items', path: '/all_items', icon: MdMoveToInbox, key: 'inbox', count: count?.all_count || 0 },
         { label: 'Personal', path: '/personal', icon: CircleUserRound, key: 'done', count: count?.personal_count || 0 },
         { label: 'Pin', path: '/pin', icon: Pin, key: 'important', count: count?.pin_count || 0 },
         { label: 'Trash', path: '/trash', icon: RiDeleteBinLine, key: 'trash', count: count?.trash_count || 0 },

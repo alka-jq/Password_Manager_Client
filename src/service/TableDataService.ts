@@ -183,12 +183,26 @@ export const editCell = async (id: string, formData: FormData) => {
     throw new Error('Failed to edit the cell')
   }
 }
-// Share API Call 
-export const shareCell = async (id: string, shareData: { recipient: string; }, formData: FormData) => {
+export const shareCell = async (itemIds: string[], recipients: string[], formData: FormData) => {
   try {
-    const response = await apiClient.post('/api/card/share', formData)
+    // Update FormData keys to match backend expectations
+    formData.delete('id');
+    formData.delete('recipient');
+
+    // Append each item_id
+    itemIds.forEach(id => {
+      formData.append('item_id', id);
+    });
+
+    // Append each shared_with_email
+    recipients.forEach(email => {
+      formData.append('shared_with_email', email);
+    });
+
+    const response = await apiClient.post('/api/card/share', formData);
+    return response.data;
   } catch (error) {
-    console.log("Fail to share the cell", error)
-    throw new Error("Failed to share the required cell")
+    console.log("Fail to share the cell", error);
+    throw new Error("Failed to share the required cell");
   }
-}
+};
