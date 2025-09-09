@@ -136,11 +136,11 @@ const IdentityModalUIOnly = () => {
             resetForm();
         }
 
-        if (vaultId) {
+         if (vaultId) {
             setCellId(vaultId);
             setPersonal(false);
         }
-    }, [isModalOpen, isEdit, identity, vaultId]);
+    }, [isEdit, identity, vaultId]);
 
     const formatDateForBackend = (input: string) => {
         if (!input) return null;

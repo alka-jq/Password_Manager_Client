@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 
 import type React from 'react';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -212,11 +212,10 @@ const CardModalUIOnly = () => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="fixed inset-0" onClick={() => dispatch(closeCardModal())} />
+            <div className="fixed inset-0 pointer-events-none" onClick={() => dispatch(closeCardModal())} />
 
             {/* Modal */}
-            <div className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl">
-                {/* Header */}
+            <div className="relative pointer-events-auto w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl">
                 <div className="sticky top-0 z-10 flex items-center justify-between p-5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-3">
                         <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">

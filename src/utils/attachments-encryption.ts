@@ -73,7 +73,7 @@ export const encryptFileattachment = async (file: File, publicKeyArmored: string
 };
 
 // Decryption function using same pattern as decryptAvatar
-export const decryptFile = async (encryptedData: string): Promise<string> => {
+export const decryptFile = async (encryptedData: string, type?: string): Promise<string> => {
   try {
     if (!encryptedData || typeof encryptedData !== 'string') {
       throw new Error('Invalid or missing encrypted data');
@@ -105,9 +105,8 @@ export const decryptFile = async (encryptedData: string): Promise<string> => {
       format: 'binary'
     });
 
-    const fileBlob = new Blob([decryptedBinary as Uint8Array]);
-    const baseUrl = await blobToDataURL(fileBlob);
-    return baseUrl;
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(decryptedBinary)));
+    return `data:${type || 'application/octet-stream'};base64,${base64}`;
   } catch (err) {
     console.error('Error decrypting file:', err);
     throw err;

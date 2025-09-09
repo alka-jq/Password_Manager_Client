@@ -85,10 +85,10 @@ export const generatePasswordAPI = async (
 // / Post API Call For Add Login Credentials
 export const addLoginCredentials = async (formData: FormData) => {
   try {
-    const response = await apiClient.post('/api/login-credentials/add', formData, {
-      headers: {
+    const response = await apiClient.post('/api/login-credentials/add', formData,{
+      headers: { 
         'Content-Type': 'multipart/form-data'
-      },
+       }
     });
     return response.data;
   } catch (error) {

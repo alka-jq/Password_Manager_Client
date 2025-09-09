@@ -506,7 +506,7 @@ const TaskModalUIOnly = () => {
     } else {
       resetForm();
       setCellId(vaultId || null);
-      setPersonal(true);
+      setPersonal(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, task, isEdit, vaultId]);
@@ -553,15 +553,14 @@ console.log("check", attachments)
 
     setIsSubmitting(true);
     try {
-
       const formData = new FormData();
 
       formData.append("title", title.trim());
 
+       // Append all attachments to formData
       if (attachments.length > 0) {
         formData.append("attachment", attachments[0]); // API supports only 1 file
       }
-
       if (email.trim()) {
         formData.append("email", email.trim());
       } else {
@@ -571,10 +570,12 @@ console.log("check", attachments)
       formData.append("password", password || "");
       formData.append("websites", websites.filter(w => w.trim()).join(","));
       formData.append("notes", note || "");
-      formData.append("is_personal", personal ? "true" : "false")
+      formData.append("is_personal", personal ? "true" : "false");
       if (cellId) {
         formData.append("cell_id", cellId);
       }
+
+
       const token = localStorage.getItem("token"); // Get token however your app stores it
 
       if (!token) {
@@ -616,12 +617,11 @@ console.log("check", attachments)
 
   if (!isModalOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="fixed inset-0" onClick={() => dispatch(closeModal())} />
-
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-xl animate-in zoom-in-95 duration-300 border border-gray-200 dark:border-gray-800">
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="fixed inset-0 pointer-events-none" onClick={() => dispatch(closeModal())} />
         {/* Header */}
+            <div className="relative pointer-events-auto w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-xl animate-in zoom-in-95 duration-300 border border-gray-200 dark:border-gray-800">
         <div className="sticky top-0 z-10 flex items-center justify-between p-5 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">

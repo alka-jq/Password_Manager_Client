@@ -29,6 +29,7 @@ type CommonTableProps = {
     onView?: (id: string) => void;
     onClose?: () => void;
     isLoading?: boolean;
+    onPinToggle?: () => void;
 };
 
 const typeStyles: Record<string, string> = {
@@ -38,7 +39,7 @@ const typeStyles: Record<string, string> = {
     // add more types here if needed
 };
 
-const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDelete, onView, onClose, isLoading = false }) => {
+const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDelete, onView, onClose, isLoading = false, onPinToggle }) => {
     // Safely handle undefined data
     const safeData = data || [];
     const dispatch = useDispatch<AppDispatch>();
@@ -85,6 +86,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             }));
             dispatch(fetchAlldata());
             dispatch(fetchItemCount());
+            if (onPinToggle) onPinToggle();
         } catch (error) {
             console.error('Failed to toggle pin:', error);
         }
@@ -173,6 +175,8 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                 });
                 return updated;
             });
+            dispatch(fetchItemCount());
+            if (onPinToggle) onPinToggle();
         } catch (error) {
             console.error('Bulk pin/unpin failed:', error);
         }
@@ -284,7 +288,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                 </div>
 
                                 {/* Table Body */}
-                                <div className="divide-y divide-gray-200 overflow-y-auto h-[100vh]">
+                                <div className="divide-y divide-gray-200 overflow-y-auto h-[100vh] md:h-[80vh]">
                                     {filteredData.map((item) => {
                                         const originalIndex = safeData.findIndex((d) => d.id === item.id);
                                         const isPinned = pinState[item.id] || false;

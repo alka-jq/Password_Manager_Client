@@ -46,7 +46,7 @@ export const ImageFile: React.FC<ImageFileProps> = ({ attachments }) => {
       const results = await Promise.all(
         attachments.map(async (file) => {
           try {
-            const url = await decryptFile(file.encryptedData);
+            const url = await decryptFile(file.encryptedData, file.type);
             return {
               name: file.name,
               url: url || ImagePlaceholder,
@@ -75,16 +75,14 @@ export const ImageFile: React.FC<ImageFileProps> = ({ attachments }) => {
         const icon = isImage ? file.url : getFileIcon(file.name, file.type);
 
         return (
-          <div className="">
-            <button
-              key={idx}
-              className="flex items-center gap-1 border border-gray-300 rounded-xl hover:bg-gray-200 px-2 py-1 text-gray-500 hover:border-gray-400"
+          <div key={idx} className="">
+            <div
+              className="flex items-center gap-2 border border-gray-300 rounded-xl px-3 py-2 text-gray-500 w-full"
+              title={file.name}
             >
-              <img src={icon} className="w-4 h-4 object-contain" alt="file icon" />
-              <div className=" w-8 addellipsis"> {file.name}</div>
-             
-            </button>
-            
+              <img src={icon} className="w-6 h-6 object-contain" alt="file icon" />
+              <div className="flex-1 truncate text-left"> {file.name}</div>
+            </div>
           </div>
         );
       })}

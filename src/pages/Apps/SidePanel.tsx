@@ -245,7 +245,7 @@ const SidePanel = () => {
                     ...vault,
                     name: vault.title, // map title to name for UI
                     key: vault.id, // ensure key is set
-                    path: `/cell/${vault.id}`, // ensure path is set
+                    path: `/vault/${vault.id}`, // ensure path is set
                 }))
             );
         } catch (error) {
