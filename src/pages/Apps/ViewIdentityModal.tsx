@@ -68,13 +68,25 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                 const response = await apiClient.get(`/api/password/items/${item.id}`);
 
                 const apiItem = response.data.item;
+                
+                const dobString = apiItem.dob; 
+                const dobDate = new Date(dobString); // Parse the string into a Date object
+
+                // Format the Date object to "DD/MM/YYYY"
+                const formattedDob = dobDate.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+
 
                 const formattedData = {
                     id: apiItem.id,
                     title: apiItem.title,
                     personalDetails: {
                         fullName: apiItem.full_name,
-                        dateOfBirth: apiItem.dob,
+                        dateOfBirth: formattedDob,
                     },
                     addressDetails: {
                         street: apiItem.street_address,
@@ -239,7 +251,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                             </p>
                         </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                         <button
                             onClick={toggleViewMode}
@@ -252,7 +264,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                                 <Eye className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                             )}
                         </button>
-                        <button 
+                        <button
                             onClick={onClose}
                             className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                         >
@@ -274,7 +286,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                         title="Personal Details"
                         icon={<User className="w-4 h-4" />}
                         expanded={expandedSections.personal}
-                        onToggle={() => setExpandedSections(prev => ({...prev, personal: !prev.personal}))}
+                        onToggle={() => setExpandedSections(prev => ({ ...prev, personal: !prev.personal }))}
                         viewMode={viewMode}
                     >
                         {renderFields(details?.personalDetails, 'personalDetails', viewMode)}
@@ -285,7 +297,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                         title="Address Details"
                         icon={<MapPin className="w-4 h-4" />}
                         expanded={expandedSections.address}
-                        onToggle={() => setExpandedSections(prev => ({...prev, address: !prev.address}))}
+                        onToggle={() => setExpandedSections(prev => ({ ...prev, address: !prev.address }))}
                         viewMode={viewMode}
                     >
                         {renderFields(details?.addressDetails, 'addressDetails', viewMode)}
@@ -296,7 +308,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                         title="Contact Details"
                         icon={<Phone className="w-4 h-4" />}
                         expanded={expandedSections.contact}
-                        onToggle={() => setExpandedSections(prev => ({...prev, contact: !prev.contact}))}
+                        onToggle={() => setExpandedSections(prev => ({ ...prev, contact: !prev.contact }))}
                         viewMode={viewMode}
                     >
                         {renderFields(details?.contactDetails, 'contactDetails', viewMode)}
@@ -307,7 +319,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                         title="Work Details"
                         icon={<Briefcase className="w-4 h-4" />}
                         expanded={expandedSections.work}
-                        onToggle={() => setExpandedSections(prev => ({...prev, work: !prev.work}))}
+                        onToggle={() => setExpandedSections(prev => ({ ...prev, work: !prev.work }))}
                         viewMode={viewMode}
                     >
                         {renderFields(details?.workDetails, 'workDetails', viewMode)}
@@ -319,7 +331,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                             title="Additional Fields"
                             icon={<Info className="w-4 h-4" />}
                             expanded={expandedSections.additional}
-                            onToggle={() => setExpandedSections(prev => ({...prev, additional: !prev.additional}))}
+                            onToggle={() => setExpandedSections(prev => ({ ...prev, additional: !prev.additional }))}
                             viewMode={viewMode}
                         >
                             {details.dynamicFields.map((field: any, idx: number) => (
@@ -346,7 +358,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                             title={`Attachments (${details.attachments.length})`}
                             icon={<Paperclip className="w-4 h-4" />}
                             expanded={expandedSections.attachments}
-                            onToggle={() => setExpandedSections(prev => ({...prev, attachments: !prev.attachments}))}
+                            onToggle={() => setExpandedSections(prev => ({ ...prev, attachments: !prev.attachments }))}
                             viewMode={viewMode}
                         >
                             {details.attachments.map((file: string, idx: number) => (

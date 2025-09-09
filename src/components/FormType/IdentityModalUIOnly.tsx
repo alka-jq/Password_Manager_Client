@@ -8,10 +8,9 @@ import { X, Plus, User, MapPin, Phone, Briefcase, ChevronDown, ChevronUp, Upload
 import apiClient from '@/service/apiClient';
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
-import { useParams } from 'react-router-dom'; 
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import CellDropDwon from '@/pages/Components/Cells/CellDropDwon';
-
+import { useParams } from 'react-router-dom';
 
 const IdentityModalUIOnly = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -19,7 +18,11 @@ const IdentityModalUIOnly = () => {
     const { isModalOpen, modalMode, editIdentity: identity, expandedSections } = useSelector((state: RootState) => state.identity);
     const identities = useSelector((state: RootState) => state.identity.identities);
     const [selectedTab, setSelectedTab] = useState('');
-const { vaultId } = useParams<{ vaultId: string }>();
+
+
+    const { vaultId } = useParams<{ vaultId: string }>();
+    
+
     const isEdit = modalMode === 'edit';
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -66,8 +69,6 @@ const { vaultId } = useParams<{ vaultId: string }>();
     const [cellId, setCellId] = useState<string | null>(null);
     const [personal, setPersonal] = useState(false);
 
-    console.log(cellId);
-    console.log(personal);
 
     const resetForm = () => {
         setTitle('');
@@ -101,7 +102,7 @@ const { vaultId } = useParams<{ vaultId: string }>();
         setIsSubmitting(false);
     };
 
-  useEffect(() => {
+    useEffect(() => {
         if (!isModalOpen) return;
 
         if (isEdit && identity) {
@@ -147,7 +148,7 @@ const { vaultId } = useParams<{ vaultId: string }>();
 
     const formatDateForBackend = (input: string) => {
         if (!input) return null;
-        const [year, month, day] = input.split('-');
+        const [year, month,day ] = input.split('-');
         return `${day}/${month}/${year}`;
     };
 
@@ -304,9 +305,8 @@ const { vaultId } = useParams<{ vaultId: string }>();
                                     setErrors({ ...errors, title: false });
                                 }}
                                 placeholder="Identity Title"
-                                className={`w-full h-11 px-4 py-2 border rounded-xl text-sm bg-white dark:bg-gray-800 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.title ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
-                                }`}
+                                className={`w-full h-11 px-4 py-2 border rounded-xl text-sm bg-white dark:bg-gray-800 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                    }`}
                             />
                             {errors.title && (
                                 <div className="flex items-center gap-2 text-sm text-red-600 mt-1">

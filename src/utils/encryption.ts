@@ -230,7 +230,6 @@ export async function discoverPublicKey(email: string, token: string): Promise<s
 }
 
 async function fetchInternalPublicKey(email: string, token: string): Promise<string | null> {
-  console.log("Fetching public key for email:", email);
   
   try {
     // First check local cache

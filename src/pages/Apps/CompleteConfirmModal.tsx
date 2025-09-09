@@ -95,3 +95,4 @@ const CompleteConfirmModal = ({ isOpen, onClose, onConfirm, type, title }: Compl
 }
 
 export default CompleteConfirmModal
+
