@@ -160,6 +160,7 @@ const IdentityModalUIOnly = () => {
             return;
         }
 
+        
         setIsSubmitting(true);
 
         // Map your form data to API fields
