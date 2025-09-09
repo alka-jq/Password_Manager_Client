@@ -409,6 +409,8 @@ export interface Identity {
   vaultKey?:string
   vaultName?:string
   vaultColor?:string
+  cell_id?: string | null
+  is_personal?: boolean
   // assigneeColor: string
   // Optional fields
   // description?: string

@@ -6,6 +6,7 @@ import { MdOutlineRestore } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { fetchItemCount } from '@/store/Slices/countSlice';
+import Loader from '../Components/Loader';
 
 
 import PermanentDeleteConfirmationModal from './PermanentDeleteConfirmationModal';
@@ -37,6 +38,7 @@ const TrashList: React.FC = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTargetIds, setDeleteTargetIds] = useState<string[]>([]);
+  const [isBulkRestoring, setIsBulkRestoring] = useState(false);
 
   // Fetch trash items from API
   useEffect(() => {
@@ -99,6 +101,7 @@ const handleRestore = async (id: string) => {
 const handleBulkRestore = async () => {
   const ids = data.filter((_, i) => selected[i]).map(item => item.id);
   if (ids.length === 0) return;
+  setIsBulkRestoring(true);
   try {
     await restorePasswords(ids);
     setData(data.filter(item => !ids.includes(item.id)));
@@ -107,6 +110,8 @@ const handleBulkRestore = async () => {
   } catch (error) {
     console.error('Bulk restore failed:', error);
     alert('Failed to restore selected items');
+  } finally {
+    setIsBulkRestoring(false);
   }
 };
 
@@ -146,7 +151,11 @@ const handleBulkRestore = async () => {
 
   return (
     <div className="">
-      {data.length === 0 ? (
+      {isBulkRestoring ? (
+        <div className="flex justify-center items-center w-full h-[80vh]">
+          <Loader />
+        </div>
+      ) : data.length === 0 ? (
         <div className="flex justify-center items-center h-[80vh]">
           <h1 className="text-2xl font-medium text-gray-600">Trash is empty</h1>
         </div>
@@ -168,8 +177,8 @@ const handleBulkRestore = async () => {
               </div>
               <div className="w-[20%] flex justify-center">
                 {(someSelected || allSelected) ? (
-                  <button onClick={handleBulkRestore} className="hover:text-blue-600 transition-colors" title="Restore Selected">
-                    <MdOutlineRestore size={20} />
+                  <button onClick={handleBulkRestore} className="hover:text-blue-600 transition-colors" title="Restore Selected" disabled={isBulkRestoring}>
+                    {isBulkRestoring ? <Loader /> : <MdOutlineRestore size={20} />}
                   </button>
                 ) : (
                   <span className="text-md font-normal opacity-70">Pin</span>
@@ -257,17 +266,3 @@ const handleBulkRestore = async () => {
 
 export default TrashList;
 
-
-
-// import React from 'react'
-// import CellPopup from '../Components/Cells/CellPopup'
-
-// const Trash = () => {
-//   return (
-//     <div>
-//       <CellPopup/>
-//     </div>
-//   )
-// }
-
-// export default Trash

@@ -85,6 +85,12 @@ const CardModalUIOnly = () => {
             // setSelectedTab(card.vaultKey || "")
         } else {
             resetForm();
+            setCellId(getInitialTab() || null);
+            if(vaultId) {
+                setPersonal(false);
+            } else {
+                setPersonal(true);
+            }
         }
 
         if (vaultId) {
@@ -92,14 +98,6 @@ const CardModalUIOnly = () => {
             setPersonal(false);
         }
     }, [isModalOpen, isEdit, card, getInitialTab, resetForm, vaultId]);
-
-    const fieldTypes = [
-        { type: 'text' as const, label: 'Text', icon: FileText },
-        { type: '2fa' as const, label: '2FA secret key (TOTP)', icon: Shield },
-        { type: 'hidden' as const, label: 'Hidden', icon: Eye },
-        { type: 'date' as const, label: 'Date', icon: Calendar },
-        { type: 'note' as const, label: 'Note', icon: FileText },
-    ];
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -169,43 +167,13 @@ const CardModalUIOnly = () => {
     const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCardNumber(formatCardNumber(e.target.value));
     };
-
-    const addDynamicField = (type: DynamicField['type']) => {
-        const newField: DynamicField = {
-            id: Date.now().toString(),
-            type,
-            label: fieldTypes.find((ft) => ft.type === type)?.label || 'Text',
-            value: '',
-        };
-        setDynamicFields([...dynamicFields, newField]);
-        setShowDropdown(false);
-    };
-
+   
     const updateDynamicField = (id: string, value: string) => {
         setDynamicFields((fields) => fields.map((field) => (field.id === id ? { ...field, value } : field)));
     };
 
     const removeDynamicField = (id: string) => {
         setDynamicFields((fields) => fields.filter((field) => field.id !== id));
-    };
-
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        setAttachments((prev) => [...prev, ...files]);
-    };
-
-    const removeAttachment = (index: number) => {
-        setAttachments((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault();
-    };
-
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        const files = Array.from(e.dataTransfer.files);
-        setAttachments((prev) => [...prev, ...files]);
     };
 
     if (!isModalOpen) return null;

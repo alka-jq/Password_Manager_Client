@@ -12,35 +12,6 @@ import { useParams } from 'react-router-dom';
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import CellDropDwon from '@/pages/Components/Cells/CellDropDwon';
 
-import {
-    Home,
-    Gift,
-    Store,
-    Heart,
-    AlarmClock,
-    AppWindow,
-    Settings,
-    Users,
-    Ghost,
-    ShoppingCart,
-    Leaf,
-    Shield,
-    Circle,
-    CreditCard,
-    Fish,
-    Smile,
-    Lock,
-    UserCheck,
-    Star,
-    Flame,
-    Wallet,
-    Bookmark,
-    IceCream,
-    Laptop,
-    BookOpen,
-    Infinity,
-} from 'lucide-react';
-
 
 const IdentityModalUIOnly = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -160,15 +131,19 @@ const { vaultId } = useParams<{ vaultId: string }>();
             setWorkEmail(identity.workDetails?.workEmail || '');
             setWorkPhoneNumber(identity.workDetails?.workPhone || '');
             setDynamicFields(identity.dynamicFields || []);
+            // Set cell and personal for edit
+            setCellId(identity.cell_id ?? null);
+            setPersonal(identity.is_personal ?? false);
         } else {
             resetForm();
+            setCellId(vaultId || null);
+            if (vaultId) {
+                setPersonal(false);
+            } else {
+                setPersonal(true);
+            }
         }
-
-         if (vaultId) {
-            setCellId(vaultId);
-            setPersonal(false);
-        }
-    }, [isEdit, identity, vaultId]);
+    }, [isModalOpen, isEdit, identity, vaultId]);
 
     const formatDateForBackend = (input: string) => {
         if (!input) return null;
@@ -302,7 +277,7 @@ const { vaultId } = useParams<{ vaultId: string }>();
                     </div>
                     {/* ==================================Cell DropDown===================================== */}
                     <div className="flex ">
-                        <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} />
+                        <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={cellId} initialPersonal={personal}/>
                         {/* ==================================----------------------------------------------------------- */}
 
                         <button

@@ -127,7 +127,7 @@ export const EmptyVaultState: React.FC<EmptyVaultStateProps> = ({
 
   return (
     <div>
-      {items.length < 0 ? (
+      {items.length > 0 ? (
         <div className="flex items-center justify-center min-h-[70vh] p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <div className="w-full max-w-3xl text-center">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">

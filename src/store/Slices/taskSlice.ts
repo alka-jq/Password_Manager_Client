@@ -21,6 +21,8 @@ interface TaskState {
   searching: boolean;
   isModalOpen: boolean;
   modalMode: 'add' | 'edit';
+  selectedVaultId: string | null;
+  isPersonal: boolean;
 }
 
 const getOrdinal = (n: number): string => {
@@ -49,6 +51,8 @@ const initialState: TaskState = {
   searching: false,
   isModalOpen: false,
   modalMode: 'add',
+  selectedVaultId: null,
+  isPersonal: true,
 };
 
 const taskSlice = createSlice({
@@ -127,10 +131,17 @@ const taskSlice = createSlice({
     },
 
     // Modal control
-    openAddModal: (state) => {
+    openAddModal: (state, action: PayloadAction<{ vaultId?: string | null; personal?: boolean } | undefined>) => {
       state.modalMode = 'add';
       state.editTask = null;
       state.isModalOpen = true;
+      if (action.payload) {
+        state.selectedVaultId = action.payload.vaultId ?? null;
+        state.isPersonal = action.payload.personal ?? true;
+      } else {
+        state.selectedVaultId = null;
+        state.isPersonal = true;
+      }
     },
 
     openEditModal: (state, action: PayloadAction<Task>) => {
