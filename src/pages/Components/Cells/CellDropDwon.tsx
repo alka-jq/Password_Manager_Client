@@ -46,18 +46,20 @@ color?: string,
 icon?: string,
 }
 interface Props {
-cellId: string | null;
-setCellId: (id: string | null) => void;
-personal: boolean;
-setPersonal: (p: boolean) => void;
+    cellId: string | null;
+    setCellId: (id: string | null) => void;
+    personal: boolean;
+    setPersonal: (p: boolean) => void;
+    initialCellId?: string | null;
+    initialPersonal?: boolean;
 }
 
-const CellDropDwon: FunctionComponent<Props> = ({ cellId, setCellId, personal, setPersonal }) => {
-const [celldata, setCellData] = useState<CellData[]>([]);
-const [celldropdown, setcellDropdown] = useState(false)
-const [celltype, setCellType] = useState("Personal")
-const [selectedIcon, setSelectedIcon] = useState<string>("Personal")
-const [selectedColor, setSelectedColor] = useState<string>("")
+const CellDropDwon: FunctionComponent<Props> = ({ cellId, setCellId, personal, setPersonal, initialCellId = null, initialPersonal = true }) => {
+    const [celldata, setCellData] = useState<CellData[]>([]);
+    const [celldropdown, setcellDropdown] = useState(false)
+    const [celltype, setCellType] = useState("Personal")
+    const [selectedIcon, setSelectedIcon] = useState<string>("Personal")
+    const [selectedColor, setSelectedColor] = useState<string>("")
 
 const fetchCell = async () => {
     const res = await apiClient.get("/api/password/getCell")
@@ -67,35 +69,56 @@ useEffect(() => {
     fetchCell()
 }, [])
 
-const handleCell = async (cell: CellData) => {
-    const id = cell.id
-    setCellId(id || null)
-    setCellType(cell.title || "")
-    setSelectedIcon(cell.icon || "Home")
-    setSelectedColor(cell.color || "")
-    setcellDropdown(false)
-    setPersonal(false)
-};
+useEffect(() => {
+    if (celldata.length > 0) {
+        if (initialPersonal) {
+            setCellType("Personal")
+            setSelectedIcon("Personal")
+            setSelectedColor("")
+            setCellId(null)
+            setPersonal(true)
+        } else if (initialCellId) {
+            const cell = celldata.find(c => c.id === initialCellId)
+            if (cell) {
+                setCellType(cell.title || "")
+                setSelectedIcon(cell.icon || "Home")
+                setSelectedColor(cell.color || "")
+                setCellId(cell.id || null)
+                setPersonal(false)
+            }
+        }
+    }
+}, [celldata, initialCellId, initialPersonal, setCellId, setPersonal])
 
-return (
-    <div>
-        <div className="flex ">
-            <div className="relative rounded-xl overflow-hidden  border  flex items-center justify-between bg-white font-sans ">
+    const handleCell = async (cell: CellData) => {
+        const id = cell.id
+        setCellId(id || null)
+        setCellType(cell.title || "")
+        setSelectedIcon(cell.icon || "Home")
+        setSelectedColor(cell.color || "")
+        setcellDropdown(false)
+        setPersonal(false)
+    };
 
-                <div>
-                    <button onClick={() => setcellDropdown(!celldropdown)}>
-                        <div className='flex justify-between w-[8vw] p-2 items-center'>
-                            <div className="flex items-center gap-2">
-                                <span style={{ color: selectedColor }}>
-                                    {iconComponents[selectedIcon]}
-                                </span>
-                                {celltype}
+    return (
+        <div>
+            <div className="flex ">
+                <div className="relative rounded-xl overflow-hidden  border  flex items-center justify-between bg-white font-sans ">
+
+                    <div>
+                        <button onClick={() => setcellDropdown(!celldropdown)}>
+                            <div className='flex justify-between w-[8vw] p-2 items-center'>
+                                <div className="flex items-center gap-2">
+                                    <span style={{ color: selectedColor }}>
+                                        {iconComponents[selectedIcon]}
+                                    </span>
+                                    {celltype}
+                                </div>
+                                <div> {celldropdown ? <FaChevronUp /> : <FaChevronDown />}</div>
                             </div>
-                            <div> {celldropdown ? <FaChevronUp /> : <FaChevronDown />}</div>
-                        </div>
-                    </button>
-                </div>
-
+                        </button>
+                    </div>
+                               
             </div>
 
             {celldropdown && (
@@ -110,7 +133,7 @@ return (
                     }}>
                         <span className="flex gap-2"><User size={16} />Personal</span></button>
                     {celldata.map((cell, index) => (
-                        <div className="font-sans">
+                        <div className="font-sans" key={index}>
                             <button onClick={(e) => handleCell(cell)}>
                                 <span className="flex items-center gap-2">
                                     <span style={{ color: cell.color }}>

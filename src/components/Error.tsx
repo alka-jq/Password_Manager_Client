@@ -1,7 +1,7 @@
 const Error = () => {
     return (
-        <div>
-            <h1>Error</h1>
+        <div className="w-full mt-[40vh] flex justify-center item-center m-auto ">
+            <h1 className="font-sans font-semibold text-xl">This page are Not available</h1>
         </div>
     );
 };

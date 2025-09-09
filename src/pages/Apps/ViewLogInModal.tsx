@@ -8,6 +8,7 @@ import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
 import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
+import { ImageFile } from '@/components/imageFile';
 
 type TableItem = {
   id: string;
@@ -21,6 +22,12 @@ type Props = {
   editMode?: boolean;
 };
 
+interface Attachment {
+  name: string;
+  type: string;
+  encryptedData: string;
+}
+
 interface LoginDetails {
   id: string;
   title: string;
@@ -31,7 +38,8 @@ interface LoginDetails {
   websites?: string[];
   note?: string;
   lastUpdated: string;
-  attachments?: string[];
+  attachments?: Attachment[];
+  attachmentFiles?: File[];
 }
 
 const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
@@ -539,31 +547,31 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
                     <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Any file type (Max: 10MB)</p>
                   </div>
-                  <input 
-                    type="file" 
-                    multiple 
-                    className="hidden" 
+                  <input
+                    type="file"
+                    multiple
+                    className="hidden"
                     onChange={(e) => {
-                      const files = Array.from(e.target.files || []).map(file => file.name);
+                      const files = Array.from(e.target.files || []);
                       setDetails(prev =>
-                        prev ? { ...prev, attachments: files } : prev
+                        prev ? { ...prev, attachmentFiles: [...(prev.attachmentFiles || []), ...files] } : prev
                       );
                     }}
                   />
                 </label>
-                
-                {details?.attachments && details.attachments.length > 0 && (
+
+                {details?.attachmentFiles && details.attachmentFiles.length > 0 && (
                   <div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-3">
                     <h4 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Selected files:</h4>
                     <ul className="space-y-2">
-                      {details.attachments.map((f, idx) => (
+                      {details.attachmentFiles.map((file: File, idx: number) => (
                         <li key={idx} className="flex items-center justify-between bg-white dark:bg-gray-800 p-2 rounded-md">
-                          <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[70%]">{f}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[70%]">{file.name}</span>
                           <button
-                            onClick={() => setDetails(prev => 
-                              prev ? { 
-                                ...prev, 
-                                attachments: prev.attachments?.filter((_, i) => i !== idx) 
+                            onClick={() => setDetails(prev =>
+                              prev ? {
+                                ...prev,
+                                attachmentFiles: prev.attachmentFiles?.filter((_, i) => i !== idx)
                               } : prev
                             )}
                             className="p-1 text-red-500 hover:text-red-700 dark:hover:text-red-400 rounded-md hover:bg-red-100 dark:hover:bg-red-900/30"
@@ -580,11 +588,30 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
             ) : (
               <div className={`p-3 rounded-lg ${details?.attachments && details.attachments.length > 0 ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-gray-100/50 dark:bg-gray-800/30'}`}>
                 {details?.attachments && details.attachments.length > 0 ? (
-                  <ul className="list-disc list-inside text-gray-800 dark:text-gray-200">
-                    {details.attachments.map((f, idx) => (
-                      <li key={idx}>{f}</li>
-                    ))}
-                  </ul>
+                  <ImageFile attachments={details.attachments.map((attachment: any, idx: number) => {
+                    let name = `File ${idx + 1}`;
+                    let encryptedData = '';
+                    let type = 'application/octet-stream';
+
+                    if (typeof attachment === 'string') {
+                      encryptedData = attachment;
+                      // Try to extract file name from encryptedData string if possible
+                      const match = attachment.match(/([^\/]+)$/);
+                      if (match) {
+                        name = decodeURIComponent(match[1]);
+                      }
+                    } else if (typeof attachment === 'object' && attachment !== null) {
+                      name = attachment.name || name;
+                      encryptedData = attachment.encryptedData || '';
+                      type = attachment.type || type;
+                    }
+
+                    return {
+                      name,
+                      encryptedData,
+                      type
+                    };
+                  })} />
                 ) : (
                   <p className="text-gray-400 dark:text-gray-500 italic">No files uploaded</p>
                 )}

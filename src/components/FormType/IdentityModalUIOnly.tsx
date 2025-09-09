@@ -34,11 +34,12 @@ import {
   ShoppingCart, Leaf, Shield, Circle, CreditCard, Fish, Smile, Lock, UserCheck, Star,
   Flame, Wallet, Bookmark, IceCream, Laptop, BookOpen, Infinity,
 } from 'lucide-react';
-
+import { useParams } from "react-router-dom";
 
 
 const IdentityModalUIOnly = () => {
   const dispatch = useDispatch<AppDispatch>()
+  const { vaultId } = useParams<{ vaultId: string }>();
 
   const {
     isModalOpen,
@@ -92,9 +93,8 @@ const IdentityModalUIOnly = () => {
   const [attachments, setAttachments] = useState<File[]>([])
   const [errors, setErrors] = useState({ title: false })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [cellId, setCellId] = useState<string | null>(null)
+  const [cellId, setCellId] = useState<string | null>(vaultId || null)
   const [personal, setPersonal] = useState(true)
-
 
 
   const resetForm = () => {
@@ -158,10 +158,16 @@ const IdentityModalUIOnly = () => {
       setWorkPhoneNumber(identity.workDetails?.workPhone || "")
       setDynamicFields(identity.dynamicFields || [])
 
+
     } else {
-      resetForm()
+      resetForm();
     }
-  }, [isEdit, identity])
+
+    if (vaultId) {
+      setCellId(vaultId);
+      setPersonal(false);
+    }
+  }, [isModalOpen, isEdit, vaultId])
 
   const formatDateForBackend = (input: string) => {
     if (!input) return null;
@@ -218,7 +224,11 @@ const IdentityModalUIOnly = () => {
     }
 
     try {
-      const response = await apiClient.post("/api/identity/create", payload)
+      const response = await apiClient.post("/api/identity/create", payload, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+      })
       if (!response) {
         console.error("API error:")
         setIsSubmitting(false)
@@ -303,7 +313,7 @@ const IdentityModalUIOnly = () => {
           </div>
           {/* ==================================Cell DropDown===================================== */}
           <div className="flex ">
-            <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} />
+            <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={cellId} initialPersonal={personal} />
             {/* ==================================----------------------------------------------------------- */}
 
             <button

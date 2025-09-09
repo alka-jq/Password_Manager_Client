@@ -26,6 +26,7 @@ import { fetchAlldata } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import CellDropDwon from "@/pages/Components/Cells/CellDropDwon"
 import { fetchItemCount } from '@/store/Slices/countSlice';
+import { useParams } from "react-router-dom";
 
 // interface DynamicField {
 //   id: string
@@ -48,7 +49,7 @@ const CardModalUIOnly = () => {
     (state: RootState) => state.card
   )
   const isEdit = modalMode === "edit"
-
+  const { vaultId } = useParams<{ vaultId: string }>();
 
   // Form state // const fileInputRef = useRef<HTMLInputElement>(null)
   const [title, setTitle] = useState("")
@@ -69,7 +70,6 @@ const CardModalUIOnly = () => {
 
   const [cellId, setCellId] = useState<string | null>(null)
   const [personal, setPersonal] = useState(true)
-
   // const getInitialTab = useCallback(() => {
   //   // if (isEdit && card?.vaultKey) return card.vaultKey;
   //   return ""; 
@@ -91,23 +91,30 @@ const CardModalUIOnly = () => {
   }, [])
 
   // Initialize form when modal opens or edit mode changes
-  // useEffect(() => {
-  //   if (!isModalOpen) return
+  useEffect(() => {
+    if (!isModalOpen) return;
 
-  //   if (isEdit && card) {
-  //     setTitle(card.title || "")
-  //     setNameOnCard(card.nameOnCard || "")
-  //     setCardNumber(card.cardNumber || "")
-  //     setExpirationDate(card.expirationDate || "")
-  //     setSecurityCode(card.securityCode || "")
-  //     setPin(card.pin || "")
-  //     setNote(card.note || "")
-  //     setDynamicFields(card.dynamicFields || [])
-  //     // setSelectedTab(card.vaultKey || "")
-  //   } else {
-  //     resetForm()
-  //   }
-  // }, [isModalOpen, isEdit, card, getInitialTab, resetForm])
+    if (isEdit && card) {
+      setTitle(card.title || '');
+      setNameOnCard(card.nameOnCard || '');
+      setCardNumber(card.cardNumber || '');
+      setExpirationDate(card.expirationDate || '');
+      setSecurityCode(card.securityCode || '');
+      setPin(card.pin || '');
+      setNote(card.note || '');
+      // setDynamicFields(card.dynamicFields || []);
+      // setCellId(card.cellId || null);
+      // setPersonal(card.personal || false);
+      // setSelectedTab(card.vaultKey || "")
+    } else {
+      resetForm();
+    }
+
+    if (vaultId) {
+      setCellId(vaultId);
+      setPersonal(false);
+    }
+  }, [isModalOpen, isEdit, card, resetForm, vaultId]);
 
 
 
@@ -251,7 +258,7 @@ const CardModalUIOnly = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} />
+            <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={cellId} initialPersonal={personal} />
 
             <button
               onClick={() => dispatch(closeCardModal())}

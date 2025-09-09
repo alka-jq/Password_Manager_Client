@@ -24,7 +24,6 @@ const initialState: CountState = {
 // 🔹 Thunk to fetch count
 export const fetchItemCount = createAsyncThunk('count/fetchItemCount', async () => {
     const res = await apiClient.get('/api/password/items-count');
-    console.log("hello", res)
     return res.data.counts;
 });
 
