@@ -75,7 +75,6 @@ const TaskModalUIOnly = () => {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    console.log("files", files)
     setAttachments((prev) => [...prev, ...files]);
   };
 
@@ -104,7 +103,6 @@ const TaskModalUIOnly = () => {
     setIsSubmitting(false);
     setAttachments([]);
   };
-console.log("check", attachments)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 

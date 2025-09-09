@@ -24,11 +24,10 @@ const Pin = () => {
 
 
     const fetchData = async () => {
-        console.log("pin data")
         try {
             setLoading(true)
             const res = await getPindata();
-            console.log("all data", res);
+            // console.log("all data", res);
             // Assume all items in Pin folder are pinned
             const pinnedItems = res.data.map((item: Item) => ({ ...item, isPinned: true }));
             setItems(pinnedItems);
@@ -64,7 +63,6 @@ const Pin = () => {
         setDeleteModalOpen(true);
     };
 
-    // Step 3.2: When user confirms in modal
 
     const handleDeleteConfirm = async () => {
         try {
@@ -79,7 +77,6 @@ const Pin = () => {
     };
 
 
-    // Step 3.3: When user cancels modal
     const handleDeleteCancel = () => {
         setDeleteModalOpen(false);
         setIdsToDelete([]);

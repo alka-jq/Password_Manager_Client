@@ -6,6 +6,7 @@ import { softDeleteItems } from '@/service/TableDataService';
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { fetchItemCount } from '@/store/Slices/countSlice';
+
 type Item = {
     id: string;
     title: string;
@@ -18,21 +19,23 @@ const Personal = () => {
     const [loading, setLoading] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
-    
+
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const res = await getPersonaldata();
+            // console.log('all data', res);
+            setItems(res.data);
+        } catch (err) {
+            console.log('backend error');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const res = await getPersonaldata();
-                console.log('all data', res);
-                setItems(res.data);
-            } catch (err) {
-                console.log('backend error');
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, []);
 
@@ -71,6 +74,7 @@ const Personal = () => {
             setDeleteModalOpen(false);
             setIdsToDelete([]);
             dispatch(fetchItemCount());
+            fetchData();
         } catch (error) {
             console.error('Soft delete failed:', error);
         }
