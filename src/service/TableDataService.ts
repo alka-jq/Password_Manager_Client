@@ -1,3 +1,4 @@
+// Service file to handle all API calls related to table data management
 import apiClient from "./apiClient";
 
 export const getAlldata = async () => {
@@ -130,19 +131,19 @@ export const softDeleteItems = async (ids: string[]) => {
   return response.data;
 }
 
-//Restore API Call for both by ID and by all 
-export const restorePasswords = async (ids: string[]) => {
+//Restore API Call for both by ID and by all
+export const restorePasswords= async (ids: string[]) => {
   try {
-    const response = await apiClient.post(
-      '/api/password/item/restore', // Adjust the path if needed
-      { ids }
-    );
+    const response = await apiClient.patch('/api/password/item/restore', {
+      id: ids,
+     });
     return response.data;
   } catch (error: any) {
     console.error('Restore failed:', error.response?.data || error.message);
-    throw new Error('Failed to restore passwords');
+    throw new Error('Restore failed');
   }
 };
+
 
 // Toggle Pin/Unpin API Call
 export const togglePinStatus = async (ids: string[], is_pin: boolean) => {

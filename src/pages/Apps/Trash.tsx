@@ -15,6 +15,12 @@ type TableItem = {
   type: string;
 };
 
+const typeStyles: Record<string, string> = {
+    login: 'text-blue-400 bg-gradient-to-b from-blue-100 to-blue-50 border-blue-200',
+    identity: 'text-green-400 bg-gradient-to-b from-green-100 to-green-50 border-green-200',
+    card: 'text-orange-400 bg-gradient-to-b from-orange-100 to-orange-50 border-orange-200',
+    // add more types here if needed
+};
 
 const TrashList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -75,8 +81,9 @@ const TrashList: React.FC = () => {
 
 const handleRestore = async (id: string) => {
   try {
-    await restorePasswords([id]); 
+    await restorePasswords([id]);
     setData(data.filter(item => item.id !== id));
+    dispatch(fetchItemCount());
   } catch (error) {
     console.error('Failed to restore item:', error);
     alert('Failed to restore item');
@@ -96,6 +103,7 @@ const handleBulkRestore = async () => {
     await restorePasswords(ids);
     setData(data.filter(item => !ids.includes(item.id)));
     setSelected(data.map(() => false));
+    dispatch(fetchItemCount());
   } catch (error) {
     console.error('Bulk restore failed:', error);
     alert('Failed to restore selected items');
@@ -208,7 +216,7 @@ const handleBulkRestore = async () => {
                 </div>
                 <div className="w-[30%] truncate font-medium text-gray-800">{item.title}</div>
                 <div className="w-[30%]">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${item.type || 'bg-gray-100 text-gray-600'}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${typeStyles[item.type] || 'bg-gray-100 text-gray-600'}`}>
                     {item.type}
                   </span>
                 </div>
