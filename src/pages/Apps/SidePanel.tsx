@@ -335,7 +335,7 @@ const SidePanel = () => {
                         ...vault,
                         name: vault.title,
                         key: vault.id,
-                        path: `/vault/${vault.id}`,
+                        path: `/cell/${vault.id}`,
                     }))
                 );
                 setDeleteModalOpen(false);

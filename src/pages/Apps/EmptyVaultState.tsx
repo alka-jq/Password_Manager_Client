@@ -10,6 +10,12 @@ import { openAddModal } from '@/store/Slices/taskSlice';
 import { openAddModal as openCardAddModal } from '@/store/Slices/cardSlice';
 import { openAddModal as openIdentityAddModal } from '@/store/Slices/identitySlice';
 import { openPasswordGenerator } from '@/store/Slices/passwordSlice';
+import TaskList from './Table';
+import React, { useEffect, useState } from 'react';
+import { softDeleteItems } from '@/service/TableDataService';
+import { fetchItemCount } from '@/store/Slices/countSlice';
+import { RootState, AppDispatch } from '../../store';
+
 
 export type ItemType =
   | 'login'
@@ -28,7 +34,7 @@ export const EmptyVaultState: React.FC<EmptyVaultStateProps> = ({
   onCreateItem,
   onImport,
 }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const createOptions = [
     {
@@ -60,53 +66,115 @@ export const EmptyVaultState: React.FC<EmptyVaultStateProps> = ({
       action: () => dispatch(openPasswordGenerator()),
     },
   ];
+  const dummyData = [
+    { id: '1', title: 'Email Login', type: 'Login' },
+    { id: '2', title: 'Office ID Card', type: 'Identity Card' },
+    { id: '3', title: 'Bank Password', type: 'Password' },
+    { id: '4', title: 'Social Media Account', type: 'Login' },
+    { id: '5', title: 'University ID', type: 'Identity Card' },
+    { id: '6', title: 'WiFi Password', type: 'Password' },
+    { id: '7', title: 'WiFi Password', type: 'Card' }
+  ];
+
+  const [items, setItems] = useState(dummyData)
+  const [loading, setLoading] = useState()
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
+
+  // 🔹 Fetch items on component mount
+  //  useEffect(() => {
+  //  }, [dispatch]);
+
+  // 🔹 Delete modal handlers
+  const requestDelete = (ids: string[]) => {
+    setIdsToDelete(ids);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await softDeleteItems(idsToDelete);
+      setDeleteModalOpen(false);
+      setIdsToDelete([]);
+      dispatch(fetchItemCount());
+    } catch (error) {
+      console.error('Soft delete failed:', error);
+    }
+  };
+
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
+    setIdsToDelete([]);
+  };
+
+  // 🔹 Action handlers
+  const handleEdit = (id: string) => {
+    alert(`Editing item with ID: ${id}`);
+  };
+
+  const handleDelete = (id: string) => {
+    requestDelete([id]);
+  };
+
+  const handleBulkDelete = (ids: string[]) => {
+    requestDelete(ids);
+  };
+
+  const handleView = (id: string) => {
+    alert(`Viewing item with ID: ${id}`);
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-[70vh] p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="w-full max-w-3xl text-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          🗝️ Your cell is empty
-        </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-8">
-          Start by adding an item to this vault. Everything you store here is encrypted and secure.
-        </p>
+    <div>
+      {items.length < 0 ? (
+        <div className="flex items-center justify-center min-h-[70vh] p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+          <div className="w-full max-w-3xl text-center">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              🗝️ Your cell is empty
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-8">
+              Start by adding an item to this vault. Everything you store here is encrypted and secure.
+            </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          {createOptions.map((option) => (
-            <button
-              key={option.id}
-              onClick={option.action}
-              className="group relative overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg p-4 text-left shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200"
-            >
-              <div className="flex items-center gap-4">
-                <div className="bg-gray-100 dark:bg-gray-700 rounded-full p-2">
-                  {option.icon}
-                </div>
-                <div>
-                  <h4 className="text-md font-semibold text-gray-800 dark:text-white">
-                    {option.label}
-                  </h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {option.description}
-                  </p>
-                </div>
-              </div>
-              <div className="absolute right-3 top-3 w-2 h-2 bg-green-500 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity" />
-            </button>
-          ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+              {createOptions.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={option.action}
+                  className="group relative overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg p-4 text-left shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-200"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="bg-gray-100 dark:bg-gray-700 rounded-full p-2">
+                      {option.icon}
+                    </div>
+                    <div>
+                      <h4 className="text-md font-semibold text-gray-800 dark:text-white">
+                        {option.label}
+                      </h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {option.description}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="absolute right-3 top-3 w-2 h-2 bg-green-500 rounded-full animate-pulse opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
+      ) : (
+        <TaskList
+          data={items}
+          isLoading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onBulkDelete={handleBulkDelete}
+        />
 
-        {/* Optional Import Button */}
-        {/* 
-        <button
-          onClick={onImport}
-          className="inline-flex items-center justify-center px-5 py-2 text-sm font-medium text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
-        >
-          <FiDownload className="w-4 h-4 mr-2" />
-          Import passwords
-        </button> 
-        */}
-      </div>
+      )}
     </div>
   );
 };
+
+

@@ -11,6 +11,7 @@ import type { AppDispatch } from '@/store';
 import { useParams } from 'react-router-dom'; 
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import CellDropDwon from '@/pages/Components/Cells/CellDropDwon';
+
 import {
     Home,
     Gift,
@@ -129,7 +130,9 @@ const { vaultId } = useParams<{ vaultId: string }>();
         setIsSubmitting(false);
     };
 
-    useEffect(() => {
+  useEffect(() => {
+        if (!isModalOpen) return;
+
         if (isEdit && identity) {
             setTitle(identity.title || '');
             setNote(identity.note || '');

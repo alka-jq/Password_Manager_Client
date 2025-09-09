@@ -18,9 +18,9 @@ const Personal = () => {
     const [loading, setLoading] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
+    
     useEffect(() => {
         const fetchData = async () => {
-            console.log('Personal data');
             try {
                 setLoading(true);
                 const res = await getPersonaldata();

@@ -101,7 +101,7 @@ export const addLoginCredentials = async (formData: FormData) => {
 export const deletePasswordById = async (id: string,) => {
   try {
     const response = await apiClient.delete(`/api/password/delete/${id}`, {
-      });
+    });
     return response.data;
   } catch (error: any) {
     console.error(`Failed to delete password with ID ${id}:`, error.response?.data || error.message);
@@ -162,11 +162,11 @@ export const togglePinStatus = async (ids: string[], is_pin: boolean) => {
 
 // Create a Cell API call 
 
-export const createCell = async (FormData: FormData) =>{
+export const createCell = async (FormData: FormData) => {
   try {
     const response = await apiClient.post('/api/identity/cell/create', FormData)
     return response.data
-  } catch (error) { 
+  } catch (error) {
     console.error('Failed to create cell:', error)
     throw new Error('Failed to create cell')
   }
@@ -174,7 +174,7 @@ export const createCell = async (FormData: FormData) =>{
 
 // Edit a cell API call 
 
-export const editCell = async (id: string, formData: FormData) =>{
+export const editCell = async (id: string, formData: FormData) => {
   try {
     const response = await apiClient.put(`/api/identity/cell/edit/${id}`, formData)
     return response.data
@@ -184,7 +184,7 @@ export const editCell = async (id: string, formData: FormData) =>{
   }
 }
 // Share API Call 
-export const shareCell = async (id: string, shareData: { recipient: string; }, formData: FormData) =>{
+export const shareCell = async (id: string, shareData: { recipient: string; }, formData: FormData) => {
   try {
     const response = await apiClient.post('/api/card/share', formData)
   } catch (error) {
