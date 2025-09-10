@@ -1,24 +1,41 @@
 import React, { useState } from "react";
+import apiClient from "@/service/apiClient";
+
 
 interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (recipient: string) => void;
   vaultName?: string;
+  vaultToShare?: string | null;
 }
 
-const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, onConfirm }) => {
+const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, vaultToShare }) => {
   const [inputValue, setInputValue] = useState("");
 
-  const handleShare = () => {
+  const sharepayload = {
+    item_id: vaultToShare,
+    shared_with_email: inputValue
+  }
+
+  const handleShareVault = async () => {
     if (!inputValue.trim()) {
       alert("Please enter a link or email");
       return;
     }
-    onConfirm(inputValue);
-    setInputValue("");
-    onClose();
+
+    try {
+      const res = await apiClient.post("/api/card/share", sharepayload)
+      console.log(res)
+      setInputValue("");
+      onClose();
+
+    } catch (error) {
+      console.error('Failed to share cell', error);
+    }
   };
+
+
+
 
   if (!isOpen) return null;
 
@@ -68,7 +85,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, onConfirm }) =
                 clipRule="evenodd"
               />
             </svg>
-          </div>  
+          </div>
         </div>
 
         {/* Title & Description */}
@@ -90,7 +107,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, onConfirm }) =
 
         {/* Share Button */}
         <button
-          onClick={handleShare}
+          onClick={handleShareVault}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition text-sm"
         >
           Share Now

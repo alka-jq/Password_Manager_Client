@@ -64,7 +64,8 @@ import { useVaults, Vault } from '@/useContext/VaultContext';
 import type { RootState } from '@/store';
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import type { AppDispatch } from '@/store';
-import { createCell, getAllCell, editCell, deletePasswordById, shareCell } from '@/service/TableDataService';
+import { createCell, getAllCell, editCell, deletePasswordById, } from '@/service/TableDataService';
+import apiClient from '@/service/apiClient';
 
 interface CountState {
     count: {
@@ -302,36 +303,23 @@ const SidePanel = () => {
         setIsDrawerOpen(true);
     };
 
-    const [vaultToShare, setVaultToShare] = useState<Vault | null>(null);
+    const [vaultToShare, setVaultToShare] = useState<string | null>(null);
     const [shareRecipient, setShareRecipient] = useState<string>('');
 
     const openShareModal = (vault: Vault) => {
-        setVaultToShare(vault);
+        setVaultToShare(vault.id);
         setIsShareModalOpen(true);
-    };
-
-    const handleShareVault = async () => {
-        if (!vaultToShare) return;
-        try {
-            const formData = new FormData();
-            await shareCell([vaultToShare.id], [shareRecipient], formData);
-            setIsShareModalOpen(false);
-            setShareRecipient('');
-            setVaultToShare(null);
-        } catch (error) {
-            console.error('Failed to share cell', error);
-        }
     };
 
     const handleCloseModal = () => {
         setIsShareModalOpen(false);
     };
 
-const handleDeleteClick = (vault: Vault) => {
-    setVaultToDelete(vault);
-    setDeleteTargetIds([vault.id]); // Set the ID here to avoid undefined error
-    setDeleteModalOpen(true);
-};
+    const handleDeleteClick = (vault: Vault) => {
+        setVaultToDelete(vault);
+        setDeleteTargetIds([vault.id]); // Set the ID here to avoid undefined error
+        setDeleteModalOpen(true);
+    };
 
     const handleCancelDelete = () => {
         setDeleteModalOpen(false);
@@ -635,11 +623,7 @@ const handleDeleteClick = (vault: Vault) => {
                                 <ShareModal
                                     isOpen={isShareModalOpen}
                                     onClose={handleCloseModal}
-                                    onConfirm={(recipient) => {
-                                        setShareRecipient(recipient);
-                                        handleShareVault();
-                                    }}
-                                    vaultName={vaultToShare?.title ?? vaultToShare?.name ?? ''}
+                                    vaultToShare={vaultToShare}
                                 />
 
                                 <div className="h-px dark:border-[#1b2e4b]"></div>
