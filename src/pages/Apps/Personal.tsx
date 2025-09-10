@@ -25,7 +25,6 @@ const Personal = () => {
         try {
             setLoading(true);
             const res = await getPersonaldata();
-            // console.log('all data', res);
             setItems(res.data);
         } catch (err) {
             console.log('backend error');
@@ -44,7 +43,6 @@ const Personal = () => {
 
     const handleEdit = (id: string) => {
         console.log('Edit item with ID:', id);
-        // You can implement your edit logic here
         alert(`Editing item with ID: ${id}`);
     };
 
@@ -58,7 +56,6 @@ const Personal = () => {
 
     const handleView = (id: string) => {
         console.log('View item with ID:', id);
-        // You can implement your view logic here
         alert(`Viewing item with ID: ${id}`);
     };
 
@@ -67,7 +64,6 @@ const Personal = () => {
         setDeleteModalOpen(true);
     };
 
-    // Step 3.2: When user confirms in modal
     const handleDeleteConfirm = async () => {
         try {
             await softDeleteItems(idsToDelete);
@@ -80,7 +76,6 @@ const Personal = () => {
         }
     };
 
-    // Step 3.3: When user cancels modal
     const handleDeleteCancel = () => {
         setDeleteModalOpen(false);
         setIdsToDelete([]);

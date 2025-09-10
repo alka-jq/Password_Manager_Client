@@ -21,7 +21,7 @@ const IdentityModalUIOnly = () => {
 
 
     const { vaultId } = useParams<{ vaultId: string }>();
-    
+
 
     const isEdit = modalMode === 'edit';
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -148,7 +148,7 @@ const IdentityModalUIOnly = () => {
 
     const formatDateForBackend = (input: string) => {
         if (!input) return null;
-        const [year, month,day ] = input.split('-');
+        const [year, month, day] = input.split('-');
         return `${day}/${month}/${year}`;
     };
 
@@ -160,47 +160,51 @@ const IdentityModalUIOnly = () => {
             return;
         }
 
-        
+
         setIsSubmitting(true);
-
-        // Map your form data to API fields
-        const payload = {
-            title: title,
-            full_name: fullName || null,
-            email: email || null,
-            phone_number: phoneNumber || null,
-            dob: formatDateForBackend(dateOfBirth) || null,
-            organization: organization || null,
-            street_address: streetAddress || null,
-            po_box: null, // You can add this field if needed
-            zip_code: zipCode || null,
-            city: city || null,
-            state: state || null,
-            country: country || null,
-            home_phone: homePhone || null,
-            work_phone: workPhone || null,
-            mobile_phone: mobilePhone || null,
-            alt_phone: alternateEmail || null,
-            website: website || null,
-            company_name: company || null,
-            job_title: jobTitle || null,
-            department: department || null,
-            work_email: workEmail || null,
-            work_address: workAddress || null,
-            attachments: attachments.map((file) => file.name) || [],
-            notes: note || null,
-            custom_sections: dynamicFields.reduce((acc, field) => {
-                acc[field.id] = { label: field.label, value: field.value, type: field.type, section: field.section };
-                return acc;
-            }, {} as Record<string, any>),
-            is_personal: personal,
-            is_pin: false,
-            is_trash: false,
-            cell_id: cellId,
-        };
-
         try {
-            const response = await apiClient.post('/api/identity/create', payload);
+            const formData = new FormData();
+            formData.append('title', title.trim());
+            formData.append('full_name', fullName || '')
+            formData.append('email', email || '')
+            formData.append('phone_number', phoneNumber || '')
+            formData.append('dob', formatDateForBackend(dateOfBirth) || '')
+            formData.append('organization', organization || '')
+            formData.append('street_address', streetAddress || '')
+            formData.append('zip_code', zipCode || '')
+            formData.append('city', city || '')
+            formData.append('state', state || '')
+            formData.append('country', country || '')
+            formData.append('home_phone', homePhone || '')
+            formData.append('work_phone', workPhone || '')
+            formData.append('mobile_phone', mobilePhone || '')
+            formData.append('alt_phone', alternateEmail || '')
+            formData.append('website', website || '')
+            formData.append('company_name', company || '')
+            formData.append('job_title', jobTitle || '')
+            formData.append('company_name', company || '')
+            formData.append('company_name', company || '')
+            formData.append('company_name', company || '')
+            formData.append('department', department || '')
+            formData.append('work_email', workEmail || '')
+            formData.append('work_address', workAddress || '')
+            formData.append('notes', note || '')
+            formData.append('po_box', '')
+            attachments.forEach((file) => {
+                formData.append('attachment', file);
+            });
+            if (dynamicFields.length > 0) {
+                formData.append('dynamic_fields', JSON.stringify(dynamicFields));
+            }
+            formData.append('cell_id', cellId || '');
+            formData.append('is_personal', personal ? 'true' : 'false');
+
+
+            const response = await apiClient.post('/api/identity/create', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             if (!response) {
                 console.error('API error:');
                 setIsSubmitting(false);
@@ -279,7 +283,7 @@ const IdentityModalUIOnly = () => {
                     </div>
                     {/* ==================================Cell DropDown===================================== */}
                     <div className="flex ">
-                        <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={cellId} initialPersonal={personal}/>
+                        <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={cellId} initialPersonal={personal} />
                         {/* ==================================----------------------------------------------------------- */}
 
                         <button
