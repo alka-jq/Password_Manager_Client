@@ -160,7 +160,6 @@ export const togglePinStatus = async (ids: string[], is_pin: boolean) => {
 };
 
 // Create a Cell API call 
-
 export const createCell = async (FormData: FormData) => {
   try {
     const response = await apiClient.post('/api/identity/cell/create', FormData)
@@ -172,7 +171,6 @@ export const createCell = async (FormData: FormData) => {
 }
 
 // Edit a cell API call 
-
 export const editCell = async (id: string, formData: FormData) => {
   try {
     const response = await apiClient.put(`/api/identity/cell/edit/${id}`, formData)
@@ -182,4 +180,3 @@ export const editCell = async (id: string, formData: FormData) => {
     throw new Error('Failed to edit the cell')
   }
 }
-

@@ -64,7 +64,7 @@ import { useVaults, Vault } from '@/useContext/VaultContext';
 import type { RootState } from '@/store';
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import type { AppDispatch } from '@/store';
-import { createCell, getAllCell, editCell, deletePasswordById } from '@/service/TableDataService';
+import { createCell, getAllCell, editCell, deletePasswordById, } from '@/service/TableDataService';
 import apiClient from '@/service/apiClient';
 
 interface CountState {
@@ -303,15 +303,12 @@ const SidePanel = () => {
     };
 
     const [vaultToShare, setVaultToShare] = useState<string | null>(null);
-    const [vaultName, setVaultName] = useState<string>('');
     const [shareRecipient, setShareRecipient] = useState<string>('');
 
     const openShareModal = (vault: Vault) => {
         setVaultToShare(vault.id);
-        setVaultName(vault.name ?? vault.title ?? '');
         setIsShareModalOpen(true);
     };
-
 
     const handleCloseModal = () => {
         setIsShareModalOpen(false);
@@ -630,12 +627,7 @@ const SidePanel = () => {
                                 <ShareModal
                                     isOpen={isShareModalOpen}
                                     onClose={handleCloseModal}
-                                    vaultToShare={vaultToShare || undefined}
-                                    onConfirm={(recipient) => {
-                                        console.log('received email', recipient);
-                                        setShareRecipient(recipient);
-                                    }}
-                                    vaultName={vaultName}
+                                    vaultToShare={vaultToShare}
                                 />
 
                                 <div className="h-px dark:border-[#1b2e4b]"></div>

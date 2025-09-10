@@ -5,15 +5,12 @@ import apiClient from "@/service/apiClient";
 interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (recipient: string) => void;
   vaultName?: string;
-  vaultToShare?: string
+  vaultToShare?: string | null;
 }
 
-const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, onConfirm, vaultToShare }) => {
+const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, vaultToShare }) => {
   const [inputValue, setInputValue] = useState("");
-
-
 
   const sharepayload = {
     item_id: vaultToShare,
@@ -36,6 +33,9 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, onConfirm, vau
       console.error('Failed to share cell', error);
     }
   };
+
+
+
 
   if (!isOpen) return null;
 
