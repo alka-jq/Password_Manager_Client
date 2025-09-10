@@ -49,36 +49,35 @@ export const getPindata = async () => {
 // -------------------------------------------------------------------------
 
 
-// POST API for password Generator 
+// POST API for password Generator
 export const generatePasswordAPI = async (
   type: "advanced" | "memorable" | "random" = "advanced",
-  length: number = 20
+  options: any = {}
 ) => {
   try {
     const token = localStorage.getItem("authToken") // or however you're storing it
 
-    if (!token) {
-      throw new Error("Authentication token not found");
+    const config: any = {
+      headers: {},
+    };
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     const response = await apiClient.post(
       "/api/password/generate",
       {
         type,
-        options: {
-          length,
-        },
+        options,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      config
     );
 
-    return response.data;
+    return response.data.password.value;
   } catch (err) {
-    console.error(err)
+    console.error(err);
+    throw err; // Re-throw to handle in component
   }
 }
 
@@ -183,26 +182,4 @@ export const editCell = async (id: string, formData: FormData) => {
     throw new Error('Failed to edit the cell')
   }
 }
-export const shareCell = async (itemIds: string[], recipients: string[], formData: FormData) => {
-  try {
-    // Update FormData keys to match backend expectations
-    formData.delete('id');
-    formData.delete('recipient');
 
-    // Append each item_id
-    itemIds.forEach(id => {
-      formData.append('item_id', id);
-    });
-
-    // Append each shared_with_email
-    recipients.forEach(email => {
-      formData.append('shared_with_email', email);
-    });
-
-    const response = await apiClient.post('/api/card/share', formData);
-    return response.data;
-  } catch (error) {
-    console.log("Fail to share the cell", error);
-    throw new Error("Failed to share the required cell");
-  }
-};

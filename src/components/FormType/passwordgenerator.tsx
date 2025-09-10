@@ -87,111 +87,60 @@ const PasswordGenerator: React.FC = () => {
     if (score <= 4) return "Good"
     return "Strong"
   }
-// Generate memorable password
-  // const generateMemorablePassword = () => {
-  //   const words = []
-
-  //   for (let i = 0; i < wordCount; i++) {
-  //     let word
-  //     if (i % 2 === 0) {
-  //       word = adjectives[Math.floor(Math.random() * adjectives.length)]
-  //     } else {
-  //       word = nouns[Math.floor(Math.random() * nouns.length)]
-  //     }
-
-  //     if (capitalize) {
-  //       word = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-  //     } else {
-  //       word = word.toLowerCase()
-  //     }
-
-  //     words.push(word)
-  //   }
-
-  //   let password = words.join(separator)
-
-  //   if (includeNumbers) {
-  //     const randomNum = Math.floor(Math.random() * 100)
-  //     password += randomNum
-  //   }
-
-  //   return password
-  // }
-
-  // Generate random password
-  // const generateRandomPassword = () => {
-  //   let charset = ""
-
-  //   if (includeLowercase) charset += "abcdefghijklmnopqrstuvwxyz"
-  //   if (includeUppercase) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  //   if (includeNumbersRandom) charset += "0123456789"
-  //   if (includeSymbols) charset += "!@#$%^&*()_+-=[]{}|;:,.<>?"
-
-  //   if (excludeSimilar) {
-  //     charset = charset.replace(/[il1Lo0O]/g, "")
-  //   }
-
-  //   let password = ""
-  //   for (let i = 0; i < length; i++) {
-  //     password += charset.charAt(Math.floor(Math.random() * charset.length))
-  //   }
-
-  //   return password
-  // }
-
-  // const generatePassword = () => {
-  //   const newPassword = passwordType === "memorable" ? generateMemorablePassword() : generateRandomPassword()
-  //   const strength = calculateStrength(newPassword)
-
-  //   dispatch(setCurrentPassword(newPassword))
-  //   dispatch(setPasswordStrength(strength))
-
-  //   // Add to history
-  //   const historyEntry: PasswordHistory = {
-  //     id: Date.now().toString(),
-  //     password: newPassword,
-  //     type: passwordType === "memorable" ? "Memorable Password" : "Random Password",
-  //     timestamp: new Date().toISOString(),
-  //     strength,
-  //   }
-
-  //   dispatch(addToPasswordHistory(historyEntry))
-  // }
   // Generate new password
   const generatePassword = async () => {
     setLoading(true)
-  try {
-    let password = ""
-    const type = passwordType
+    try {
+      let password = ""
+      const type = passwordType
 
-    if (type === "memorable") {
-      // Construct options for memorable password
-      password = await generatePasswordAPI("memorable", wordCount)
-    } else {
-      // Construct options for random password
-      password = await generatePasswordAPI("random", length)
+      if (type === "memorable") {
+        // Construct options for memorable password
+        const options = {
+          length: wordCount * 6, // approximate length, adjust as needed
+          uppercase: capitalize,
+          symbols: includeNumbers,
+        }
+        password = await generatePasswordAPI("memorable", options)
+      } else {
+        // Construct options for random password
+        const options = {
+          length,
+          uppercase: includeUppercase,
+          lowercase: includeLowercase,
+          numbers: includeNumbersRandom,
+          symbols: includeSymbols,
+          excludeSimilar,
+        }
+        password = await generatePasswordAPI("random", options)
+      }
+
+      let strength: "Weak" | "Fair" | "Good" | "Strong" = "Weak"
+
+      if (password) {
+        strength = calculateStrength(password)
+        dispatch(setCurrentPassword(password))
+        dispatch(setPasswordStrength(strength))
+      } else {
+        dispatch(setCurrentPassword("Failed to generate password"))
+        dispatch(setPasswordStrength("Weak"))
+      }
+
+      const historyEntry: PasswordHistory = {
+        id: Date.now().toString(),
+        password: password || "Failed to generate password",
+        type: passwordType === "memorable" ? "Memorable Password" : "Random Password",
+        timestamp: new Date().toISOString(),
+        strength,
+      }
+
+      dispatch(addToPasswordHistory(historyEntry))
+    } catch (error) {
+      console.error("Failed to generate password:", error)
+    } finally {
+      setLoading(false)
     }
-
-    const strength = calculateStrength(password)
-
-    dispatch(setCurrentPassword(password))
-    dispatch(setPasswordStrength(strength))
-
-    const historyEntry: PasswordHistory = {
-      id: Date.now().toString(),
-      password,
-      type: passwordType === "memorable" ? "Memorable Password" : "Random Password",
-      timestamp: new Date().toISOString(),
-      strength,
-    }
-
-    dispatch(addToPasswordHistory(historyEntry))
-  } catch (error) {
-    console.error("Failed to generate password:", error)
-  } finally {
-    setLoading(false)
   }
-}
 
 
   // Copy to clipboard
