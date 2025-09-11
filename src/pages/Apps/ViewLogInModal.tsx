@@ -536,7 +536,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wide">
               <FileText className="w-4 h-4" />
-              File{details?.attachments && details.attachments.length !== 1 ? 's' : ''}
+              File 
             </div>
 
             {editMode ? (
@@ -559,7 +559,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
                     }}
                   />
                 </label>
-                
+
                 {details?.attachmentFiles && details.attachmentFiles.length > 0 && (
                   <div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-3">
                     <h4 className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Selected files:</h4>
@@ -587,34 +587,34 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
               </div>
             ) : (
               <div className={`p-3 rounded-lg ${details?.attachments && details.attachments.length > 0 ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-gray-100/50 dark:bg-gray-800/30'}`}>
-{details?.attachments && details.attachments.length > 0 ? (
-  <ImageFile attachments={details.attachments.map((attachment: any, idx: number) => {
-    let name = `File ${idx + 1}`;
-    let encryptedData = '';
-    let type = 'application/octet-stream';
+                {details?.attachments && details.attachments.length > 0 ? (
+                  <ImageFile attachments={details.attachments.map((attachment: any, idx: number) => {
+                    let name = `File ${idx + 1}`;
+                    let encryptedData = '';
+                    let type = 'application/octet-stream';
 
-    if (typeof attachment === 'string') {
-      encryptedData = attachment;
-      // Try to extract file name from encryptedData string if possible
-      const match = attachment.match(/([^\/]+)$/);
-      if (match) {
-        name = decodeURIComponent(match[1]);
-      }
-    } else if (typeof attachment === 'object' && attachment !== null) {
-      name = attachment.name || name;
-      encryptedData = attachment.encryptedData || '';
-      type = attachment.type || type;
-    }
+                    if (typeof attachment === 'string') {
+                      encryptedData = attachment;
+                      // Try to extract file name from encryptedData string if possible
+                      const match = attachment.match(/([^\/]+)$/);
+                      if (match) {
+                        name = decodeURIComponent(match[1]);
+                      }
+                    } else if (typeof attachment === 'object' && attachment !== null) {
+                      name = attachment.name || name;
+                      encryptedData = attachment.encryptedData || '';
+                      type = attachment.type || type;
+                    }
 
-    return {
-      name,
-      encryptedData,
-      type
-    };
-  })} />
-) : (
-  <p className="text-gray-400 dark:text-gray-500 italic">No files uploaded</p>
-)}
+                    return {
+                      name,
+                      encryptedData,
+                      type
+                    };
+                  })} />
+                ) : (
+                  <p className="text-gray-400 dark:text-gray-500 italic">No files uploaded</p>
+                )}
               </div>
             )}
           </div>
