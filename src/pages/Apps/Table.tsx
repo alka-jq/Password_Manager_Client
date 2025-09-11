@@ -6,11 +6,11 @@ import ViewCardModal from './ViewCardModal';
 import ViewLogInModal from './ViewLogInModal';
 import ViewIdentityModal from './ViewIdentityModal';
 import FilterDropdown from './FilterDropdown';
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "@/store";
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/store';
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import { fetchAlldata } from '../../store/Slices/TableSlice';
-
+import logo from '../../assets/images/ubs icons/2-removebg-preview.png';
 import Loader from '../Components/Loader';
 import { togglePinStatus } from '@/service/TableDataService';
 
@@ -61,7 +61,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
     // Initialize pin state from data when it changes
     useEffect(() => {
         const initialPinState: Record<string, boolean> = {};
-        safeData.forEach(item => {
+        safeData.forEach((item) => {
             initialPinState[item.id] = item.isPinned || false;
         });
         setPinState(initialPinState);
@@ -69,11 +69,9 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
     }, [safeData]);
 
     // Filter data based on selected type
-    const filteredData = safeData
-        .filter(item =>
-            (filterType === 'All Items' || item.type.toLowerCase() === filterType.toLowerCase()) &&
-            (item.title.toLowerCase().includes(searchQuery)) // 🔍 Search filter
-        );
+    const filteredData = safeData.filter(
+        (item) => (filterType === 'All Items' || item.type.toLowerCase() === filterType.toLowerCase()) && item.title.toLowerCase().includes(searchQuery) // 🔍 Search filter
+    );
 
     // Toggle pin for a specific item
     const togglePin = async (id: string) => {
@@ -81,9 +79,9 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
         try {
             await togglePinStatus([id], newPinState);
-            setPinState(prev => ({
+            setPinState((prev) => ({
                 ...prev,
-                [id]: newPinState
+                [id]: newPinState,
             }));
             dispatch(fetchAlldata());
             dispatch(fetchItemCount());
@@ -162,18 +160,18 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
         setIsBulkPinning(true);
 
         // Determine if all selected items are pinned or not
-        const allSelectedPinned = selectedItems.every(item => pinState[item.id]);
+        const allSelectedPinned = selectedItems.every((item) => pinState[item.id]);
         const newPinState = !allSelectedPinned;
 
-        const idsToUpdate = selectedItems.map(item => item.id);
+        const idsToUpdate = selectedItems.map((item) => item.id);
 
         try {
             await togglePinStatus(idsToUpdate, newPinState);
 
             // Update pin state for all selected items
-            setPinState(prev => {
+            setPinState((prev) => {
                 const updated = { ...prev };
-                idsToUpdate.forEach(id => {
+                idsToUpdate.forEach((id) => {
                     updated[id] = newPinState;
                 });
                 return updated;
@@ -216,7 +214,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
     return (
         <>
-            {(isLoading || isBulkPinning) ? (
+            {isLoading || isBulkPinning ? (
                 <div className="flex justify-center items-center w-full h-[100vh]">
                     <Loader />
                 </div>
@@ -227,7 +225,9 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                             <div className="mb-4">
                                 <FilterDropdown selected={filterType} onChange={setFilterType} />
                             </div>
-                            <h1 className="w-full h-[80vh] flex justify-center m-auto items-center text-xl">No Item Found</h1>
+                            <div className="flex flex-col justify-center items-center h-[80vh]">
+                                <img src={logo} alt="No Items Found" className="mx-auto w-24 h-24 opacity-40" />
+                            </div>
                         </>
                     ) : (
                         <>
@@ -257,18 +257,16 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                         {allSelected || someSelected ? (
                                             <button
                                                 className="text-gray-700 hover:text-blue-600"
-                                                title={safeData.some((_, index) => selected[index] && !pinState[safeData[index].id]) ? "Pin Selected" : "Unpin Selected"}
+                                                title={safeData.some((_, index) => selected[index] && !pinState[safeData[index].id]) ? 'Pin Selected' : 'Unpin Selected'}
                                                 onClick={handleBulkPin}
                                                 disabled={isBulkPinning}
                                             >
                                                 {isBulkPinning ? (
                                                     <Loader />
+                                                ) : safeData.some((_, index) => selected[index] && !pinState[safeData[index].id]) ? (
+                                                    <LuPin size={18} />
                                                 ) : (
-                                                    safeData.some((_, index) => selected[index] && !pinState[safeData[index].id]) ? (
-                                                        <LuPin size={18} />
-                                                    ) : (
-                                                        <LuPinOff size={18} />
-                                                    )
+                                                    <LuPinOff size={18} />
                                                 )}
                                             </button>
                                         ) : (
@@ -279,11 +277,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                     <div className="col-span-3">Type</div>
                                     <div className="col-span-2  flex justify-end items-center">
                                         {allSelected || someSelected ? (
-                                            <button
-                                                className="text-gray-700 hover:text-red-600"
-                                                title="Delete Selected"
-                                                onClick={handleBulkDelete}
-                                            >
+                                            <button className="text-gray-700 hover:text-red-600" title="Delete Selected" onClick={handleBulkDelete}>
                                                 <FaTrash size={16} />
                                             </button>
                                         ) : (
@@ -322,8 +316,9 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                                 </div>
                                                 <div className="col-span-3 flex items-center">
                                                     <span
-                                                        className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm border ${typeStyles[item.type] || 'text-gray-600 bg-gray-100 border-gray-300'
-                                                            }`}
+                                                        className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm border ${
+                                                            typeStyles[item.type] || 'text-gray-600 bg-gray-100 border-gray-300'
+                                                        }`}
                                                     >
                                                         {item.type}
                                                     </span>
@@ -345,8 +340,9 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                                         {dropdownVisible === item.id && (
                                                             <div
                                                                 ref={dropdownRef}
-                                                                className={`absolute bg-white border border-gray-200 rounded-md shadow-md py-1 w-32 z-10 ${dropdownPosition === 'above' ? 'bottom-full mb-1' : 'top-full mt-1'
-                                                                    } right-0`}
+                                                                className={`absolute bg-white border border-gray-200 rounded-md shadow-md py-1 w-32 z-10 ${
+                                                                    dropdownPosition === 'above' ? 'bottom-full mb-1' : 'top-full mt-1'
+                                                                } right-0`}
                                                             >
                                                                 <button
                                                                     className="w-full px-4 py-2 text-left flex items-center space-x-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -379,15 +375,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                     <div className="flex items-center space-x-3">
                                         <span className="text-sm text-gray-700">{selected.filter(Boolean).length} selected</span>
                                         <button onClick={handleBulkPin} className="text-gray-700 hover:text-blue-600 p-1" title="Toggle Pin for Selected" disabled={isBulkPinning}>
-                                            {isBulkPinning ? (
-                                                <Loader />
-                                            ) : (
-                                                safeData.some((_, index) => selected[index] && !pinState[safeData[index].id]) ? (
-                                                    <LuPin size={18} />
-                                                ) : (
-                                                    <LuPinOff size={18} />
-                                                )
-                                            )}
+                                            {isBulkPinning ? <Loader /> : safeData.some((_, index) => selected[index] && !pinState[safeData[index].id]) ? <LuPin size={18} /> : <LuPinOff size={18} />}
                                         </button>
                                         <button onClick={handleBulkDelete} className="text-gray-700 hover:text-red-600 p-1" title="Delete Selected">
                                             <FaTrash size={16} />
@@ -404,12 +392,8 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             {viewItem && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-                        {viewItem.type === 'identity' && (
-                            <ViewIdentityModal item={viewItem} onClose={() => setViewItem(null)} />
-                        )}
-                        {viewItem.type === 'login' && (
-                            <ViewLogInModal item={viewItem} onClose={() => setViewItem(null)} />
-                        )}
+                        {viewItem.type === 'identity' && <ViewIdentityModal item={viewItem} onClose={() => setViewItem(null)} />}
+                        {viewItem.type === 'login' && <ViewLogInModal item={viewItem} onClose={() => setViewItem(null)} />}
 
                         {viewItem.type === 'card' && <ViewCardModal item={viewItem} onClose={() => setViewItem(null)} />}
                     </div>
