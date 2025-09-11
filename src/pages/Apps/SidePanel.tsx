@@ -161,6 +161,8 @@ const SidePanel = () => {
     const [selectedTab, setSelectedTab] = useState(() => {
         return localStorage.getItem('selectedTab') || 'inbox';
     });
+    const [selectedCell, setSelectedCell] = useState<string | null>(() => localStorage.getItem("selectedCell"));
+
     const [deleteTargetIds, setDeleteTargetIds] = useState<string[]>([]);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const { vaults, setVaults } = useVaults();
@@ -360,6 +362,30 @@ const SidePanel = () => {
         dispatch(fetchItemCount());
     }, [dispatch]);
 
+    // Update active states based on URL
+    useEffect(() => {
+        const path = location.pathname;
+
+        if (path.startsWith('/cell/')) {
+            // Extract label name from URL
+            const cell = decodeURIComponent(path.split('/')[3]);
+            setSelectedCell(cell);
+            setSelectedTab('label');
+            localStorage.setItem("selectedCell", cell);
+            localStorage.setItem("selectedTab", "label");
+        } else {
+            // Handle tab selection based on path
+            const tabKey = tabs.find(tab => tab.path === path)?.key || "inbox";
+            setSelectedTab(tabKey);
+            setSelectedCell(null);
+            localStorage.setItem("selectedTab", tabKey);
+            localStorage.removeItem("selectedLabel");
+        }
+    }, [location.pathname]);
+
+
+
+
     const tabs = [
         { label: 'All Items', path: '/all_items', icon: MdMoveToInbox, key: 'inbox', count: count?.all_count || 0 },
         { label: 'Personal', path: '/personal', icon: CircleUserRound, key: 'done', count: count?.personal_count || 0 },
@@ -385,6 +411,9 @@ const SidePanel = () => {
         'lightmint:bg-[#477f5f67] lightmint:text-white ' +
         'salmonpink:bg-[#34878e7a] salmonpink:text-white ' +
         'softazure:bg-[#4a4e69]';
+
+    const cellBaseClasses = "mb-0.5 w-full flex justify-between items-center px-3 py-2 rounded-md font-medium";
+    const cellHoverClasses = "hover:bg-[#162b4a] hover:text-white";
 
     const modalItems = [
         {
@@ -426,9 +455,7 @@ const SidePanel = () => {
 
     // Function to handle vault click
     const handleVaultClick = (vault: Vault) => {
-        // setSelectedTab(vault.key);
-        // localStorage.setItem('selectedTab', vault.key);
-        // navigate(vault.path);
+        localStorage.setItem('selectedCell', vault.key);
         navigate(`/cell/${vault.id}/${vault.name}`);
 
 
@@ -523,9 +550,7 @@ const SidePanel = () => {
                                                 <div key={vault.id} className="relative group">
                                                     <Tippy content={vault.name} placement="right">
                                                         <div
-                                                            className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${
-                                                                selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''
-                                                            }`}
+                                                            className={`${cellBaseClasses} ${selectedCell === vault.name ? activeClasses : cellHoverClasses}`}
                                                             onClick={(e) => handleVaultClick(vault)}
                                                         >
                                                             {/* Left Icon and Name */}
