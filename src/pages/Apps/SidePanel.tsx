@@ -457,8 +457,8 @@ const SidePanel = () => {
     const handleVaultClick = (vault: Vault) => {
         localStorage.setItem('selectedCell', vault.key);
         navigate(`/cell/${vault.id}/${vault.name}`);
-
-
+        console.log('vaultkey', vault.key)
+        localStorage.setItem("cellId", vault.id)
     };
 
     return (

@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
-import { fetchAlldata } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 
 type TableItem = {
@@ -28,7 +28,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
   const [error, setError] = useState<string | null>(null);
   const [showSecurityCode, setShowSecurityCode] = useState(false);
   const [showPin, setShowPin] = useState(false);
-
+  const [cellId, setCellId] = useState<string>()
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,7 +38,9 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
       try {
         const response = await apiClient.get(`/api/password/items/${item.id}`);
         const data = await response.data;
-
+        const cell = data.item.cell_id
+      
+        setCellId(cell)
         if (response && data.item) {
           const card = data.item;
 
@@ -55,7 +57,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
             type: card.type,
             nameOnCard: card.name_on_card,
             cardNumber: card.card_number,
-            expirationDate: formattedDate,
+            expirationDate: card.expiration_date,
             securityCode: card.security_code,
             pin: card.pin,
             note: card.note || '',
@@ -87,18 +89,18 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
 
     try {
       // Format expiration date to ISO string if it's in MM/YY format
-      let formattedExpirationDate = '';
-      if (details.expirationDate) {
-        const [month, year] = details.expirationDate.split('/');
-        const fullYear = parseInt(year.length === 2 ? `20${year}` : year);
-        formattedExpirationDate = new Date(fullYear, parseInt(month) - 1, 1).toISOString();
-      }
+      // let formattedExpirationDate = '';
+      // if (details.expirationDate) {
+      //   const [month, year] = details.expirationDate.split('/');
+      //   const fullYear = parseInt(year.length === 2 ? `20${year}` : year);
+      //   formattedExpirationDate = new Date(fullYear, parseInt(month) - 1, 1).toISOString();
+      // }
 
       const payload = {
         title: details.title,
         name_on_card: details.nameOnCard,
         card_number: details.cardNumber,
-        expiration_date: formattedExpirationDate,
+        expiration_date: details.expiration_date,
         security_code: details.securityCode,
         pin: details.pin,
         attachments: details.attachments || [],
@@ -115,7 +117,12 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
 
       console.log("Card updated successfully:", response.data.message);
       onClose(); // Close modal on success
-      dispatch(fetchAlldata());
+      if (location.pathname === '/all_items') {
+        dispatch(fetchAlldata());
+      }
+      if (cellId) {
+        dispatch(fetchcellIdData(cellId));
+      }
     } catch (err: any) {
       console.error("Error updating card:", err);
       setError("Failed to update card.");
@@ -176,7 +183,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
               {error}
             </div>
           )}
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Card Name */}
             <div className="space-y-2">

@@ -21,7 +21,7 @@ import {
   Upload,
 } from "lucide-react";
 import { addLoginCredentials } from "@/service/TableDataService";
-import { fetchAlldata, fetchcellIdData } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import CellDropDwon from "@/pages/Components/Cells/CellDropDwon"
 import { fetchItemCount } from '@/store/Slices/countSlice';
@@ -147,6 +147,9 @@ const TaskModalUIOnly = () => {
       dispatch(closeModal());
       if (location.pathname === '/all_items') {
         dispatch(fetchAlldata());
+      }
+      if (location.pathname === '/personal') {
+        dispatch(fetchPersonalData())
       }
       dispatch(fetchItemCount());
       if (cellId) {

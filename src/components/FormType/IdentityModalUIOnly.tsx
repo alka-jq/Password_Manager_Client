@@ -6,7 +6,7 @@ import { addIdentity, editIdentity, closeIdentityModal, toggleSection } from '@/
 import type { DynamicField } from '@/store/Slices/identitySlice';
 import { X, Plus, User, MapPin, Phone, Briefcase, ChevronDown, ChevronUp, Upload, Trash2, AlertCircle, FileText, Paperclip, Calendar, Globe, Building } from 'lucide-react';
 import apiClient from '@/service/apiClient';
-import { fetchAlldata, fetchcellIdData } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import CellDropDwon from '@/pages/Components/Cells/CellDropDwon';
@@ -216,6 +216,9 @@ const IdentityModalUIOnly = () => {
             resetForm();
             if (location.pathname === '/all_items') {
                 dispatch(fetchAlldata());
+            }
+            if (location.pathname === '/personal') {
+                dispatch(fetchPersonalData())
             }
             dispatch(fetchItemCount());
 
