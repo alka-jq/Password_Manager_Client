@@ -6,7 +6,7 @@ import {
   FiUser,
   // FiDownload // Uncomment if needed
 } from 'react-icons/fi';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { openAddModal } from '@/store/Slices/taskSlice';
 import { openAddModal as openCardAddModal } from '@/store/Slices/cardSlice';
 import { openAddModal as openIdentityAddModal } from '@/store/Slices/identitySlice';
@@ -19,6 +19,7 @@ import { RootState, AppDispatch } from '../../store';
 import { useParams } from 'react-router-dom';
 import apiClient from '@/service/apiClient';
 import DeleteModal from './DeleteModal';
+import { fetchcellIdData } from '../../store/Slices/TableSlice';
 
 
 type Item = {
@@ -31,8 +32,9 @@ type Item = {
 
 export const EmptyVaultState: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(false)
+  const { items, loading } = useSelector((state: RootState) => state.data);
+  // const [items, setItems] = useState<Item[]>([]);
+  // const [loading, setLoading] = useState(false)
   const { vaultId } = useParams<{ vaultId: string }>();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
@@ -68,23 +70,30 @@ export const EmptyVaultState: React.FC = () => {
   ];
 
 
-  const fetchcelldata = async () => {
-    console.log("function call")
-    console.log(vaultId)
-    try {
-      setLoading(true)
-      const res = await apiClient.get(`/api/filter/all/${vaultId}`)
-      console.log(res.data.data)
-      setItems(res.data.data)
-    } catch (err) {
-      console.error("err")
-    } finally {
-      setLoading(false)
-    }
-  }
+  // const fetchcelldata = async (id: string) => {
+  //   console.log("function call")
+  //   console.log(vaultId)
+  //   try {
+
+  //     // const res = await apiClient.get(`/api/filter/all/${vaultId}`)
+  //     if (vaultId) {
+  //       const res = dispatch(fetchcellIdData(vaultId));
+  //       console.log(res)
+  //     }
+
+  //     // setItems(res.data.data)
+  //   } catch (err) {
+  //     console.error("err")
+  //   } finally {
+  //     // setLoading(false)
+  //   }
+  // }
 
   useEffect(() => {
-    fetchcelldata()
+    if (vaultId) {
+      const res = dispatch(fetchcellIdData(vaultId));
+      console.log(res)
+    }
   }, [vaultId])
 
 
@@ -100,7 +109,9 @@ export const EmptyVaultState: React.FC = () => {
       await softDeleteItems(idsToDelete);
       setDeleteModalOpen(false);
       setIdsToDelete([]);
-      fetchcelldata()
+      if (vaultId) {
+        dispatch(fetchcellIdData(vaultId));
+      }
       dispatch(fetchItemCount());
     } catch (error) {
       console.error('Soft delete failed:', error);

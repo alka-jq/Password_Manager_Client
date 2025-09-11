@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import type React from 'react';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -8,7 +8,7 @@ import { addCard, editCard, closeCardModal } from '@/store/Slices/cardSlice';
 import { useParams } from 'react-router-dom';
 import { X, Plus, CreditCard, User, Calendar, Shield, Hash, FileText, Paperclip, Upload, Eye, EyeOff, AlertCircle, Trash2 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
-import { fetchAlldata } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import CellDropDwon from '@/pages/Components/Cells/CellDropDwon';
 import { fetchItemCount } from '@/store/Slices/countSlice';
@@ -44,7 +44,7 @@ const CardModalUIOnly = () => {
 
     const [cellId, setCellId] = useState<string | null>(null);
     const [personal, setPersonal] = useState<boolean>(false);
-  
+
 
     const getInitialTab = useCallback(() => {
         // if (isEdit && card?.vaultKey) return card.vaultKey;
@@ -85,7 +85,7 @@ const CardModalUIOnly = () => {
         } else {
             resetForm();
             setCellId(getInitialTab() || null);
-            if(vaultId) {
+            if (vaultId) {
                 setPersonal(false);
             } else {
                 setPersonal(true);
@@ -141,6 +141,9 @@ const CardModalUIOnly = () => {
             }
             dispatch(closeCardModal());
             dispatch(fetchAlldata());
+            if (cellId) {
+                dispatch(fetchcellIdData(cellId));
+            }
             dispatch(fetchItemCount());
             resetForm();
         } catch (error) {
@@ -165,7 +168,7 @@ const CardModalUIOnly = () => {
     const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCardNumber(formatCardNumber(e.target.value));
     };
-   
+
     const updateDynamicField = (id: string, value: string) => {
         setDynamicFields((fields) => fields.map((field) => (field.id === id ? { ...field, value } : field)));
     };
@@ -194,7 +197,7 @@ const CardModalUIOnly = () => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={cellId} initialPersonal={personal}/>
+                        <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={cellId} initialPersonal={personal} />
 
                         <button
                             onClick={() => dispatch(closeCardModal())}
@@ -222,9 +225,8 @@ const CardModalUIOnly = () => {
                                     setErrors({ ...errors, title: false });
                                 }}
                                 placeholder="Card Title"
-                                className={`w-full h-11 px-4 py-2 border rounded-xl text-sm bg-white dark:bg-gray-800 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                    errors.title ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
-                                }`}
+                                className={`w-full h-11 px-4 py-2 border rounded-xl text-sm bg-white dark:bg-gray-800 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.title ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                    }`}
                             />
                             {errors.title && (
                                 <div className="flex items-center gap-2 text-sm text-red-600 mt-1">
@@ -399,7 +401,7 @@ const CardModalUIOnly = () => {
                                 )}
                             </div>
                         ))}
-                     
+
 
                         {/* Action Buttons */}
                         <div className="flex justify-end flex-col-reverse sm:flex-row gap-3 pt-6 pb-2 border-t border-gray-200 dark:border-gray-700">

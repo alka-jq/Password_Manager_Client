@@ -21,7 +21,7 @@ import {
   Upload,
 } from "lucide-react";
 import { addLoginCredentials } from "@/service/TableDataService";
-import { fetchAlldata } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import CellDropDwon from "@/pages/Components/Cells/CellDropDwon"
 import { fetchItemCount } from '@/store/Slices/countSlice';
@@ -117,7 +117,7 @@ const TaskModalUIOnly = () => {
 
       formData.append("title", title.trim());
 
-       // Append all attachments to formData
+      // Append all attachments to formData
       if (attachments.length > 0) {
         formData.append("attachment", attachments[0]); // API supports only 1 file
       }
@@ -147,6 +147,10 @@ const TaskModalUIOnly = () => {
       dispatch(closeModal());
       dispatch(fetchAlldata());
       dispatch(fetchItemCount());
+      if (cellId) {
+        dispatch(fetchcellIdData(cellId));
+      }
+
       resetForm();
 
     } catch (error) {
@@ -177,11 +181,11 @@ const TaskModalUIOnly = () => {
 
   if (!isModalOpen) return null;
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="fixed inset-0 pointer-events-none" onClick={() => dispatch(closeModal())} />
-        {/* Header */}
-            <div className="relative pointer-events-auto w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-xl animate-in zoom-in-95 duration-300 border border-gray-200 dark:border-gray-800">
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="fixed inset-0 pointer-events-none" onClick={() => dispatch(closeModal())} />
+      {/* Header */}
+      <div className="relative pointer-events-auto w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-xl animate-in zoom-in-95 duration-300 border border-gray-200 dark:border-gray-800">
         <div className="sticky top-0 z-10 flex items-center justify-between p-5 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">

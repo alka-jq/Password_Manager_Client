@@ -66,7 +66,6 @@ import { fetchItemCount } from '@/store/Slices/countSlice';
 import type { AppDispatch } from '@/store';
 import { createCell, getAllCell, editCell, deletePasswordById, } from '@/service/TableDataService';
 import apiClient from '@/service/apiClient';
-import { gettCellData } from '@/service/TableDataService';
 
 interface CountState {
     count: {
@@ -430,7 +429,7 @@ const SidePanel = () => {
         // setSelectedTab(vault.key);
         // localStorage.setItem('selectedTab', vault.key);
         // navigate(vault.path);
-        navigate(`/cell/${vault.id}`);
+        navigate(`/cell/${vault.id}/${vault.name}`);
 
 
     };

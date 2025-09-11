@@ -181,12 +181,3 @@ export const editCell = async (id: string, formData: FormData) => {
   }
 }
 
-//Get Cell by data 
-export const gettCellData = async (id:string)=>{
-  try{
-    const response = await apiClient.get(`api/filter/all/${id}`)
-    return response.data.data
-  }catch(err){
-    console.error("something is wrong")
-  }
-}
