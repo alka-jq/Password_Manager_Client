@@ -4,7 +4,7 @@
 interface DeleteModals {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+    onConfirm: () => void;
   itemType?: string;
   bulk?: boolean;
 }
