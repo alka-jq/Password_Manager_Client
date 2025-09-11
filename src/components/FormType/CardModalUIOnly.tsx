@@ -8,7 +8,7 @@ import { addCard, editCard, closeCardModal } from '@/store/Slices/cardSlice';
 import { useParams } from 'react-router-dom';
 import { X, Plus, CreditCard, User, Calendar, Shield, Hash, FileText, Paperclip, Upload, Eye, EyeOff, AlertCircle, Trash2 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
-import { fetchAlldata, fetchcellIdData } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import CellDropDwon from '@/pages/Components/Cells/CellDropDwon';
 import { fetchItemCount } from '@/store/Slices/countSlice';
@@ -142,6 +142,9 @@ const CardModalUIOnly = () => {
             dispatch(closeCardModal());
             if (location.pathname === '/all_items') {
                 dispatch(fetchAlldata());
+            }
+            if (location.pathname === '/personal') {
+                dispatch(fetchPersonalData())
             }
             if (cellId) {
                 dispatch(fetchcellIdData(cellId));

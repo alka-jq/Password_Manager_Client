@@ -9,7 +9,8 @@ import FilterDropdown from './FilterDropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
 import { fetchItemCount } from '@/store/Slices/countSlice';
-import { fetchAlldata } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
+import { useParams } from 'react-router-dom';
 import logo from '../../assets/images/ubs icons/2-removebg-preview.png';
 import Loader from '../Components/Loader';
 import { togglePinStatus } from '@/service/TableDataService';
@@ -53,6 +54,14 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
     const [viewItem, setViewItem] = useState<TableItem | null>(null);
     const [editItem, setEditItem] = useState<TableItem | null>(null);
     const searchQuery = useSelector((state: RootState) => state.search.query.toLowerCase());
+    const [cellId, setCellId] = useState<any>()
+
+    //use for received cell id 
+    useEffect(() => {
+        const vaultId = localStorage.getItem('cellId');
+        console.log("good", vaultId)
+        setCellId(vaultId)
+    }, [])
 
     // Ref for the dropdown menu
     const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -83,7 +92,20 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                 ...prev,
                 [id]: newPinState,
             }));
-            dispatch(fetchAlldata());
+
+            if (location.pathname === '/all_items') {
+                console.log("call all items api")
+                dispatch(fetchAlldata());
+            }
+            if (location.pathname === '/personal') {
+                dispatch(fetchPersonalData());
+            }
+
+            if (cellId) {
+                console.log("cell item api")
+                dispatch(fetchcellIdData(cellId));
+            }
+            console.log("call count api")
             dispatch(fetchItemCount());
             if (onPinToggle) onPinToggle();
         } catch (error) {
@@ -176,6 +198,15 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                 });
                 return updated;
             });
+            if (location.pathname === '/all_items') {
+                dispatch(fetchAlldata());
+            }
+            if (location.pathname === '/personal') {
+                dispatch(fetchPersonalData());
+            }
+            if (cellId) {
+                dispatch(fetchcellIdData(cellId));
+            }
             dispatch(fetchItemCount());
             if (onPinToggle) onPinToggle();
         } catch (error) {

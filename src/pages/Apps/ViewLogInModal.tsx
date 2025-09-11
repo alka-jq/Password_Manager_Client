@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
-import { fetchAlldata } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import { ImageFile } from '@/components/imageFile';
 
@@ -50,6 +50,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const [cellId, setCellId] = useState<string>()
 
   useEffect(() => {
     if (!item?.id) return;
@@ -59,7 +60,8 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
       try {
         const res = await apiClient.get(`/api/password/items/${item.id}`);
         const apiItem = res.data.item;
-
+        const cell = apiItem.cell_id
+        setCellId(cell)
         const formattedData: LoginDetails = {
           id: apiItem.id,
           title: apiItem.title,
@@ -139,7 +141,12 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
 
       console.log("Save successful:", response.data.message);
       onClose();
-      dispatch(fetchAlldata());
+      if (location.pathname === '/all_items') {
+        dispatch(fetchAlldata());
+      }
+      if (cellId) {
+        dispatch(fetchcellIdData(cellId));
+      }
     } catch (err) {
       console.error("Failed to save:", err);
       setError("Failed to update login credential.");
@@ -536,7 +543,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-xs font-semibold uppercase tracking-wide">
               <FileText className="w-4 h-4" />
-              File 
+              File
             </div>
 
             {editMode ? (

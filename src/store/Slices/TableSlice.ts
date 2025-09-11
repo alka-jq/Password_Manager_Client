@@ -1,6 +1,7 @@
 // redux/dataSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import apiClient from '../../service/apiClient';
+import { BsReverseLayoutSidebarInsetReverse } from 'react-icons/bs';
 
 // 🔹 Define type for a single item
 export interface Item {
@@ -37,6 +38,11 @@ export const fetchcellIdData = createAsyncThunk('data/fetchCell', async (id: str
     return res.data.data
 })
 
+export const fetchPersonalData = createAsyncThunk('data/fetchPersonal', async () => {
+    const res = await apiClient.get('/api/password/state/personal')
+    return res.data.data
+})
+
 // 🔹 Slice
 const dataSlice = createSlice({
     name: 'data',
@@ -67,6 +73,20 @@ const dataSlice = createSlice({
                 state.items = action.payload;
             })
             .addCase(fetchcellIdData.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message ?? 'Unknown error';
+            })
+
+            //fetch Personal Data
+            .addCase(fetchPersonalData.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchPersonalData.fulfilled, (state, action) => {
+                state.loading = false;
+                state.items = action.payload;
+            })
+            .addCase(fetchPersonalData.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message ?? 'Unknown error';
             })

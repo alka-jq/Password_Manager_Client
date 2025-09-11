@@ -38,6 +38,7 @@ export const EmptyVaultState: React.FC = () => {
   const { vaultId } = useParams<{ vaultId: string }>();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
+  
   const createOptions = [
     {
       id: 'login',
@@ -70,24 +71,6 @@ export const EmptyVaultState: React.FC = () => {
   ];
 
 
-  // const fetchcelldata = async (id: string) => {
-  //   console.log("function call")
-  //   console.log(vaultId)
-  //   try {
-
-  //     // const res = await apiClient.get(`/api/filter/all/${vaultId}`)
-  //     if (vaultId) {
-  //       const res = dispatch(fetchcellIdData(vaultId));
-  //       console.log(res)
-  //     }
-
-  //     // setItems(res.data.data)
-  //   } catch (err) {
-  //     console.error("err")
-  //   } finally {
-  //     // setLoading(false)
-  //   }
-  // }
 
   useEffect(() => {
     if (vaultId) {
@@ -117,8 +100,6 @@ export const EmptyVaultState: React.FC = () => {
       console.error('Soft delete failed:', error);
     }
   };
-
-
   const handleDeleteCancel = () => {
     setDeleteModalOpen(false);
     setIdsToDelete([]);

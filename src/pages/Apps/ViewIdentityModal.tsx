@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { X, User, Briefcase, MapPin, Phone, Info, Paperclip, LinkIcon, Trash2, Save, Edit3, Eye, FileText, Trash } from 'lucide-react';
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAlldata } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import { ImageFile } from '@/components/imageFile';
 // ----------------------
@@ -33,7 +33,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState(!editMode);
-
+    const [cellId, setCellId] = useState<string>()
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
         personal: true,
         address: true,
@@ -53,12 +53,11 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
             try {
                 setLoading(true);
                 const response = await apiClient.get(`/api/password/items/${item.id}`);
-
                 const apiItem = response.data.item;
-
                 const dobString = apiItem.dob;
                 const dobDate = new Date(dobString); // Parse the string into a Date object
-
+                const cell = apiItem.cell_id
+                setCellId(cell)
                 // Format the Date object to "DD/MM/YYYY"
                 const formattedDob = dobDate.toLocaleDateString('en-GB', {
                     day: '2-digit',
@@ -164,7 +163,15 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
 
             // Close modal or give feedback on success
             onClose();
-            dispatch(fetchAlldata());
+            if (location.pathname === '/all_items') {
+                dispatch(fetchAlldata());
+            }
+            if (location.pathname === '/personal') {
+                dispatch(fetchPersonalData())
+            }
+            if (cellId) {
+                dispatch(fetchcellIdData(cellId));
+            }
         } catch (err: any) {
             console.error('Failed to save identity:', err);
             setError('Failed to save identity.');
@@ -355,9 +362,9 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                                                             setDetails((prev: { attachmentFiles: any[] }) =>
                                                                 prev
                                                                     ? {
-                                                                          ...prev,
-                                                                          attachmentFiles: prev.attachmentFiles?.filter((_: any, i: number) => i !== idx),
-                                                                      }
+                                                                        ...prev,
+                                                                        attachmentFiles: prev.attachmentFiles?.filter((_: any, i: number) => i !== idx),
+                                                                    }
                                                                     : prev
                                                             )
                                                         }

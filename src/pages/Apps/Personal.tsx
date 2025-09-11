@@ -5,7 +5,8 @@ import DeleteModal from './DeleteModal';
 import { softDeleteItems } from '@/service/TableDataService';
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
-import { fetchItemCount } from '@/store/Slices/countSlice';
+import { fetchItemCount, } from '@/store/Slices/countSlice';
+import { fetchPersonalData } from '@/store/Slices/TableSlice';
 
 type Item = {
     id: string;
@@ -15,27 +16,29 @@ type Item = {
 
 const Personal = () => {
     const dispatch = useDispatch<AppDispatch>()
-    const [items, setItems] = useState<Item[]>([]);
-    const [loading, setLoading] = useState(false);
+    // const [items, setItems] = useState<Item[]>([]);
+    // const [loading, setLoading] = useState(false);
+    const { items, loading } = useSelector((state: RootState) => state.data);
+
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
 
-    const fetchData = async () => {
-        try {
-            setLoading(true);
-            const res = await getPersonaldata();
-            setItems(res.data);
-        } catch (err) {
-            console.log('backend error');
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const fetchData = async () => {
+    //     try {
+    //         setLoading(true);
+    //         const res = await dispatch(fetchPersonalData())
+    //         setItems(res);
+    //     } catch (err) {
+    //         console.log('backend error');
+    //         console.error(err);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     useEffect(() => {
-        fetchData();
+        dispatch(fetchPersonalData())
     }, []);
 
     // Handler functions
@@ -70,7 +73,7 @@ const Personal = () => {
             setDeleteModalOpen(false);
             setIdsToDelete([]);
             dispatch(fetchItemCount());
-            fetchData();
+            dispatch(fetchPersonalData())
         } catch (error) {
             console.error('Soft delete failed:', error);
         }
