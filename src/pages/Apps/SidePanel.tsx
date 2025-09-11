@@ -66,6 +66,7 @@ import { fetchItemCount } from '@/store/Slices/countSlice';
 import type { AppDispatch } from '@/store';
 import { createCell, getAllCell, editCell, deletePasswordById, } from '@/service/TableDataService';
 import apiClient from '@/service/apiClient';
+import { gettCellData } from '@/service/TableDataService';
 
 interface CountState {
     count: {
@@ -426,11 +427,12 @@ const SidePanel = () => {
 
     // Function to handle vault click
     const handleVaultClick = (vault: Vault) => {
-        setSelectedTab(vault.key);
-        localStorage.setItem('selectedTab', vault.key);
+        // setSelectedTab(vault.key);
+        // localStorage.setItem('selectedTab', vault.key);
         // navigate(vault.path);
-         navigate(`/cell/${vault.id}`);
-       
+        navigate(`/cell/${vault.id}`);
+
+
     };
 
     return (
@@ -438,9 +440,8 @@ const SidePanel = () => {
             <div className="lg:flex lg:relative h-full text-[#fff] lightmint:bg-[#629e7c]">
                 <div className={`overlay bg-black/60 z-[5] w-full h-full fixed inset-0 xl:!hidden ${menuBarOpen ? 'block' : 'hidden'}`} onClick={() => setMenuBarOpen(false)}></div>
                 <div
-                    className={`overflow-hidden lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${
-                        menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtr:right-0' : ''
-                    }`}
+                    className={`overflow-hidden lg:block dark:gray-50 classic:bg-[#F8FAFD] cornflower:bg-[#6BB8C5] bg-[#133466] peach:bg-[#1b2e4b] dark:bg-[#202127] w-[250px] max-w-full flex-none xl:relative lg:relative z-50 xl:h-auto h-auto hidden salmonpink:bg-[#006d77] softazure:bg-[#9a8c98] blue:bg-[#64b5f6] softazure:text-[#f7fff7] ${menuBarOpen ? '!block fixed inset-y-0 ltr:left-0 rtr:right-0' : ''
+                        }`}
                 >
                     <div className="lightmint:bg-[#629e7c]">
                         <div className="py-3 px-5 blue:bg-[#64b5f6]">
@@ -509,9 +510,9 @@ const SidePanel = () => {
                                     editVault={
                                         editingVault
                                             ? {
-                                                  ...editingVault,
-                                                  name: editingVault.title ?? editingVault.name,
-                                              }
+                                                ...editingVault,
+                                                name: editingVault.title ?? editingVault.name,
+                                            }
                                             : null
                                     }
                                 />
@@ -523,10 +524,9 @@ const SidePanel = () => {
                                                 <div key={vault.id} className="relative group">
                                                     <Tippy content={vault.name} placement="right">
                                                         <div
-                                                            className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${
-                                                                selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''
-                                                            }`}
-                                                            onClick={() => handleVaultClick(vault)}
+                                                            className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''
+                                                                }`}
+                                                            onClick={(e) => handleVaultClick(vault)}
                                                         >
                                                             {/* Left Icon and Name */}
                                                             <div className="flex items-center gap-1 w-full">
@@ -569,9 +569,8 @@ const SidePanel = () => {
                                                                                             e.stopPropagation();
                                                                                             handleEditVault(vault);
                                                                                         }}
-                                                                                        className={`${
-                                                                                            active ? 'bg-gray-100 dark:bg-gray-700' : ''
-                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium`}
+                                                                                        className={`${active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                                                                            } flex items-center w-full px-4 py-2 text-sm font-medium`}
                                                                                     >
                                                                                         <GoPencil className="mr-2 w-4 h-4" />
                                                                                         Edit Cell
@@ -586,9 +585,8 @@ const SidePanel = () => {
                                                                                             e.stopPropagation();
                                                                                             openShareModal(vault);
                                                                                         }}
-                                                                                        className={`${
-                                                                                            active ? 'bg-gray-100 dark:bg-gray-700' : ''
-                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium`}
+                                                                                        className={`${active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                                                                            } flex items-center w-full px-4 py-2 text-sm font-medium`}
                                                                                     >
                                                                                         <FiUserPlus className="mr-2 w-4 h-4" />
                                                                                         Share Cell
@@ -603,9 +601,8 @@ const SidePanel = () => {
                                                                                             e.stopPropagation();
                                                                                             handleDeleteClick(vault);
                                                                                         }}
-                                                                                        className={`${
-                                                                                            active ? 'bg-red-100 dark:bg-red-900/30' : ''
-                                                                                        } flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`}
+                                                                                        className={`${active ? 'bg-red-100 dark:bg-red-900/30' : ''
+                                                                                            } flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400`}
                                                                                     >
                                                                                         <FaRegTrashAlt className="mr-2 w-4 h-4" />
                                                                                         Delete Cell
