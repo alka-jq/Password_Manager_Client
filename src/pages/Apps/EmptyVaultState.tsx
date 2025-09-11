@@ -15,6 +15,8 @@ import React, { useEffect, useState } from 'react';
 import { softDeleteItems } from '@/service/TableDataService';
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import { RootState, AppDispatch } from '../../store';
+import { useParams } from 'react-router-dom';
+import { fetchAlldata } from '../../store/Slices/TableSlice';
 
 
 export type ItemType =
@@ -35,6 +37,7 @@ export const EmptyVaultState: React.FC<EmptyVaultStateProps> = ({
   onImport,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const { vaultId } = useParams<{ vaultId: string }>();
 
   const createOptions = [
     {
@@ -66,24 +69,39 @@ export const EmptyVaultState: React.FC<EmptyVaultStateProps> = ({
       action: () => dispatch(openPasswordGenerator()),
     },
   ];
-  const dummyData = [
-    { id: '1', title: 'Email Login', type: 'Login' },
-    { id: '2', title: 'Office ID Card', type: 'Identity Card' },
-    { id: '3', title: 'Bank Password', type: 'Password' },
-    { id: '4', title: 'Social Media Account', type: 'Login' },
-    { id: '5', title: 'University ID', type: 'Identity Card' },
-    { id: '6', title: 'WiFi Password', type: 'Password' },
-    { id: '7', title: 'WiFi Password', type: 'Card' }
-  ];
 
-  const [items, setItems] = useState(dummyData)
-  const [loading, setLoading] = useState()
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
-  // 🔹 Fetch items on component mount
-  //  useEffect(() => {
-  //  }, [dispatch]);
+  // 🔹 Fetch items on vaultId change
+  useEffect(() => {
+    const fetchVaultData = async () => {
+      if (vaultId) {
+        setLoading(true);
+        try {
+          // Assuming fetchAlldata fetches data for the current vault or all, adjust as needed
+          await dispatch(fetchAlldata());
+          // For now, set dummy data, replace with actual fetch
+          setItems([
+            { id: '1', title: 'Email Login', type: 'Login' },
+            { id: '2', title: 'Office ID Card', type: 'Identity Card' },
+            { id: '3', title: 'Bank Password', type: 'Password' },
+            { id: '4', title: 'Social Media Account', type: 'Login' },
+            { id: '5', title: 'University ID', type: 'Identity Card' },
+            { id: '6', title: 'WiFi Password', type: 'Password' },
+            { id: '7', title: 'WiFi Password', type: 'Card' }
+          ]);
+        } catch (error) {
+          console.error('Failed to fetch vault data:', error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchVaultData();
+  }, [vaultId, dispatch]);
 
   // 🔹 Delete modal handlers
   const requestDelete = (ids: string[]) => {
@@ -126,8 +144,8 @@ export const EmptyVaultState: React.FC<EmptyVaultStateProps> = ({
   };
 
   return (
-    <div>
-      {items.length > 0 ? (
+    <div>     
+      {items.length === 0 ? (
         <div className="flex items-center justify-center min-h-[70vh] p-6 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <div className="w-full max-w-3xl text-center">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -171,7 +189,6 @@ export const EmptyVaultState: React.FC<EmptyVaultStateProps> = ({
           onDelete={handleDelete}
           onBulkDelete={handleBulkDelete}
         />
-
       )}
     </div>
   );

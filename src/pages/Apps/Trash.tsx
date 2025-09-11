@@ -264,4 +264,3 @@ const TrashList: React.FC = () => {
 };
 
 export default TrashList;
-

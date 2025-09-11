@@ -13,6 +13,7 @@ const AllItems = () => {
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
+  const [deleting, setDeleting] = useState(false);
 
   // 🔹 Fetch items on component mount
   useEffect(() => {
@@ -27,13 +28,16 @@ const AllItems = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await softDeleteItems(idsToDelete);
+      setDeleting(true);
       setDeleteModalOpen(false);
+      await softDeleteItems(idsToDelete);
       setIdsToDelete([]);
       dispatch(fetchAlldata());
       dispatch(fetchItemCount());
     } catch (error) {
       console.error('Soft delete failed:', error);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -63,9 +67,10 @@ const AllItems = () => {
   
   return (
     <div>
+      
       <TaskList
         data={items}
-        isLoading={loading}
+        isLoading={loading || deleting}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onBulkDelete={handleBulkDelete}
@@ -78,7 +83,5 @@ const AllItems = () => {
         bulk={idsToDelete.length > 1}
       />
     </div>
-  );
-};
-
+  )}
 export default AllItems;
