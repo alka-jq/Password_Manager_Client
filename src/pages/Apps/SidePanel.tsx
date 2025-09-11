@@ -526,7 +526,7 @@ const SidePanel = () => {
                                                             className={`flex items-center justify-between px-2 py-2 rounded-lg dark:bg-white/10 hover:bg-[#1f2b3a] transition cursor-pointer ${
                                                                 selectedTab === vault.key ? 'bg-[#1f2b3a]' : ''
                                                             }`}
-                                                            onClick={() => handleVaultClick(vault)}
+                                                            onClick={(e) => handleVaultClick(vault)}
                                                         >
                                                             {/* Left Icon and Name */}
                                                             <div className="flex items-center gap-1 w-full">

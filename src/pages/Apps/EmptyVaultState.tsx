@@ -267,7 +267,7 @@ export const EmptyVaultState: React.FC = () => {
 
   useEffect(() => {
     fetchcelldata()
-  }, [])
+  }, [vaultId])
 
 
 
