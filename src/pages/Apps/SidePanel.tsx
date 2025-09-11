@@ -304,7 +304,6 @@ const SidePanel = () => {
     };
 
     const [vaultToShare, setVaultToShare] = useState<string | null>(null);
-    const [shareRecipient, setShareRecipient] = useState<string>('');
 
     const openShareModal = (vault: Vault) => {
         setVaultToShare(vault.id);
@@ -430,7 +429,9 @@ const SidePanel = () => {
     const handleVaultClick = (vault: Vault) => {
         setSelectedTab(vault.key);
         localStorage.setItem('selectedTab', vault.key);
-        navigate(vault.path);
+        // navigate(vault.path);
+         navigate(`/cell/${vault.id}`);
+       
     };
 
     return (
@@ -514,7 +515,7 @@ const SidePanel = () => {
                                             : null
                                     }
                                 />
-
+                                {/* ========================================Cells=========================================== */}
                                 <div className="h-[55vh] overflow-y-auto thin-scrollbar px-1">
                                     {vaults && vaults.length > 0 && (
                                         <div className="">
