@@ -49,36 +49,35 @@ export const getPindata = async () => {
 // -------------------------------------------------------------------------
 
 
-// POST API for password Generator 
+// POST API for password Generator
 export const generatePasswordAPI = async (
   type: "advanced" | "memorable" | "random" = "advanced",
-  length: number = 20
+  options: any = {}
 ) => {
   try {
     const token = localStorage.getItem("authToken") // or however you're storing it
 
-    if (!token) {
-      throw new Error("Authentication token not found");
+    const config: any = {
+      headers: {},
+    };
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     const response = await apiClient.post(
       "/api/password/generate",
       {
         type,
-        options: {
-          length,
-        },
+        options,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      config
     );
 
-    return response.data;
+    return response.data.password.value;
   } catch (err) {
-    console.error(err)
+    console.error(err);
+    throw err; // Re-throw to handle in component
   }
 }
 
