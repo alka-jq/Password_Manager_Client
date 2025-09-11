@@ -140,7 +140,9 @@ const CardModalUIOnly = () => {
                 throw new Error(data.message || 'Something went wrong.');
             }
             dispatch(closeCardModal());
-            dispatch(fetchAlldata());
+            if (location.pathname === '/all_items') {
+                dispatch(fetchAlldata());
+            }
             if (cellId) {
                 dispatch(fetchcellIdData(cellId));
             }

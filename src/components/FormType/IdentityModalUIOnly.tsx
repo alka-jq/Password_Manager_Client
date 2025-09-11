@@ -11,6 +11,7 @@ import type { AppDispatch } from '@/store';
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import CellDropDwon from '@/pages/Components/Cells/CellDropDwon';
 import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const IdentityModalUIOnly = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -21,7 +22,6 @@ const IdentityModalUIOnly = () => {
 
 
     const { vaultId } = useParams<{ vaultId: string }>();
-
 
     const isEdit = modalMode === 'edit';
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -214,8 +214,11 @@ const IdentityModalUIOnly = () => {
             console.log('Identity created:');
             dispatch(closeIdentityModal());
             resetForm();
-            dispatch(fetchAlldata());
+            if (location.pathname === '/all_items') {
+                dispatch(fetchAlldata());
+            }
             dispatch(fetchItemCount());
+
             if (cellId) {
                 dispatch(fetchcellIdData(cellId));
             }
