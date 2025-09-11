@@ -8,7 +8,6 @@ import { ImageFile } from '@/components/imageFile';
 // ----------------------
 // Types
 // ----------------------
-
 type TableItem = {
     id: string;
     title: string;
