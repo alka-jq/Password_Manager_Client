@@ -180,10 +180,7 @@ const IdentityModalUIOnly = () => {
             formData.append('mobile_phone', mobilePhone || '')
             formData.append('alt_phone', alternateEmail || '')
             formData.append('website', website || '')
-            formData.append('company_name', company || '')
             formData.append('job_title', jobTitle || '')
-            formData.append('company_name', company || '')
-            formData.append('company_name', company || '')
             formData.append('company_name', company || '')
             formData.append('department', department || '')
             formData.append('work_email', workEmail || '')
@@ -232,24 +229,24 @@ const IdentityModalUIOnly = () => {
         }
     };
 
-    const addDynamicField = (section: DynamicField['section']) => {
-        const newField: DynamicField = {
-            id: Date.now().toString(),
-            type: 'text',
-            label: 'Custom Field',
-            value: '',
-            section,
-        };
-        setDynamicFields([...dynamicFields, newField]);
-    };
+    // const addDynamicField = (section: DynamicField['section']) => {
+    //     const newField: DynamicField = {
+    //         id: Date.now().toString(),
+    //         type: 'text',
+    //         label: 'Custom Field',
+    //         value: '',
+    //         section,
+    //     };
+    //     setDynamicFields([...dynamicFields, newField]);
+    // };
 
-    const updateDynamicField = (id: string, value: string) => {
-        setDynamicFields((fields) => fields.map((field) => (field.id === id ? { ...field, value } : field)));
-    };
+    // const updateDynamicField = (id: string, value: string) => {
+    //     setDynamicFields((fields) => fields.map((field) => (field.id === id ? { ...field, value } : field)));
+    // };
 
-    const removeDynamicField = (id: string) => {
-        setDynamicFields((fields) => fields.filter((field) => field.id !== id));
-    };
+    // const removeDynamicField = (id: string) => {
+    //     setDynamicFields((fields) => fields.filter((field) => field.id !== id));
+    // };
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files ? Array.from(e.target.files) : [];
@@ -383,7 +380,7 @@ const IdentityModalUIOnly = () => {
                                             />
                                         </div>
 
-                                        <div className="space-y-2">
+                                        <div className="space-y-[1.8vh]">
                                             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Date of Birth</label>
                                             <div className="relative">
                                                 <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -407,7 +404,7 @@ const IdentityModalUIOnly = () => {
                                             />
                                         </div>
 
-                                        <div className="space-y-2">
+                                        <div className="space-y-[1.8vh]">
                                             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Nationality</label>
                                             <div className="relative">
                                                 <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -420,17 +417,6 @@ const IdentityModalUIOnly = () => {
                                                 />
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <div className="flex justify-end pt-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => addDynamicField('personal')}
-                                            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium transition-colors duration-200 px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                                        >
-                                            <Plus className="h-4 w-4" />
-                                            Add custom field
-                                        </button>
                                     </div>
                                 </div>
                             )}
@@ -699,7 +685,7 @@ const IdentityModalUIOnly = () => {
                         </div>
 
                         {/* Dynamic Fields */}
-                        {dynamicFields.map((field) => (
+                        {/* {dynamicFields.map((field) => (
                             <div key={field.id} className="space-y-2">
                                 <div className="flex items-center justify-between">
                                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{field.label}</label>
@@ -719,10 +705,10 @@ const IdentityModalUIOnly = () => {
                                     className="w-full h-10 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700/50 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-500"
                                 />
                             </div>
-                        ))}
+                        ))} */}
 
                         {/* Add Section Button */}
-                        <div className="flex justify-center pt-2">
+                        {/* <div className="flex justify-center pt-2">
                             <button
                                 type="button"
                                 onClick={() => addDynamicField('other')}
@@ -731,7 +717,7 @@ const IdentityModalUIOnly = () => {
                                 <Plus className="h-4 w-4" />
                                 Add custom field
                             </button>
-                        </div>
+                        </div> */}
 
                         {/* Attachments Section */}
                         <div className="space-y-4 pt-2">
