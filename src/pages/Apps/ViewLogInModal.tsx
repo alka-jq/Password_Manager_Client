@@ -644,17 +644,6 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  // Reset to original values
-                  // This would need access to the original data
-                  console.log("Reset clicked");
-                }}
-                className="px-4 py-2.5 flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-all shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-              >
-                <RotateCcw size={16} />
-                Reset
-              </button>
-              <button
                 onClick={handleSave}
                 disabled={loading}
                 className="px-4 py-2.5 flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-70 disabled:cursor-not-allowed"
@@ -664,7 +653,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
                 ) : (
                   <Save size={16} />
                 )}
-                {loading ? "Saving..." : "Save Changes"}
+                {loading ? "Saving..." : "Save"}
               </button>
             </div>
           ) : (

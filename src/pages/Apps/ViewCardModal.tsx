@@ -8,6 +8,7 @@ import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
 import { fetchAlldata, fetchcellIdData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
+import { LuLock } from 'react-icons/lu';
 
 type TableItem = {
   id: string;
@@ -297,7 +298,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
             {/* PIN */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
-                <Hash className="w-4 h-4" />
+                <LuLock className="w-4 h-4" />
                 PIN
               </label>
               {editMode ? (

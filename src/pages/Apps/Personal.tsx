@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TaskList from './Table';
-import { getPersonaldata } from '@/service/TableDataService';
+import { getPersonaldata, getPindata } from '@/service/TableDataService';
 import DeleteModal from './DeleteModal';
 import { softDeleteItems } from '@/service/TableDataService';
 import { useSelector, useDispatch } from "react-redux";
@@ -12,6 +12,7 @@ type Item = {
     id: string;
     title: string;
     type: string;
+    isPinned?: boolean;
 };
 
 const Personal = () => {
@@ -22,7 +23,8 @@ const Personal = () => {
 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
-
+    const [mergedItems, setMergedItems] = useState<Item[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     // const fetchData = async () => {
     //     try {
@@ -37,8 +39,35 @@ const Personal = () => {
     //     }
     // };
 
+    const fetchData = async () => {
+        try {
+            setIsLoading(true);
+            // Fetch personal data and pinned data separately
+            const personalRes = await getPersonaldata();
+            const pinRes = await getPindata();
+
+            const personalItems: Item[] = personalRes.data || [];
+            const pinnedItems: Item[] = pinRes.data || [];
+
+            // Create a set of pinned item ids for quick lookup
+            const pinnedIds = new Set(pinnedItems.map(item => item.id));
+
+            // Merge pin status into personal items
+            const merged = personalItems.map(item => ({
+                ...item,
+                isPinned: pinnedIds.has(item.id),
+            }));
+
+            setMergedItems(merged);
+        } catch (err) {
+            console.error('Error fetching personal or pinned data:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
-        dispatch(fetchPersonalData())
+        fetchData();
     }, []);
 
     // Handler functions
@@ -88,12 +117,12 @@ const Personal = () => {
         <div>
             {/* TaskList component */}
             <TaskList
-                data={items}
+                data={mergedItems}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}
                 onView={handleView}
-                isLoading={loading}
+                isLoading={isLoading}
             />
 
             <DeleteModal isOpen={deleteModalOpen} onClose={handleDeleteCancel} onConfirm={handleDeleteConfirm} bulk={idsToDelete.length > 1} />

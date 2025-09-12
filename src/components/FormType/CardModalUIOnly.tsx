@@ -12,6 +12,7 @@ import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Sl
 import type { AppDispatch } from '@/store';
 import CellDropDwon from '@/pages/Components/Cells/CellDropDwon';
 import { fetchItemCount } from '@/store/Slices/countSlice';
+import { LuLock } from 'react-icons/lu';
 
 interface DynamicField {
     id: string;
@@ -223,6 +224,7 @@ const CardModalUIOnly = () => {
                             </label>
                             <input
                                 id="title"
+                                required
                                 type="text"
                                 value={title}
                                 onChange={(e) => {
@@ -251,6 +253,7 @@ const CardModalUIOnly = () => {
                                 </label>
                                 <input
                                     id="nameOnCard"
+                                    required
                                     type="text"
                                     value={nameOnCard}
                                     onChange={(e) => setNameOnCard(e.target.value)}
@@ -268,6 +271,7 @@ const CardModalUIOnly = () => {
                                 <input
                                     id="cardNumber"
                                     type="text"
+                                    required
                                     value={cardNumber}
                                     onChange={handleCardNumberChange}
                                     placeholder="1234 1234 1234 1234"
@@ -288,6 +292,7 @@ const CardModalUIOnly = () => {
                                         <input
                                             id="expirationDate"
                                             type="text"
+                                            required
                                             value={expirationDate}
                                             onChange={(e) => setExpirationDate(e.target.value)}
                                             placeholder="MM/YY"
@@ -306,6 +311,7 @@ const CardModalUIOnly = () => {
                                     <div className="relative">
                                         <input
                                             id="securityCode"
+                                            required
                                             type={showSecurityCode ? 'text' : 'password'}
                                             value={securityCode}
                                             onChange={(e) => setSecurityCode(e.target.value)}
@@ -327,7 +333,7 @@ const CardModalUIOnly = () => {
                             {/* PIN */}
                             <div className="space-y-2">
                                 <label htmlFor="pin" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    <Hash className="h-4 w-4 text-gray-500" />
+                                    <LuLock className="h-4 w-4 text-gray-500" />
                                     PIN
                                 </label>
                                 <div className="relative">
@@ -335,6 +341,7 @@ const CardModalUIOnly = () => {
                                         id="pin"
                                         type={showPin ? 'text' : 'password'}
                                         value={pin}
+                                        required
                                         onChange={(e) => setPin(e.target.value)}
                                         placeholder="1234"
                                         maxLength={6}

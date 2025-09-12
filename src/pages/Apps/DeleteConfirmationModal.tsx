@@ -7,8 +7,10 @@ import {
   Button,
   Box,
   Typography,
-  TextField
+  TextField,
+  Alert
 } from '@mui/material';
+import { Warning } from '@mui/icons-material';
 
 interface DeleteConfirmationModalProps {
   open: boolean;
@@ -50,14 +52,17 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: '12px',
-          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+          borderRadius: '20px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           overflow: 'hidden',
+          border: '1px solid',
+          borderColor: 'divider',
         },
       }}
       BackdropProps={{
         sx: {
-          backgroundColor: 'rgba(0, 0, 0, 0.2)',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(8px)',
         },
       }}
     >
@@ -71,19 +76,23 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
           fontWeight: 600,
           borderBottom: '1px solid',
           borderColor: 'divider',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
         }}
       >
-        Delete vault "{vaultName}"?
+        <Warning sx={{ fontSize: '1.5rem', color: 'error.main' }} />
+        Delete Cell "{vaultName}"?
       </DialogTitle>
 
       <DialogContent sx={{ bgcolor: 'background.paper', px: 3, py: 2.5 }}>
         <Typography variant="body1" sx={{ mb: 2, color: 'text.secondary' }}>
-          Vault "{vaultName}" and all its items will be permanently deleted. You cannot undo this action.
+          Cell "{vaultName}" and all its items will be permanently deleted. You cannot undo this action.
         </Typography>
-        
+
         <Box sx={{ mt: 3 }}>
           <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-            Confirm vault name
+            Confirm cell name
           </Typography>
           <Typography variant="body2" sx={{ mb: 1.5, color: 'text.secondary' }}>
             Retype "{vaultName}" to confirm deletion
@@ -103,7 +112,10 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: '8px',
-              }
+                '&.Mui-focused fieldset': {
+                  borderColor: 'primary.main',
+                },
+              },
             }}
           />
         </Box>
@@ -125,9 +137,12 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
           sx={{
             textTransform: 'none',
             fontWeight: 500,
-            borderRadius: '6px',
-            px: 2,
-            py: 0.75,
+            borderRadius: '8px',
+            px: 3,
+            py: 1,
+            '&:hover': {
+              backgroundColor: 'primary.light',
+            },
           }}
         >
           Cancel
@@ -140,9 +155,12 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
           sx={{
             textTransform: 'none',
             fontWeight: 500,
-            borderRadius: '6px',
-            px: 2,
-            py: 0.75,
+            borderRadius: '8px',
+            px: 3,
+            py: 1,
+            '&:hover': {
+              backgroundColor: 'error.dark',
+            },
             '&:disabled': {
               backgroundColor: 'action.disabledBackground',
               color: 'action.disabled',
