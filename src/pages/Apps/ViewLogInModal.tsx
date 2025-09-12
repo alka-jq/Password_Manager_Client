@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
-import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData, fetchPinData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import { ImageFile } from '@/components/imageFile';
 import CellDropDwon from '../Components/Cells/CellDropDwon';
@@ -142,7 +142,6 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
       };
 
       const response = await apiClient.put(`/api/login-credentials/edit/${details.id}`, payload);
-
       console.log("Save successful:", response.data.message);
       onClose();
       if (location.pathname === '/all_items') {
@@ -150,6 +149,9 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
       }
       if (location.pathname === '/personal') {
         dispatch(fetchPersonalData())
+      }
+      if (location.pathname == '/pin') {
+        dispatch(fetchPinData())
       }
       if (currentcellId) {
         dispatch(fetchcellIdData(currentcellId));

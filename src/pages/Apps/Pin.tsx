@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { fetchItemCount } from '@/store/Slices/countSlice';
 import { softDeleteItems } from '@/service/TableDataService';
+import { fetchPinData } from '@/store/Slices/TableSlice';
 
 type Item = {
     id: string;
@@ -16,32 +17,33 @@ type Item = {
 
 const Pin = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const [items, setItems] = useState<Item[]>([]);
-    const [loading, setLoading] = useState(false);
+    // const [items, setItems] = useState<Item[]>([]);
+    // const [loading, setLoading] = useState(false);
+    const { items, loading } = useSelector((state: RootState) => state.data);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
 
 
 
-    const fetchData = async () => {
-        try {
-            setLoading(true)
-            const res = await getPindata();
-            // console.log("all data", res);
-            // Assume all items in Pin folder are pinned
-            const pinnedItems = res.data.map((item: Item) => ({ ...item, isPinned: true }));
-            setItems(pinnedItems);
-        } catch (err) {
-            console.log("backend error")
-            console.error(err)
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const fetchData = async () => {
+    //     try {
+    //         setLoading(true)
+    //         const res = await getPindata();
+    //         // console.log("all data", res);
+    //         // Assume all items in Pin folder are pinned
+    //         const pinnedItems = res.data.map((item: Item) => ({ ...item, isPinned: true }));
+    //         setItems(pinnedItems);
+    //     } catch (err) {
+    //         console.log("backend error")
+    //         console.error(err)
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
 
     useEffect(() => {
-        fetchData();
+        dispatch(fetchPinData());
     }, []);
 
     // Handler functions
@@ -69,7 +71,7 @@ const Pin = () => {
             await softDeleteItems(idsToDelete);
             setDeleteModalOpen(false);
             setIdsToDelete([]);
-            fetchData()
+            dispatch(fetchPinData())
             dispatch(fetchItemCount());
         } catch (error) {
             console.error('Soft delete failed:', error);
@@ -96,7 +98,7 @@ const Pin = () => {
                 onBulkDelete={handleBulkDelete}
                 onView={handleView}
                 isLoading={loading}
-                onPinToggle={fetchData}
+                
             />
 
             <DeleteModal isOpen={deleteModalOpen} onClose={handleDeleteCancel} onConfirm={handleDeleteConfirm} bulk={idsToDelete.length > 1} />

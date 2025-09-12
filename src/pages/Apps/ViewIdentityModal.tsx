@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { X, User, Briefcase, MapPin, Phone, Info, Paperclip, LinkIcon, Trash2, Save, Edit3, Eye, FileText, Trash } from 'lucide-react';
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData, fetchPinData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import { ImageFile } from '@/components/imageFile';
 import CellDropDwon from '../Components/Cells/CellDropDwon';
@@ -56,7 +56,6 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                 setLoading(true);
                 const response = await apiClient.get(`/api/password/items/${item.id}`);
                 const apiItem = response.data.item;
-                console.log("company name", apiItem.company_name)
                 const cell = apiItem.cell_id
                 setCurrentCellId(cell)
                 // Format the Date object to "DD/MM/YYYY"
@@ -171,6 +170,9 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
             }
             if (location.pathname === '/personal') {
                 dispatch(fetchPersonalData())
+            }
+            if (location.pathname == '/pin') {
+                dispatch(fetchPinData())
             }
             if (currentcellId) {
                 dispatch(fetchcellIdData(currentcellId));

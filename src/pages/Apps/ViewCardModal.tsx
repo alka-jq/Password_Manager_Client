@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
-import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData, fetchPinData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import { LuLock } from 'react-icons/lu';
 import CellDropDwon from '../Components/Cells/CellDropDwon';
@@ -134,6 +134,9 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
       }
       if (location.pathname === '/personal') {
         dispatch(fetchPersonalData())
+      }
+      if (location.pathname == '/pin') {
+        dispatch(fetchPinData())
       }
       if (currentcellId) {
         dispatch(fetchcellIdData(currentcellId));
