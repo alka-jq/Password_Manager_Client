@@ -27,7 +27,7 @@ const initialState: DataState = {
     error: null,
 };
 
-// 🔹 Thunk to fetch all data
+//  Thunk to fetch all data
 export const fetchAlldata = createAsyncThunk('data/fetchAll', async () => {
     const res = await apiClient.get('/api/filter/all');
     return res.data?.data;
@@ -40,6 +40,11 @@ export const fetchcellIdData = createAsyncThunk('data/fetchCell', async (id: str
 
 export const fetchPersonalData = createAsyncThunk('data/fetchPersonal', async () => {
     const res = await apiClient.get('/api/password/state/personal')
+    return res.data.data
+})
+
+export const fetchPinData = createAsyncThunk('data/fetchPin', async () => {
+    const res = await apiClient.get('/api/password/state/pin')
     return res.data.data
 })
 
@@ -91,6 +96,19 @@ const dataSlice = createSlice({
                 state.error = action.error.message ?? 'Unknown error';
             })
 
+            //fetch Pin Data
+            .addCase(fetchPinData.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchPinData.fulfilled, (state, action) => {
+                state.loading = false;
+                state.items = action.payload;
+            })
+            .addCase(fetchPinData.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message ?? 'Unknown error';
+            })
     },
 });
 
