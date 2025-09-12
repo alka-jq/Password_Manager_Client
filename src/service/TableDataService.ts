@@ -48,7 +48,6 @@ export const getPindata = async () => {
 }
 
 
-
 // POST API for password Generator
 export const generatePasswordAPI = async (
   type: "advanced" | "memorable" | "random" = "advanced",
