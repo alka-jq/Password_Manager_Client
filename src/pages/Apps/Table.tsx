@@ -98,7 +98,6 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             }));
 
             if (location.pathname === '/all_items') {
-                console.log("call all items api")
                 dispatch(fetchAlldata());
             }
             if (location.pathname === '/personal') {
@@ -106,7 +105,6 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             }
             if (location.pathname === `/cell/${cellId}/${cellname}`)
                 if (cellId) {
-                    console.log("cell item api")
                     dispatch(fetchcellIdData(cellId));
                 }
             dispatch(fetchItemCount());
