@@ -38,8 +38,15 @@ export const getTrashdata = async () => {
   }
 }
 
-
-
+export const getPindata = async () => {
+  try {
+    const response = await apiClient.get('/api/password/state/pin')
+    return response.data
+  } catch (error) {
+    console.error(error)
+  }
+}
+// -------------------------------------------------------------------------
 
 
 // POST API for password Generator
