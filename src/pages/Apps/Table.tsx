@@ -55,12 +55,16 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
     const [editItem, setEditItem] = useState<TableItem | null>(null);
     const searchQuery = useSelector((state: RootState) => state.search.query.toLowerCase());
     const [cellId, setCellId] = useState<any>()
+    const [cellname, setCellName] = useState<any>()
+
+
 
     //use for received cell id 
     useEffect(() => {
-        const vaultId = localStorage.getItem('cellId');
-        console.log("good", vaultId)
+        let vaultId = localStorage.getItem('cellId');
+        let vaultName = localStorage.getItem('selectedCell')
         setCellId(vaultId)
+        setCellName(vaultName)
     }, [])
 
     // Ref for the dropdown menu
@@ -100,12 +104,11 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             if (location.pathname === '/personal') {
                 dispatch(fetchPersonalData());
             }
-
-            if (cellId) {
-                console.log("cell item api")
-                dispatch(fetchcellIdData(cellId));
-            }
-            console.log("call count api")
+            if (location.pathname === `/cell/${cellId}/${cellname}`)
+                if (cellId) {
+                    console.log("cell item api")
+                    dispatch(fetchcellIdData(cellId));
+                }
             dispatch(fetchItemCount());
             if (onPinToggle) onPinToggle();
         } catch (error) {
@@ -347,9 +350,8 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                                 </div>
                                                 <div className="col-span-3 flex items-center">
                                                     <span
-                                                        className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm border ${
-                                                            typeStyles[item.type] || 'text-gray-600 bg-gray-100 border-gray-300'
-                                                        }`}
+                                                        className={`text-xs font-semibold px-3 py-1 rounded-full shadow-sm border ${typeStyles[item.type] || 'text-gray-600 bg-gray-100 border-gray-300'
+                                                            }`}
                                                     >
                                                         {item.type}
                                                     </span>
@@ -371,9 +373,8 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                                         {dropdownVisible === item.id && (
                                                             <div
                                                                 ref={dropdownRef}
-                                                                className={`absolute bg-white border border-gray-200 rounded-md shadow-md py-1 w-32 z-10 ${
-                                                                    dropdownPosition === 'above' ? 'bottom-full mb-1' : 'top-full mt-1'
-                                                                } right-0`}
+                                                                className={`absolute bg-white border border-gray-200 rounded-md shadow-md py-1 w-32 z-10 ${dropdownPosition === 'above' ? 'bottom-full mb-1' : 'top-full mt-1'
+                                                                    } right-0`}
                                                             >
                                                                 <button
                                                                     className="w-full px-4 py-2 text-left flex items-center space-x-2 text-sm text-gray-700 hover:bg-gray-100"

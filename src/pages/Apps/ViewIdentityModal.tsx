@@ -53,23 +53,25 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                 setLoading(true);
                 const response = await apiClient.get(`/api/password/items/${item.id}`);
                 const apiItem = response.data.item;
-                const dobString = apiItem.dob;
-                const dobDate = new Date(dobString); // Parse the string into a Date object
+                // const dobString = apiItem.dob;
+                // const dobDate = new Date(dobString); // Parse the string into a Date object
+                // console.log(apiItem.dob )
                 const cell = apiItem.cell_id
                 setCellId(cell)
                 // Format the Date object to "DD/MM/YYYY"
-                const formattedDob = dobDate.toLocaleDateString('en-GB', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                });
+                // const formattedDob = dobDate.toLocaleDateString('en-GB', {
+                //     day: '2-digit',
+                //     month: '2-digit',
+                //     year: 'numeric',
+                // });
+
 
                 const formattedData = {
                     id: apiItem.id,
                     title: apiItem.title,
                     personalDetails: {
                         fullName: apiItem.full_name,
-                        dateOfBirth: formattedDob,
+                        dateOfBirth:apiItem.dob,
                     },
                     addressDetails: {
                         street: apiItem.street_address,
