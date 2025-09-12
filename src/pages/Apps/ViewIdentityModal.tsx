@@ -56,9 +56,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                 setLoading(true);
                 const response = await apiClient.get(`/api/password/items/${item.id}`);
                 const apiItem = response.data.item;
-                // const dobString = apiItem.dob;
-                // const dobDate = new Date(dobString); // Parse the string into a Date object
-                // console.log(apiItem.dob )
+                console.log("company name", apiItem.company_name)
                 const cell = apiItem.cell_id
                 setCurrentCellId(cell)
                 // Format the Date object to "DD/MM/YYYY"
@@ -78,7 +76,6 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                     },
                     addressDetails: {
                         street: apiItem.street_address,
-                        poBox: apiItem.po_box,
                         zip: apiItem.zip_code,
                         city: apiItem.city,
                         state: apiItem.state,
@@ -185,6 +182,26 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
             setLoading(false);
         }
     };
+
+    const handleRemoveAttachment = (index: number) => {
+        setDetails((prev: any) => {
+            if (!prev) return prev;
+            const updated = [...prev.attachments];
+            updated.splice(index, 1);
+            return { ...prev, attachments: updated };
+        });
+    };
+
+    // const handleAddAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = e.target.files?.[0];
+    //     if (file) {
+    //         setDetails((prev: any) => ({
+    //             ...prev,
+    //             attachments: [...(prev.attachments || []), file.name],
+    //         }));
+    //         e.target.value = ''; // reset input
+    //     }
+    // };
 
 
 

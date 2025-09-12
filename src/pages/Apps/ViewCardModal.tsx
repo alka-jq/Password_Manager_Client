@@ -103,7 +103,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
       // }
       if (personal == true) {
         console.log(personal)
-        setCellId(null)
+        setCellId('')
         console.log(cellId)
       }
 
@@ -122,7 +122,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
         is_pin: false,
         is_trash: false,
         type: 'card',
-        cell_id: cellId || null
+        cell_id: cellId || ''
       };
 
       const response = await apiClient.put(`/api/card/edit/${item.id}`, payload);
