@@ -186,26 +186,6 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
         }
     };
 
-    const handleRemoveAttachment = (index: number) => {
-        setDetails((prev: any) => {
-            if (!prev) return prev;
-            const updated = [...prev.attachments];
-            updated.splice(index, 1);
-            return { ...prev, attachments: updated };
-        });
-    };
-
-    const handleAddAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setDetails((prev: any) => ({
-                ...prev,
-                attachments: [...(prev.attachments || []), file.name],
-            }));
-            e.target.value = ''; // reset input
-        }
-    };
-
 
 
     if (!isOpen) return null;

@@ -107,7 +107,7 @@ useEffect(() => {
 
                     <div>
                         <button onClick={() => setcellDropdown(!celldropdown)}>
-                            <div className='flex justify-between w-[8vw] p-2 items-center'>
+                            <div className='flex justify-between w-[8vw] overflow-hidden p-2 items-center'>
                                 <div className="flex items-center gap-2">
                                     <span style={{ color: selectedColor }}>
                                         {iconComponents[selectedIcon]}
