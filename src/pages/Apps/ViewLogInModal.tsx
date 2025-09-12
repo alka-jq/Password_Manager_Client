@@ -6,9 +6,10 @@ import {
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
-import { fetchAlldata, fetchcellIdData } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import { ImageFile } from '@/components/imageFile';
+import CellDropDwon from '../Components/Cells/CellDropDwon';
 
 type TableItem = {
   id: string;
@@ -50,7 +51,9 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
-  const [cellId, setCellId] = useState<string>()
+  const [cellId, setCellId] = useState<string | null>(null);
+  const [personal, setPersonal] = useState<boolean>(false);
+  const [currentcellId, setCurrentCellId] = useState<string>()
 
   useEffect(() => {
     if (!item?.id) return;
@@ -61,7 +64,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
         const res = await apiClient.get(`/api/password/items/${item.id}`);
         const apiItem = res.data.item;
         const cell = apiItem.cell_id
-        setCellId(cell)
+        setCurrentCellId(cell)
         const formattedData: LoginDetails = {
           id: apiItem.id,
           title: apiItem.title,
@@ -131,10 +134,11 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
         websites: details.websites,
         notes: details.note,
         attachments: details.attachments,
-        is_personal: false, // If needed, change based on your UI
+        is_personal: personal,
         is_pin: false,
         is_trash: false,
         type: 'login',
+        cell_id: cellId || null
       };
 
       const response = await apiClient.put(`/api/login-credentials/edit/${details.id}`, payload);
@@ -144,8 +148,11 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
       if (location.pathname === '/all_items') {
         dispatch(fetchAlldata());
       }
-      if (cellId) {
-        dispatch(fetchcellIdData(cellId));
+      if (location.pathname === '/personal') {
+        dispatch(fetchPersonalData())
+      }
+      if (currentcellId) {
+        dispatch(fetchcellIdData(currentcellId));
       }
     } catch (err) {
       console.error("Failed to save:", err);
@@ -192,12 +199,19 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
               Login
             </span>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200 transition-all"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          {/* Cell dropdown */}
+          <div className='flex gap-2'>
+            {editMode && (
+              <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={currentcellId} initialPersonal={personal} />
+            )}
+
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-all"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Body */}

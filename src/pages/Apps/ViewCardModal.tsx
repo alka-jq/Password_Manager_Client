@@ -6,9 +6,10 @@ import {
 } from 'lucide-react';
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
-import { fetchAlldata, fetchcellIdData } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import { LuLock } from 'react-icons/lu';
+import CellDropDwon from '../Components/Cells/CellDropDwon';
 
 type TableItem = {
   id: string;
@@ -29,7 +30,9 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
   const [error, setError] = useState<string | null>(null);
   const [showSecurityCode, setShowSecurityCode] = useState(false);
   const [showPin, setShowPin] = useState(false);
-  const [cellId, setCellId] = useState<string>()
+  const [cellId, setCellId] = useState<string | null>(null);
+  const [personal, setPersonal] = useState<boolean>(false);
+  const [currentcellId, setCurrentCellId] = useState<string>()
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,8 +43,8 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
         const response = await apiClient.get(`/api/password/items/${item.id}`);
         const data = await response.data;
         const cell = data.item.cell_id
-      
-        setCellId(cell)
+
+        setCurrentCellId(cell)
         if (response && data.item) {
           const card = data.item;
 
@@ -88,6 +91,8 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
     setLoading(true);
     setError(null);
 
+
+
     try {
       // Format expiration date to ISO string if it's in MM/YY format
       // let formattedExpirationDate = '';
@@ -96,6 +101,11 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
       //   const fullYear = parseInt(year.length === 2 ? `20${year}` : year);
       //   formattedExpirationDate = new Date(fullYear, parseInt(month) - 1, 1).toISOString();
       // }
+      if (personal == true) {
+        console.log(personal)
+        setCellId(null)
+        console.log(cellId)
+      }
 
       const payload = {
         title: details.title,
@@ -108,10 +118,11 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
         two_factor_secret: null,
         hidden: false,
         note: details.note || '',
-        is_personal: false,
+        is_personal: personal,
         is_pin: false,
         is_trash: false,
         type: 'card',
+        cell_id: cellId || null
       };
 
       const response = await apiClient.put(`/api/card/edit/${item.id}`, payload);
@@ -121,8 +132,11 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
       if (location.pathname === '/all_items') {
         dispatch(fetchAlldata());
       }
-      if (cellId) {
-        dispatch(fetchcellIdData(cellId));
+      if (location.pathname === '/personal') {
+        dispatch(fetchPersonalData())
+      }
+      if (currentcellId) {
+        dispatch(fetchcellIdData(currentcellId));
       }
     } catch (err: any) {
       console.error("Error updating card:", err);
@@ -169,12 +183,19 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
               <span className="text-xs text-gray-500 dark:text-gray-400">{details.type}</span>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-all"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          {/* Cell dropdown */}
+          <div className='flex gap-2'>
+            {editMode && (
+              <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={currentcellId} initialPersonal={personal} />
+            )}
+
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-all"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Body */}

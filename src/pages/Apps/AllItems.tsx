@@ -15,12 +15,12 @@ const AllItems = () => {
   const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
   const [deleting, setDeleting] = useState(false);
 
-  // 🔹 Fetch items on component mount
+  //  Fetch items on component mount
   useEffect(() => {
     dispatch(fetchAlldata());
   }, [dispatch]);
 
-  // 🔹 Delete modal handlers
+  //  Delete modal handlers
   const requestDelete = (ids: string[]) => {
     setIdsToDelete(ids);
     setDeleteModalOpen(true);
@@ -60,9 +60,9 @@ const AllItems = () => {
     requestDelete(ids);
   };
 
-  const handleView = (id: string) => {
-    alert(`Viewing item with ID: ${id}`);
-  };
+  // const handleView = (id: string) => {
+  //   alert(`Viewing item with ID: ${id}`);
+  // };
 
   
   return (

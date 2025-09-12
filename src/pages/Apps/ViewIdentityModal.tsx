@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
 import type { AppDispatch } from '@/store';
 import { ImageFile } from '@/components/imageFile';
+import CellDropDwon from '../Components/Cells/CellDropDwon';
 // ----------------------
 // Types
 // ----------------------
@@ -32,7 +33,9 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState(!editMode);
-    const [cellId, setCellId] = useState<string>()
+    const [cellId, setCellId] = useState<string | null>(null);
+    const [personal, setPersonal] = useState<boolean>(false);
+    const [currentcellId, setCurrentCellId] = useState<string>()
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
         personal: true,
         address: true,
@@ -57,7 +60,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                 // const dobDate = new Date(dobString); // Parse the string into a Date object
                 // console.log(apiItem.dob )
                 const cell = apiItem.cell_id
-                setCellId(cell)
+                setCurrentCellId(cell)
                 // Format the Date object to "DD/MM/YYYY"
                 // const formattedDob = dobDate.toLocaleDateString('en-GB', {
                 //     day: '2-digit',
@@ -71,7 +74,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                     title: apiItem.title,
                     personalDetails: {
                         fullName: apiItem.full_name,
-                        dateOfBirth:apiItem.dob,
+                        dateOfBirth: apiItem.dob,
                     },
                     addressDetails: {
                         street: apiItem.street_address,
@@ -157,6 +160,8 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                 custom_sections: details.dynamicFields,
                 attachments: details.attachments,
                 notes: details.notes,
+                cell_id: cellId || null,
+                is_personal: personal
             };
 
             // Make PUT request
@@ -170,8 +175,8 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
             if (location.pathname === '/personal') {
                 dispatch(fetchPersonalData())
             }
-            if (cellId) {
-                dispatch(fetchcellIdData(cellId));
+            if (currentcellId) {
+                dispatch(fetchcellIdData(currentcellId));
             }
         } catch (err: any) {
             console.error('Failed to save identity:', err);
@@ -201,9 +206,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
         }
     };
 
-    const toggleViewMode = () => {
-        setViewMode(!viewMode);
-    };
+
 
     if (!isOpen) return null;
 
@@ -237,13 +240,17 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Last updated: {details?.updatedAt ? new Date(details.updatedAt).toLocaleDateString() : 'N/A'}</p>
                         </div>
                     </div>
+                    {/* Cell dropdown */}
+                    <div className='flex gap-2'>
+                        {editMode && (
+                            <CellDropDwon cellId={cellId} setCellId={setCellId} personal={personal} setPersonal={setPersonal} initialCellId={currentcellId} initialPersonal={personal} />
+                        )}
 
-                    <div className="flex items-center gap-2">
-                        <button onClick={toggleViewMode} className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" title={viewMode ? 'Edit' : 'Preview'}>
-                            {viewMode ? <Edit3 className="w-5 h-5 text-gray-600 dark:text-gray-300" /> : <Eye className="w-5 h-5 text-gray-600 dark:text-gray-300" />}
-                        </button>
-                        <button onClick={onClose} className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                            <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                        <button
+                            onClick={onClose}
+                            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-all"
+                        >
+                            <X className="w-4 h-4" />
                         </button>
                     </div>
                 </div>

@@ -122,7 +122,7 @@ useEffect(() => {
             </div>
 
             {celldropdown && (
-                <div className="absolute top-[8.5vh] right-15  bg-white border rounded px-4 py-2 space-y-2 max-h-[18vh] overflow-auto hide-scrollbar">
+                <div className="absolute mt-[6vh] right-15 z-40 bg-white border rounded px-4 py-2 space-y-2 max-h-[18vh] overflow-auto hide-scrollbar">
                     <button onClick={(e) => {
                         setPersonal(true),
                             setcellDropdown(false),
