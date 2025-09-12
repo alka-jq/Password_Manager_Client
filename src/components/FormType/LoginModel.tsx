@@ -270,6 +270,7 @@ const TaskModalUIOnly = () => {
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                   placeholder="you@example.com"
                   className="w-full h-11 px-3.5 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 />
@@ -285,6 +286,7 @@ const TaskModalUIOnly = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
+                    required
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
                     className="w-full h-11 px-3.5 py-2.5 pr-10 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"

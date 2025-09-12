@@ -75,7 +75,7 @@ export const EmptyVaultState: React.FC = () => {
   useEffect(() => {
     if (vaultId) {
       const res = dispatch(fetchcellIdData(vaultId));
-      console.log(res)
+      // console.log(res)
     }
   }, [vaultId])
 
