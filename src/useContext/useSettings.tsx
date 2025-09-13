@@ -164,7 +164,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
       setProfile(data);
     } catch (err) {
       console.error("❌ Failed to load preferences:", err);
-      toast.error("Failed to load preferences");
+      // toast.error("Failed to load preferences");
     }
   };
 

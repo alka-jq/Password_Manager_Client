@@ -117,7 +117,7 @@ const Personal = () => {
         <div>
             {/* TaskList component */}
             <TaskList
-                data={mergedItems}
+                data={items}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}

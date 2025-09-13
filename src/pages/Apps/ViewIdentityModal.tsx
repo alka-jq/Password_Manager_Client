@@ -6,6 +6,7 @@ import { fetchAlldata, fetchcellIdData, fetchPersonalData, fetchPinData } from '
 import type { AppDispatch } from '@/store';
 import { ImageFile } from '@/components/imageFile';
 import CellDropDwon from '../Components/Cells/CellDropDwon';
+import { fetchItemCount } from '@/store/Slices/countSlice';
 // ----------------------
 // Types
 // ----------------------
@@ -177,6 +178,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
             if (currentcellId) {
                 dispatch(fetchcellIdData(currentcellId));
             }
+            dispatch(fetchItemCount());
         } catch (err: any) {
             console.error('Failed to save identity:', err);
             setError('Failed to save identity.');

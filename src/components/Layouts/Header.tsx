@@ -80,19 +80,20 @@ const Header = () => {
     const [userName, setUserName] = useState<string>('');
     const [userOption, setUserOption] = useState(false)
     const [openSearch, setOpenSearch] = useState(false);
-    const [searchContent, setSearchContent] = useState(false);
-    const [searchIn, setSearchIn] = useState('All mail');
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [sender, setSender] = useState('');
-    const [recipient, setRecipient] = useState('');
-    const [searchOption, setSearchOption] = useState(false);
-    const [address, setAddress] = useState('All');
+    // const [searchContent, setSearchContent] = useState(false);
+    // const [searchIn, setSearchIn] = useState('All mail');
+    // const [startDate, setStartDate] = useState('');
+    // const [endDate, setEndDate] = useState('');
+    // const [sender, setSender] = useState('');
+    // const [recipient, setRecipient] = useState('');
+    // const [searchOption, setSearchOption] = useState(false);
+    // const [address, setAddress] = useState('All');
     const popupRef = useRef(null);
     const [userId, setUserId] = useState<UserType>({
         first_name: '',
         email: '',
     });
+
     //Seacrh state (by nishan)
     const [query, setQuery] = useState("");
 
@@ -130,7 +131,7 @@ const Header = () => {
                 setOpenSearch(false);
                 setSearchingData(false);
                 setShowProfileBtn(false)
-                setOpenHelp(false);
+                // setOpenHelp(false);
             }
         };
 
@@ -188,6 +189,7 @@ const Header = () => {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
+                const token = localStorage.getItem('token')
                 const response = await fetch(`${baseUrl}/users/profile`, {
                     method: 'GET',
                     headers: {
@@ -244,85 +246,85 @@ const Header = () => {
     const nameSeed = userId?.first_name || userId?.email || 'guest';
     const bgColor = getColorFromString(nameSeed);
     const initial = nameSeed.charAt(0).toUpperCase();
-    const { setSettingOpen } = useSettings(); 
+    const { setSettingOpen } = useSettings();
 
     //-------------------search function  main----------------------//
-    const { emails, loading } = useEmailSync();
-    const [openHelp, setOpenHelp] = useState(false)
-    const [openFeadback, setOpenFeadback] = useState(false);
-    const [lunrIndex, setLunrIndex] = useState<lunr.Index | null>(null);
+    // const { emails, loading } = useEmailSync();
+    // const [openHelp, setOpenHelp] = useState(false)
+    // const [openFeadback, setOpenFeadback] = useState(false);
+    // const [lunrIndex, setLunrIndex] = useState<lunr.Index | null>(null);
 
-    useEffect(() => {
-        // console.log(' Setting up Lunr index header', emails);
+    // useEffect(() => {
+    //     // console.log(' Setting up Lunr index header', emails);
 
-        if (!emails.length) return;
+    //     if (!emails.length) return;
 
-        const idx = lunr(function () {
-            this.ref('id');
-            this.field('subject');
-            this.field('plain_text');
-            this.field('from_email');
+    //     const idx = lunr(function () {
+    //         this.ref('id');
+    //         this.field('subject');
+    //         this.field('plain_text');
+    //         this.field('from_email');
 
-            emails.forEach((email) => {
-                this.add({
-                    id: email.id.toString(),
-                    subject: email.subject || '',
-                    plain_text: email.plain_text || '',
-                    from_email: email.from_email || '',
-                });
-            });
-        });
+    //         emails.forEach((email) => {
+    //             this.add({
+    //                 id: email.id.toString(),
+    //                 subject: email.subject || '',
+    //                 plain_text: email.plain_text || '',
+    //                 from_email: email.from_email || '',
+    //             });
+    //         });
+    //     });
 
-        // console.log('✅ Built Lunr index');
-        setLunrIndex(idx);
-    }, [emails]);
+    //     // console.log('✅ Built Lunr index');
+    //     setLunrIndex(idx);
+    // }, [emails]);
 
 
     //-------------------search function  advance ----------------------//
 
-    const [searchAdvanceTerm, setSearchAdvanceTerm] = useState('');
-    const [lunrAdvIndex, setLunrAdvIndex] = useState<lunr.Index | null>(null);
+    // const [searchAdvanceTerm, setSearchAdvanceTerm] = useState('');
+    // const [lunrAdvIndex, setLunrAdvIndex] = useState<lunr.Index | null>(null);
 
-    useEffect(() => {
-        // console.log('Setting up Lunr index header', emails);
+    // useEffect(() => {
+    //     // console.log('Setting up Lunr index header', emails);
 
-        if (!emails.length) return;
+    //     if (!emails.length) return;
 
-        const idx = lunr(function () {
-            this.ref('id');
-            this.field('subject');
-            this.field('plain_text');
-            this.field('from_email');
+    //     const idx = lunr(function () {
+    //         this.ref('id');
+    //         this.field('subject');
+    //         this.field('plain_text');
+    //         this.field('from_email');
 
-            emails.forEach((email) => {
-                this.add({
-                    id: email.id.toString(),
-                    subject: email.subject || '',
-                    plain_text: email.plain_text || '',
-                    from_email: email.from_email || '',
-                });
-            });
-        });
+    //         emails.forEach((email) => {
+    //             this.add({
+    //                 id: email.id.toString(),
+    //                 subject: email.subject || '',
+    //                 plain_text: email.plain_text || '',
+    //                 from_email: email.from_email || '',
+    //             });
+    //         });
+    //     });
 
-        // console.log('✅ Built Lunr index');
-        setLunrAdvIndex(idx); // <-- corrected setter
-    }, [emails]);
+    //     // console.log('✅ Built Lunr index');
+    //     setLunrAdvIndex(idx); // <-- corrected setter
+    // }, [emails]);
 
-    const filteredEmail = useMemo(() => {
-        const term = searchAdvanceTerm.trim();
+    // const filteredEmail = useMemo(() => {
+    //     const term = searchAdvanceTerm.trim();
 
-        if (!term || !lunrAdvIndex) return emails;
+    //     if (!term || !lunrAdvIndex) return emails;
 
-        try {
-            const results = lunrAdvIndex.search(`*${term}*`);
-            const emailMap = new Map(emails.map((e) => [e.id.toString(), e]));
+    //     try {
+    //         const results = lunrAdvIndex.search(`*${term}*`);
+    //         const emailMap = new Map(emails.map((e) => [e.id.toString(), e]));
 
-            return results.map((r) => emailMap.get(r.ref)).filter(Boolean) as DecryptedEmail[];
-        } catch (error) {
-            // console.error('🔍 Lunr search error:', error);
-            return [];
-        }
-    }, [searchAdvanceTerm, emails, lunrAdvIndex]);
+    //         return results.map((r) => emailMap.get(r.ref)).filter(Boolean) as DecryptedEmail[];
+    //     } catch (error) {
+    //         // console.error('🔍 Lunr search error:', error);
+    //         return [];
+    //     }
+    // }, [searchAdvanceTerm, emails, lunrAdvIndex]);
 
     const [showProfileBtn, setShowProfileBtn] = useState(false)
     // const location = useLocation();
@@ -359,10 +361,10 @@ const Header = () => {
                                     setSearch(false);
                                 }}
                             >
-                                <div className="flex items-center gap-2   lg:w-[540px] relative">
+                                <div className="flex items-center gap-2  lg:w-[540px] relative">
                                     <input
                                         type="text"
-                                        placeholder="Search notes..."
+                                        placeholder="Search....."
                                         value={query}
                                         onChange={handleSearch}
                                         className="textMedium py-2 ltr:pl-10 w-full placeholder: rounded-xl border peach:bg-gray-200 classic:bg-gray-100 lightmint:bg-green-50 blue:bg-[#e0edf7]  border-gray-300 bg-[#fbfbfb] dark:bg-[#2F2F2F] dark:border-[#2F2F2F]  dark:text-white dark:placeholder:text-white focus:outline-none focus:shadow-md transition peer"
@@ -389,7 +391,7 @@ const Header = () => {
 
                             className="block p-2 relative  rounded-[30px]  softazure:hover:text-black  dark:text-white cornflower:text-white peach:hover:text-black peach:text-white cornflower:hover:text-black lightmint:hover:text-black lightmint:text-white cursor-pointer dark:bg-dark/40  hover:bg-white-light/90 dark:hover:bg-dark/60 softazure:text-white salmonpink:text-[#edf6f9] salmonpink:hover:text-[#000000] "
                         >
-                            <div onClick={() => setOpenHelp(!openHelp)} className=''>
+                            {/* <div onClick={() => setOpenHelp(!openHelp)} className=''>
                                 <Tippy content="Settings">
                                     <RxQuestionMarkCircled size={20} />
                                 </Tippy>
@@ -408,7 +410,7 @@ const Header = () => {
                                         </div>
                                     )
                                 }
-                            </div>
+                            </div> */}
                         </div>
                         {location.pathname !== '/settings' && (
                             <div

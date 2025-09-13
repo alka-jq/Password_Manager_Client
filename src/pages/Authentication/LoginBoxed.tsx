@@ -332,9 +332,6 @@ export default function LoginBoxed() {
                 withCredentials: true, // needed in both modes
             });
 
-            console.log(' Login response:', loginResponse.data);
-
-
             const token = loginResponse.data?.token;
             if (token) {
                 setAuthToken(token);
