@@ -67,7 +67,7 @@ const IdentityModalUIOnly = () => {
     const [errors, setErrors] = useState({ title: false });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [cellId, setCellId] = useState<string | null>(null);
-    const [personal, setPersonal] = useState(false);
+    const [personal, setPersonal] = useState(true);
 
 
     const resetForm = () => {

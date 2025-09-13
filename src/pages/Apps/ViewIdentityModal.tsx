@@ -35,7 +35,7 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
     const [error, setError] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState(!editMode);
     const [cellId, setCellId] = useState<string | null>(null);
-    const [personal, setPersonal] = useState<boolean>(false);
+    const [personal, setPersonal] = useState<boolean>(true);
     const [currentcellId, setCurrentCellId] = useState<string>()
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
         personal: true,
