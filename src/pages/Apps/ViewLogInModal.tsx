@@ -123,6 +123,12 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
 
     setLoading(true);
     setError(null);
+    
+    if (personal == true) {
+      console.log(personal)
+      setCellId('')
+      console.log(cellId)
+    }
 
     try {
       const payload = {

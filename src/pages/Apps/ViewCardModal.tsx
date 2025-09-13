@@ -18,7 +18,7 @@ type TableItem = {
 };
 
 type Props = {
-  item: TableItem;
+  item: TableItem;          
   onClose: () => void;
   editMode?: boolean;
 };

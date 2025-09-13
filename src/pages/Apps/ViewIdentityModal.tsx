@@ -7,6 +7,7 @@ import type { AppDispatch } from '@/store';
 import { ImageFile } from '@/components/imageFile';
 import CellDropDwon from '../Components/Cells/CellDropDwon';
 import { fetchItemCount } from '@/store/Slices/countSlice';
+
 // ----------------------
 // Types
 // ----------------------
@@ -129,6 +130,12 @@ const ViewIdentityModal = ({ item, onClose, editMode = false }: Props) => {
 
         setLoading(true);
         setError(null);
+
+        if (personal == true) {
+            console.log(personal)
+            setCellId('')
+            console.log(cellId)
+        }
 
         try {
             // Prepare the payload as needed by your API

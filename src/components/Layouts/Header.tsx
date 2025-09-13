@@ -112,11 +112,11 @@ const Header = () => {
     const popupInputRef = useRef<HTMLInputElement>(null);
     const searchTerm = useSelector((state: RootState) => state.task.searchTerm);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        dispatch(setSearchTerm(value));
-        dispatch(setSearchingData(value.trim().length > 0));
-    };
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const value = e.target.value;
+    //     dispatch(setSearchTerm(value));
+    //     dispatch(setSearchingData(value.trim().length > 0));
+    // };
 
     useEffect(() => {
         if (openSearch && popupInputRef.current) {
@@ -367,13 +367,11 @@ const Header = () => {
                                         placeholder="Search....."
                                         value={query}
                                         onChange={handleSearch}
-                                        className="textMedium py-2 ltr:pl-10 w-full placeholder: rounded-xl border peach:bg-gray-200 classic:bg-gray-100 lightmint:bg-green-50 blue:bg-[#e0edf7]  border-gray-300 bg-[#fbfbfb] dark:bg-[#2F2F2F] dark:border-[#2F2F2F]  dark:text-white dark:placeholder:text-white focus:outline-none focus:shadow-md transition peer"
+                                        className="textMedium py-2 ltr:pl-10 w-full placeholder: rounded-xl border peach:bg-gray-200 classic:bg-gray-100 lightmint:bg-green-50 blue:bg-[#e0edf7]  border-gray-300 bg-[#fbfbfb] dark:bg-[#2F2F2F] dark:border-[#2F2F2F]  dark:text-white dark:placeholder:text-white focus:outline-none focus:shadow-md transition peer "
                                     />
                                     <button type="button" className="absolute dark:text-white w-8 h-full flex items-center justify-center ml-1 inset-0 ltr:right-auto rtl:left-auto">
                                         <IoIosSearch size={20} className="mx-auto" />
                                     </button>
-
-
                                 </div>
 
                                 {/* {openSearch && (
