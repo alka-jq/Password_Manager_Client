@@ -46,7 +46,6 @@ export const getPindata = async () => {
     console.error(error)
   }
 }
-// -------------------------------------------------------------------------
 
 
 // POST API for password Generator
