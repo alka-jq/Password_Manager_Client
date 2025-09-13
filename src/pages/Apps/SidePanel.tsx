@@ -553,10 +553,10 @@ const SidePanel = () => {
                                                             onClick={(e) => handleVaultClick(vault)}
                                                         >
                                                             {/* Left Icon and Name */}
-                                                            <div className="flex items-center gap-1 w-full">
-                                                                <Box sx={{ color: vault.color, display: 'flex', mr: 1 }}>{iconComponents[vault.icon]}</Box>
-                                                                <span className="text-white font-medium text-sm truncate">{vault.name}</span>
-                                                            </div>
+<div className="flex items-center gap-1 w-full min-w-0">
+  <Box sx={{ color: vault.color, display: 'flex', mr: 1 }} className="flex-shrink-0">{iconComponents[vault.icon]}</Box>
+  <span className="text-white font-medium text-sm truncate flex-1 min-w-0 max-w-full">{vault.name}</span>
+</div>
 
                                                             {/* Dots Dropdown */}
                                                             <div className="relative flex-shrink-0 z-50">
