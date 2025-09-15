@@ -7,6 +7,7 @@ import {
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
 import { fetchAlldata, fetchcellIdData, fetchPersonalData, fetchPinData } from '../../store/Slices/TableSlice';
+import { fetchItemCount } from '@/store/Slices/countSlice';
 import type { AppDispatch } from '@/store';
 import { ImageFile } from '@/components/imageFile';
 import CellDropDwon from '../Components/Cells/CellDropDwon';
@@ -162,6 +163,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
       if (currentcellId) {
         dispatch(fetchcellIdData(currentcellId));
       }
+      dispatch(fetchItemCount())
     } catch (err) {
       console.error("Failed to save:", err);
       setError("Failed to update login credential.");

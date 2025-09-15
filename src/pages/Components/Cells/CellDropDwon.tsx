@@ -103,18 +103,18 @@ useEffect(() => {
     return (
         <div>
             <div className="flex ">
-                <div className="relative rounded-xl overflow-hidden  border  flex items-center justify-between bg-white font-sans ">
+                <div className="relative rounded-xl   overflow-hidden  border  flex items-center justify-between bg-white font-sans ">
 
                     <div>
                         <button onClick={() => setcellDropdown(!celldropdown)}>
-                            <div className='flex justify-between w-[8vw] overflow-hidden p-2 items-center'>
+                            <div className='flex justify-between overflow-ellipsis p-2 items-center'>
                                 <div className="flex items-center gap-2">
                                     <span style={{ color: selectedColor }}>
                                         {iconComponents[selectedIcon]}
                                     </span>
                                     {celltype}
                                 </div>
-                                <div> {celldropdown ? <FaChevronUp /> : <FaChevronDown />}</div>
+                                <div className='ml-1'> {celldropdown ? <FaChevronUp /> : <FaChevronDown />}</div>
                             </div>
                         </button>
                     </div>

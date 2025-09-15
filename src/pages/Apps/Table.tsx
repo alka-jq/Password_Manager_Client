@@ -9,7 +9,7 @@ import FilterDropdown from './FilterDropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
 import { fetchItemCount } from '@/store/Slices/countSlice';
-import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData, fetchPinData } from '../../store/Slices/TableSlice';
 import { useParams } from 'react-router-dom';
 import logo from '../../assets/images/ubs icons/2-removebg-preview.png';
 import Loader from '../Components/Loader';
@@ -19,7 +19,7 @@ type TableItem = {
     id: string;
     title: string;
     type: string;
-    isPinned?: boolean; // Add isPinned property to TableItem
+    is_pin?: boolean; // Add isPinned property to TableItem
 };
 
 type CommonTableProps = {
@@ -75,7 +75,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
     useEffect(() => {
         const initialPinState: Record<string, boolean> = {};
         safeData.forEach((item) => {
-            initialPinState[item.id] = item.isPinned || false;
+            initialPinState[item.id] = item.is_pin || false;
         });
         setPinState(initialPinState);
         setSelected(safeData.map(() => false));
@@ -88,14 +88,18 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
     // Toggle pin for a specific item
     const togglePin = async (id: string) => {
+        console.log("just", pinState)
         const newPinState = !pinState[id];
+        console.log("curent pin status", newPinState)
 
         try {
-            await togglePinStatus([id], newPinState);
+            let res = await togglePinStatus([id], newPinState);
+            console.log("afte api cal pin status", res)
             setPinState((prev) => ({
                 ...prev,
                 [id]: newPinState,
             }));
+            console.log('now', pinState)
 
             if (location.pathname === '/all_items') {
                 dispatch(fetchAlldata());
@@ -103,10 +107,14 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             if (location.pathname === '/personal') {
                 dispatch(fetchPersonalData());
             }
-            if (location.pathname === `/cell/${cellId}/${cellname}`)
+            if (location.pathname === `/cell/${cellId}/${cellname}`) {
                 if (cellId) {
                     dispatch(fetchcellIdData(cellId));
                 }
+            }
+            if (location.pathname === '/pin') {
+                dispatch(fetchPinData())
+            }
             dispatch(fetchItemCount());
             if (onPinToggle) onPinToggle();
         } catch (error) {
@@ -205,8 +213,13 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             if (location.pathname === '/personal') {
                 dispatch(fetchPersonalData());
             }
-            if (cellId) {
-                dispatch(fetchcellIdData(cellId));
+            if (location.pathname === `/cell/${cellId}/${cellname}`) {
+                if (cellId) {
+                    dispatch(fetchcellIdData(cellId));
+                }
+            }
+            if (location.pathname === '/pin') {
+                dispatch(fetchPinData())
             }
             dispatch(fetchItemCount());
             if (onPinToggle) onPinToggle();
@@ -321,7 +334,6 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                 <div className="divide-y divide-gray-200 overflow-y-auto h-[100vh] md:h-[80vh]">
                                     {filteredData.map((item) => {
                                         const originalIndex = safeData.findIndex((d) => d.id === item.id);
-                                        const isPinned = pinState[item.id] || false;
                                         return (
                                             <div key={item.id} className="grid grid-cols-12 gap-4 px-6 py-3 hover:bg-gray-50 items-center">
                                                 <div className="col-span-1 flex items-center">
@@ -333,7 +345,7 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
                                                     />
                                                 </div>
                                                 <div className="col-span-1 flex items-center">
-                                                    {isPinned ? (
+                                                    {item.is_pin == true ? (
                                                         <button onClick={() => togglePin(item.id)} className="text-blue-500 hover:text-blue-700" title="Unpin">
                                                             <LuPin size={18} />
                                                         </button>
