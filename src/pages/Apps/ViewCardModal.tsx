@@ -7,6 +7,7 @@ import {
 import apiClient from '@/service/apiClient';
 import { useDispatch, useSelector } from "react-redux"
 import { fetchAlldata, fetchcellIdData, fetchPersonalData, fetchPinData } from '../../store/Slices/TableSlice';
+import { fetchItemCount } from '@/store/Slices/countSlice';
 import type { AppDispatch } from '@/store';
 import { LuLock } from 'react-icons/lu';
 import CellDropDwon from '../Components/Cells/CellDropDwon';
@@ -18,7 +19,7 @@ type TableItem = {
 };
 
 type Props = {
-  item: TableItem;          
+  item: TableItem;
   onClose: () => void;
   editMode?: boolean;
 };
@@ -31,7 +32,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
   const [showSecurityCode, setShowSecurityCode] = useState(false);
   const [showPin, setShowPin] = useState(false);
   const [cellId, setCellId] = useState<string | null>(null);
-  const [personal, setPersonal] = useState<boolean>(false);
+  const [personal, setPersonal] = useState<boolean>(true);
   const [currentcellId, setCurrentCellId] = useState<string>()
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -141,6 +142,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
       if (currentcellId) {
         dispatch(fetchcellIdData(currentcellId));
       }
+      dispatch(fetchItemCount());
     } catch (err: any) {
       console.error("Error updating card:", err);
       setError("Failed to update card.");

@@ -355,7 +355,7 @@ const Header = () => {
                     <div className="sm:flex-1 ltr:sm:ml-0  ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex items-center space-x-0 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6] gap-1 lg:gap-">
                         <div className="sm:ltr:mr-auto w-full  sm:rtl:ml-auto ">
                             <form
-                                className={`${search ? '!block' : ''} sm:relative absolute inset-x-0 sm:top-0 top-1/2 sm:translate-y-0 -translate-y-1/2 sm:mx-0 mx-4 z-10 sm:block hidden`}
+                                className={`${search ? '!block' : ''} sm:relative absolute inset-x-0 sm:top-0 top-1/2 sm:translate-y-0 -translate-y-1/2 sm:mx-0 mx-4 z-10 sm:block ml-[70px]`}
                                 onSubmit={(e) => {
                                     e.preventDefault();
                                     setSearch(false);
@@ -367,7 +367,7 @@ const Header = () => {
                                         placeholder="Search....."
                                         value={query}
                                         onChange={handleSearch}
-                                        className="textMedium py-2 ltr:pl-10 w-full placeholder: rounded-xl border peach:bg-gray-200 classic:bg-gray-100 lightmint:bg-green-50 blue:bg-[#e0edf7]  border-gray-300 bg-[#fbfbfb] dark:bg-[#2F2F2F] dark:border-[#2F2F2F]  dark:text-white dark:placeholder:text-white focus:outline-none focus:shadow-md transition peer "
+                                        className="textMedium py-2 ltr:pl-10 w-[42vw] placeholder: rounded-xl border peach:bg-gray-200 classic:bg-gray-100 lightmint:bg-green-50 blue:bg-[#e0edf7]  border-gray-300 bg-[#fbfbfb] dark:bg-[#2F2F2F] dark:border-[#2F2F2F]  dark:text-white dark:placeholder:text-white focus:outline-none focus:shadow-md transition peer "
                                     />
                                     <button type="button" className="absolute dark:text-white w-8 h-full flex items-center justify-center ml-1 inset-0 ltr:right-auto rtl:left-auto">
                                         <IoIosSearch size={20} className="mx-auto" />

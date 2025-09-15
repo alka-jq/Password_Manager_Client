@@ -98,7 +98,7 @@ const Pin = () => {
                 onBulkDelete={handleBulkDelete}
                 onView={handleView}
                 isLoading={loading}
-                onPinToggle={() => dispatch(fetchPinData())}
+                onPinToggle={()=>dispatch(fetchPinData())}
             />
 
             <DeleteModal isOpen={deleteModalOpen} onClose={handleDeleteCancel} onConfirm={handleDeleteConfirm} bulk={idsToDelete.length > 1} />

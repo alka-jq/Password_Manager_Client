@@ -21,6 +21,8 @@ const Personal = () => {
     // const [loading, setLoading] = useState(false);
     const { items, loading } = useSelector((state: RootState) => state.data);
 
+
+
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
     const [mergedItems, setMergedItems] = useState<Item[]>([]);
@@ -39,35 +41,35 @@ const Personal = () => {
     //     }
     // };
 
-    const fetchData = async () => {
-        try {
-            setIsLoading(true);
-            // Fetch personal data and pinned data separately
-            const personalRes = await getPersonaldata();
-            const pinRes = await getPindata();
+    // const fetchData = async () => {
+    //     try {
+    //         setIsLoading(true);
+    //         // Fetch personal data and pinned data separately
+    //         const personalRes = await getPersonaldata();
+    //         const pinRes = await getPindata();
 
-            const personalItems: Item[] = personalRes.data || [];
-            const pinnedItems: Item[] = pinRes.data || [];
+    //         const personalItems: Item[] = personalRes.data || [];
+    //         const pinnedItems: Item[] = pinRes.data || [];
 
-            // Create a set of pinned item ids for quick lookup
-            const pinnedIds = new Set(pinnedItems.map(item => item.id));
+    //         // Create a set of pinned item ids for quick lookup
+    //         const pinnedIds = new Set(pinnedItems.map(item => item.id));
 
-            // Merge pin status into personal items
-            const merged = personalItems.map(item => ({
-                ...item,
-                isPinned: pinnedIds.has(item.id),
-            }));
+    //         // Merge pin status into personal items
+    //         const merged = personalItems.map(item => ({
+    //             ...item,
+    //             isPinned: pinnedIds.has(item.id),
+    //         }));
 
-            setMergedItems(merged);
-        } catch (err) {
-            console.error('Error fetching personal or pinned data:', err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    //         setMergedItems(merged);
+    //     } catch (err) {
+    //         console.error('Error fetching personal or pinned data:', err);
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
 
     useEffect(() => {
-        fetchData();
+        dispatch(fetchPersonalData())
     }, []);
 
     // Handler functions
@@ -114,8 +116,10 @@ const Personal = () => {
     };
 
     const handlePinToggle = () => {
-        fetchData();
+        dispatch(fetchPersonalData())
     };
+
+
 
     return (
         <div>
@@ -126,7 +130,7 @@ const Personal = () => {
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}
                 onView={handleView}
-                isLoading={isLoading}
+                isLoading={loading}
                 onPinToggle={handlePinToggle}
             />
 
