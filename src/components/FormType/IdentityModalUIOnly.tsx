@@ -208,7 +208,6 @@ const IdentityModalUIOnly = () => {
                 return;
             }
             const data = await response.data;
-            console.log('Identity created:');
             dispatch(closeIdentityModal());
             resetForm();
             if (location.pathname === '/all_items') {

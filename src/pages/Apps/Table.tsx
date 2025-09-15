@@ -88,18 +88,13 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
 
     // Toggle pin for a specific item
     const togglePin = async (id: string) => {
-        console.log("just", pinState)
         const newPinState = !pinState[id];
-        console.log("curent pin status", newPinState)
-
         try {
-            let res = await togglePinStatus([id], newPinState);
-            console.log("afte api cal pin status", res)
+            await togglePinStatus([id], newPinState);
             setPinState((prev) => ({
                 ...prev,
                 [id]: newPinState,
             }));
-            console.log('now', pinState)
 
             if (location.pathname === '/all_items') {
                 dispatch(fetchAlldata());

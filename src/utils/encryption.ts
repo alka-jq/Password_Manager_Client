@@ -195,7 +195,7 @@ async function cachePublicKey(email: string, key: string, token: string): Promis
 }
 
 export async function discoverPublicKey(email: string, token: string): Promise<string | null> {
-    console.log("Discover Public Key Triggered for email:", email);
+    // console.log("Discover Public Key Triggered for email:", email);
     const domain = email.split('@')[1]?.toLowerCase();
     
     // Special handling for internal domains
@@ -245,7 +245,7 @@ async function fetchInternalPublicKey(email: string, token: string): Promise<str
     
     if (response.ok) {
       const keyData = await response.json();
-      console.log("Response from internal key fetch:", keyData);
+      // console.log("Response from internal key fetch:", keyData);
       if (keyData.publicKey) {
         console.log("Public key found for", email);
         // Cache the key locally
@@ -320,7 +320,7 @@ export async function encryptForMultipleRecipients(
 }> {
   const results = await Promise.all(
     recipients.map(async ({ email, type }) => {
-      console.log("Encrypting for recipient:", email);
+      // console.log("Encrypting for recipient:", email);
       try {
         const { encryptedBody, encryptedSubject, publicKeyUsed } = 
           await encryptEmailContent(email, subject, body, token);

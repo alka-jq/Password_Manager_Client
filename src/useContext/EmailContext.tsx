@@ -45,11 +45,11 @@ export const MailProvider = ({ children }: { children: React.ReactNode }) => {
       withCredentials: true,
     };
 
-    console.log('Fetching emails for page:', page);
+    // console.log('Fetching emails for page:', page);
 
     axios(config)
       .then((response) => {
-        console.log('Response', response.data);
+        // console.log('Response', response.data);
         setPagedMails(response.data.emails);
         setPaginationData(response.data.pagination);
         setIsLoading(false);
@@ -57,8 +57,8 @@ export const MailProvider = ({ children }: { children: React.ReactNode }) => {
       .catch((err) => {
         setIsLoading(false);
         if (err.response) {
-          console.error('Error:', err.response.status);
-          console.error('Backend Response:', err.response.data);
+          // console.error('Error:', err.response.status);
+          // console.error('Backend Response:', err.response.data);
         } else {
           console.error('Request Error:', err.message);
         }

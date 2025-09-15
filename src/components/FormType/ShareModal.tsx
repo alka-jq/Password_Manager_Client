@@ -25,7 +25,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, vaultToShare }
 
     try {
       const res = await apiClient.post("/api/card/share", sharepayload)
-      console.log(res)
+      // console.log(res)
       setInputValue("");
       onClose();
 

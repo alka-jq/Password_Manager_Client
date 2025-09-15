@@ -15,7 +15,6 @@ function GmailImport() {
   const baseUrl = import.meta.env.VITE_API_BASE_URL as string;
  const { token } = useAuth();
  const {profile} = useSettings();
- console.log(token)
   // Initialize Google API
   const loadGapiClient = async (): Promise<void> => {
     return new Promise((resolve) => {
@@ -120,12 +119,12 @@ function GmailImport() {
 const storeImportedEmails = async (importedMessages: Map<string, ProcessedEmail>) => {
   // Convert Map to array of objects (flatten to include message_id)
 
-  console.log("import inbox-0-----------", importedMessages)
+  // console.log("import inbox-0-----------", importedMessages)
   const emails = Array.from(importedMessages.entries()).map(([id, email]) => ({
     message_id: id,
     ...email
   }));
-console.log("email----------------",emails)
+// console.log("email----------------",emails)
   try {
     const response = await fetch(`${baseUrl}/mails/store-emails-to-db`, {
       method: 'POST',
@@ -142,7 +141,7 @@ console.log("email----------------",emails)
     }
 
     const data = await response.json();
-    console.log("Emails stored:", data);
+    // console.log("Emails stored:", data);
   } catch (error) {
     console.error("Error during email storage:", error);
   }
@@ -203,7 +202,7 @@ const handleImport = async () => {
     });
     setStatus('success');
    console.log(importedMessages,"imported message")
-    // 🔥 Call your storage function right after import completes!
+    //  Call your storage function right after import completes!
     await storeImportedEmails(importedMessages);
 
   } catch (err) {

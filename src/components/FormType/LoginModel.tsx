@@ -143,7 +143,7 @@ const TaskModalUIOnly = () => {
       }
 
       const response = await addLoginCredentials(formData);
-      console.log("Credential added:", response);
+      // console.log("Credential added:", response);
       dispatch(closeModal());
       if (location.pathname === '/all_items') {
         dispatch(fetchAlldata());

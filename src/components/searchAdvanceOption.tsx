@@ -81,7 +81,7 @@ const SearchPopup: React.FC<SearchPopupProps> = ({ openSearch, setOpenSearch, em
         const emailMap = new Map(emails.map((e) => [e.id.toString(), e]));
         results = searchResults.map((r) => emailMap.get(r.ref)).filter(Boolean) as DecryptedEmail[];
       } catch (error) {
-        console.error('🔍 Lunr search error:', error);
+        // console.error('🔍 Lunr search error:', error);
         return [];
       }
     }
@@ -138,20 +138,20 @@ const SearchPopup: React.FC<SearchPopupProps> = ({ openSearch, setOpenSearch, em
           start.setHours(0, 0, 0, 0);
           startMatch = emailDate >= start;
         }
-        console.log("start", startDate)
+        // console.log("start", startDate)
         if (endDate) {
           const end = new Date(endDate);
           end.setHours(23, 59, 59, 999);
           endMatch = emailDate <= end;
         }
-        console.log("end", endDate)
+        // console.log("end", endDate)
         return startMatch && endMatch;
       });
     }
 
     return results;
   }, [basicFilteredEmails, isAdvancedSearchTriggered, sender, recipient, startDate, endDate]);
-  console.log("filter data", finalFilteredEmails)
+  // console.log("filter data", finalFilteredEmails)
   // Reset all search filters
   const resetForm = () => {
     setSearchAdvanceTerm('');

@@ -78,7 +78,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
     useEffect(() => {
         if (isInIframe()) setIsIframe(true);
         window.addEventListener('scroll', onScrollHandler);
-        console.log(isOpen, 'From COntent');
+        // console.log(isOpen, 'From COntent');
 
         const screenLoader = document.getElementsByClassName('screen_loader');
         if (screenLoader?.length) {

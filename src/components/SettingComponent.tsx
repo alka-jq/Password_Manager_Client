@@ -21,7 +21,7 @@ const SettingComponent = () => {
         toggleAndUpdatePreference('Theme', themeKey);
         dispatch(toggleTheme(themeKey));
     };
-    console.log("check the font size in prefrences",preferences?.FontSize);
+    // console.log("check the font size in prefrences",preferences?.FontSize);
     
     const ref = useRef<HTMLDivElement>(null);
 
