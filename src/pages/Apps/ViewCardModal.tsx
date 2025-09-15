@@ -32,7 +32,7 @@ const ViewCardModal: React.FC<Props> = ({ item, onClose, editMode }) => {
   const [showSecurityCode, setShowSecurityCode] = useState(false);
   const [showPin, setShowPin] = useState(false);
   const [cellId, setCellId] = useState<string | null>(null);
-  const [personal, setPersonal] = useState<boolean>(false);
+  const [personal, setPersonal] = useState<boolean>(true);
   const [currentcellId, setCurrentCellId] = useState<string>()
   const modalRef = useRef<HTMLDivElement>(null);
 
