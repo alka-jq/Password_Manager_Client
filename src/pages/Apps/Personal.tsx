@@ -21,58 +21,14 @@ const Personal = () => {
     // const [loading, setLoading] = useState(false);
     const { items, loading } = useSelector((state: RootState) => state.data);
 
-
-
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [idsToDelete, setIdsToDelete] = useState<string[]>([]);
     const [mergedItems, setMergedItems] = useState<Item[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-
-    // const fetchData = async () => {
-    //     try {
-    //         setLoading(true);
-    //         const res = await dispatch(fetchPersonalData())
-    //         setItems(res);
-    //     } catch (err) {
-    //         console.log('backend error');
-    //         console.error(err);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
-    // const fetchData = async () => {
-    //     try {
-    //         setIsLoading(true);
-    //         // Fetch personal data and pinned data separately
-    //         const personalRes = await getPersonaldata();
-    //         const pinRes = await getPindata();
-
-    //         const personalItems: Item[] = personalRes.data || [];
-    //         const pinnedItems: Item[] = pinRes.data || [];
-
-    //         // Create a set of pinned item ids for quick lookup
-    //         const pinnedIds = new Set(pinnedItems.map(item => item.id));
-
-    //         // Merge pin status into personal items
-    //         const merged = personalItems.map(item => ({
-    //             ...item,
-    //             isPinned: pinnedIds.has(item.id),
-    //         }));
-
-    //         setMergedItems(merged);
-    //     } catch (err) {
-    //         console.error('Error fetching personal or pinned data:', err);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
 
     useEffect(() => {
         dispatch(fetchPersonalData())
     }, []);
 
-    // Handler functions
 
 
     const handleEdit = (id: string) => {
@@ -125,7 +81,7 @@ const Personal = () => {
         <div>
             {/* TaskList component */}
             <TaskList
-                data={mergedItems}
+                data={items}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}
@@ -133,7 +89,6 @@ const Personal = () => {
                 isLoading={loading}
                 onPinToggle={handlePinToggle}
             />
-
             <DeleteModal isOpen={deleteModalOpen} onClose={handleDeleteCancel} onConfirm={handleDeleteConfirm} bulk={idsToDelete.length > 1} />
         </div>
     );

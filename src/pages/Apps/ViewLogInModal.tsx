@@ -55,7 +55,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
   const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [cellId, setCellId] = useState<string | null>(null);
-  const [personal, setPersonal] = useState<boolean>(false);
+  const [personal, setPersonal] = useState<boolean>(true);
   const [currentcellId, setCurrentCellId] = useState<string>()
 
   useEffect(() => {
