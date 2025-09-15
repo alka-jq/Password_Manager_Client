@@ -9,7 +9,7 @@ import FilterDropdown from './FilterDropdown';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
 import { fetchItemCount } from '@/store/Slices/countSlice';
-import { fetchAlldata, fetchcellIdData, fetchPersonalData } from '../../store/Slices/TableSlice';
+import { fetchAlldata, fetchcellIdData, fetchPersonalData, fetchPinData } from '../../store/Slices/TableSlice';
 import { useParams } from 'react-router-dom';
 import logo from '../../assets/images/ubs icons/2-removebg-preview.png';
 import Loader from '../Components/Loader';
@@ -102,6 +102,9 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             }
             if (location.pathname === '/personal') {
                 dispatch(fetchPersonalData());
+            }
+            if (location.pathname === '/pin') {
+                dispatch(fetchPinData());
             }
             if (location.pathname === `/cell/${cellId}/${cellname}`)
                 if (cellId) {
@@ -205,11 +208,15 @@ const TaskList: React.FC<CommonTableProps> = ({ data, onEdit, onDelete, onBulkDe
             if (location.pathname === '/personal') {
                 dispatch(fetchPersonalData());
             }
+            if (location.pathname === '/pin') {
+                dispatch(fetchPinData());
+            }
             if (cellId) {
                 dispatch(fetchcellIdData(cellId));
             }
             dispatch(fetchItemCount());
             if (onPinToggle) onPinToggle();
+            setSelected(selected.map(() => false)); // clear selection after bulk pin
         } catch (error) {
             console.error('Bulk pin/unpin failed:', error);
         } finally {

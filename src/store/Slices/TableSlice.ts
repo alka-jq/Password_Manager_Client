@@ -103,7 +103,7 @@ const dataSlice = createSlice({
             })
             .addCase(fetchPinData.fulfilled, (state, action) => {
                 state.loading = false;
-                state.items = action.payload;
+                state.items = action.payload.map((item: Item) => ({ ...item, isPinned: true }));
             })
             .addCase(fetchPinData.rejected, (state, action) => {
                 state.loading = false;

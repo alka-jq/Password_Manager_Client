@@ -105,8 +105,8 @@ export const decryptFile = async (encryptedData: string, type?: string): Promise
       format: 'binary'
     });
 
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(decryptedBinary)));
-    return `data:${type || 'application/octet-stream'};base64,${base64}`;
+    const blob = new Blob([decryptedBinary], { type: type || 'application/octet-stream' });
+    return URL.createObjectURL(blob);
   } catch (err) {
     console.error('Error decrypting file:', err);
     throw err;

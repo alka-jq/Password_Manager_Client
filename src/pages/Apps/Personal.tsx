@@ -113,16 +113,21 @@ const Personal = () => {
         setIdsToDelete([]);
     };
 
+    const handlePinToggle = () => {
+        fetchData();
+    };
+
     return (
         <div>
             {/* TaskList component */}
             <TaskList
-                data={items}
+                data={mergedItems}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onBulkDelete={handleBulkDelete}
                 onView={handleView}
                 isLoading={isLoading}
+                onPinToggle={handlePinToggle}
             />
 
             <DeleteModal isOpen={deleteModalOpen} onClose={handleDeleteCancel} onConfirm={handleDeleteConfirm} bulk={idsToDelete.length > 1} />

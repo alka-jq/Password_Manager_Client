@@ -4,11 +4,11 @@ import { readMessage, readPrivateKey, decrypt } from 'openpgp';
 let privateKey: string | null = null;
 let publicKey: string | null = null;
 let authToken: string | null = null;
-
+console.log("Auth Token in cryptoUtils:", authToken);
 export const initializeCrypto = (token: string): void => {
   authToken = token;
 };
-
+console.log("Auth Token in cryptoUtils:", authToken);
 export const fetchUserKeys = async (): Promise<{ publicKey: string; privateKey: string }> => {
   if (!authToken) {
     throw new Error('Authentication token not set');

@@ -10,6 +10,8 @@ import { fetchAlldata, fetchcellIdData, fetchPersonalData, fetchPinData } from '
 import type { AppDispatch } from '@/store';
 import { ImageFile } from '@/components/imageFile';
 import CellDropDwon from '../Components/Cells/CellDropDwon';
+import { encryptFileattachment } from '@/utils/attachments-encryption';
+import { fetchUserKeys, initializeCrypto } from '@/utils/cryptoUtils';
 
 type TableItem = {
   id: string;
@@ -118,19 +120,38 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const handleSave = async () => {
+    const handleSave = async () => {
     if (!details) return;
 
     setLoading(true);
     setError(null);
-    
-    if (personal == true) {
-      console.log(personal)
-      setCellId('')
-      console.log(cellId)
-    }
+
+    // Removed the block that resets cellId when personal is true to allow coexistence
 
     try {
+      // Initialize crypto with token from localStorage
+      const token = localStorage.getItem('token');
+      if (token) {
+        initializeCrypto(token);
+      }
+
+      // Encrypt new files
+      const keys = await fetchUserKeys();
+      const publicKey = keys.publicKey;
+      const newAttachments = [];
+      for (const file of details.attachmentFiles || []) {
+        try {
+          const encrypted = await encryptFileattachment(file, publicKey);
+          newAttachments.push(encrypted);
+        } catch (err) {
+          console.error('Error encrypting file:', err);
+          setError('Failed to encrypt file.');
+          setLoading(false);
+          return;
+        }
+      }
+      const allAttachments = [...(details.attachments || []), ...newAttachments];
+
       const payload = {
         title: details.title,
         email: details.email,
@@ -139,7 +160,7 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
         two_factor_secret: details.totp,
         websites: details.websites,
         notes: details.note,
-        attachments: details.attachments,
+        attachments: allAttachments,
         is_personal: personal,
         is_pin: false,
         is_trash: false,
@@ -149,6 +170,8 @@ const ViewLogInModal = ({ item, onClose, editMode }: Props) => {
 
       const response = await apiClient.put(`/api/login-credentials/edit/${details.id}`, payload);
       console.log("Save successful:", response.data.message);
+      // Update local state
+      setDetails(prev => prev ? { ...prev, attachments: allAttachments, attachmentFiles: [] } : prev);
       onClose();
       if (location.pathname === '/all_items') {
         dispatch(fetchAlldata());

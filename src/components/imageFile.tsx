@@ -81,7 +81,14 @@ export const ImageFile: React.FC<ImageFileProps> = ({ attachments }) => {
               title={file.name}
             >
               <img src={icon} className="w-6 h-6 object-contain" alt="file icon" />
-              <div className="flex-1 truncate text-left"> {file.name}</div>
+              <a
+                href={file.url}
+                download={file.name}
+                className="flex-1 truncate text-left text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer"
+                title={`Download ${file.name}`}
+              >
+                {file.name}
+              </a>
             </div>
           </div>
         );
